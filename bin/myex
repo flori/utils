@@ -1,0 +1,90 @@
+#!/usr/bin/env ruby
+
+require 'spruz'
+include Spruz::GO
+
+def usage
+  puts <<EOT
+Usage: #{File.basename($0)} list|create|truncate|insert|replace [OPTION] [TABLES]
+
+  Commands are
+    - list:     display all tables in the backup
+
+    - create:   display all create table statements in the backup. If TABLES
+                are given, display only those statements.
+      -d        if this OPTION is given, first drop the table (if it exists)
+                before creation.
+
+    - truncate: all tables or the given TABLES, if they exist.
+
+    - insert:   extract insert statemnts from the backup. If TABLES are given,
+                extract only those statements for these TABLES.
+      -t        if this OPTION is given, truncate the table, before starting
+                to insert.
+
+    - replace:  extract insert statemnts from the backup, and convert them
+                into replace statements. If TABLES are given, extract only
+                those statements for these TABLES.
+EOT
+  exit 1
+end
+
+def bell(n = 1, s = 1)
+  n.times do
+    STDERR.print "\a\b"
+    sleep s
+  end
+end
+
+cmd = ARGV.shift or usage
+opts = go('dtD')
+
+STDOUT.sync = true
+case cmd
+when 'list'
+  STDIN.grep(/^CREATE TABLE `([^`]+)` \(/) { puts $1 }
+when 'create'
+  STDIN.grep(/^CREATE TABLE `([^`]+)` \(/) do |stmt|
+    table = $1
+    next unless ARGV.empty? or ARGV.member?(table)
+    if opts['d']
+      puts "DROP TABLE IF EXISTS `#{table}`;"
+      warn "Dropped table #{table}."
+    end
+    line = stmt
+    puts line
+    until line =~ /;$/
+      line = STDIN.readline
+      puts line
+    end
+    warn "Created table #{table}."
+  end
+when 'truncate'
+  STDIN.grep(/^CREATE TABLE `([^`]+)` \(/) do |stmt|
+    table = $1
+    next unless ARGV.empty? or ARGV.member?(table)
+    puts "TRUNCATE TABLE `#{table}`;"
+    warn "Truncated table #{table}."
+  end
+when 'insert'
+  truncated = {}
+  STDIN.grep(/^INSERT INTO `(#{ARGV.empty? ? '[^`]+' : ARGV * '|'})`/) do |stmt|
+    table = $1
+    if opts['t'] and not truncated.key?(table)
+      puts "TRUNCATE TABLE `#{table}`;"
+      truncated[table] = true
+      warn "Truncated table #{table}."
+    end
+    puts stmt
+    warn "Inserted into table #{table}."
+  end
+when 'replace'
+  STDIN.grep(/^INSERT INTO `(#{ARGV.empty? ? '[^`]+' : ARGV * '|'})`/) do |stmt|
+    table = $1
+    puts stmt.sub(/^INSERT INTO `(?:[^`]+)`/, "REPLACE INTO `#{table}`")
+    warn "Replaced into table #{table}."
+  end
+else
+  usage
+end
+bell 3

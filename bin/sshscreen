@@ -1,0 +1,68 @@
+#!/usr/bin/env ruby
+
+require 'fileutils'
+include FileUtils::Verbose
+require 'spruz/go'
+include Spruz::GO
+
+=begin
+~/.ssh/config:
+
+Host *
+  ForwardX11 = yes
+  ControlMaster auto
+  ControlPath ~/.ssh/%r@%h:%p.sock
+=end
+
+def usage
+  puts <<EOT
+Usage: #{File.basename($0)} [OPTS] [user@]remote[:port]"
+
+OPTS is one of
+  -N                  list all session names on the specified remote
+  -n NAME             name of the screen session to attach to
+  -t [HOST[:PORT]]    host:port to tunnel if different from LOCALPORT
+  -l LOCALPORT        the localport to forward to
+  -h                  to display this help
+
+EOT
+  exit 1
+end
+
+arguments = ARGV.dup
+opts = go 'l:t:n:hN', arguments
+usage if opts['h'] or arguments.size != 1
+user_remote = arguments.shift
+user, remote, rport =
+  case user_remote
+  when /\A(?:([^@:]+)@)?([^@:]+)(?::(\d+))?\Z/
+    user = $1 || ENV['USER']
+    user.to_s.empty? and fail "user required to login"
+    [ user, $2, $3 || '22' ]
+  else
+    usage
+  end
+lport = opts['l']
+tunnel, tport = if tunnel_port = opts['t']
+  case tunnel_port
+  when /\A([^:]+)(?::(\d+))?\Z/
+    [ $1, $2 || '22' ]
+  else
+    usage
+  end
+else
+  [ 'localhost', lport ]
+end
+ssh_dir = File.expand_path('~/.ssh')
+mkdir_p ssh_dir
+sock_file = "#{ssh_dir}/#{user}@#{remote}:#{rport}.sock"
+if opts['N']
+  exec "ssh -p #{rport} -S #{sock_file} #{user}@#{remote} screen -ls"
+elsif lport
+  File.exist? sock_file and rm_f sock_file
+  exec "ssh -p #{rport} -Mt -L localhost:#{lport}:#{tunnel}:#{tport}"\
+    " -S #{sock_file} #{user}@#{remote} screen -DUR #{opts['n']}"
+else
+  File.exist? sock_file and rm_f sock_file
+  exec "ssh -p #{rport} -Mt -S #{sock_file} #{user}@#{remote} screen -DUR #{opts['n']}"
+end

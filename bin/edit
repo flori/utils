@@ -1,0 +1,74 @@
+#!/usr/bin/env ruby
+
+require 'tempfile'
+
+def cmd(*parts)
+  command = parts.inject([]) do |a, p|
+    case
+    when p == nil, p == []
+      a
+    when p.respond_to?(:to_ary)
+      a.concat p.to_ary
+    else
+      a << p.to_s
+    end
+  end
+  $DEBUG and warn command * ' '
+  command
+end
+
+case `uname -s`
+when /\Adarwin/i
+  vim = if File.directory?('/Applications/Installed')
+          '/Applications/Installed/MacVim.app/Contents/MacOS/Vim'
+        elsif File.directory?('/Applications')
+          '/Applications/MacVim.app/Contents/MacOS/Vim'
+        else
+          fail "cannot find MacVim.app"
+        end
+else
+  vim       = 'gvim'
+  geometry  = [ '-geometry', '80x59' ]
+end
+servername  = [ '--servername', "G#{ENV['USER'].upcase}" ]
+
+argv = ARGV.dup
+if argv.empty?
+  if !STDIN.tty?
+    file = File.new(File.join(Dir.tmpdir, "edit_tmp.#$$"), 'w')
+    until STDIN.eof?
+      buffer = STDIN.read(8192)
+      file.write buffer
+    end
+    file.close
+    argv << file.path
+  elsif `#{vim} -g --serverlist`.split.member?(servername)
+    system *cmd(vim, '-g', geometry, servername, '--remote', "stupid_trick#{rand}")
+    sleep 1
+    exec *cmd(vim, '-g', geometry, servername, '--remote-send', '<ESC>:bw<CR>')
+  else
+    exec *cmd(vim, '-g', geometry, servername)
+  end
+end
+unless argv.empty?
+  lineno_re = /^\s*([^:]+):(\d+)/
+  if argv.first =~ lineno_re
+    for a in argv
+      if a =~ lineno_re
+        system *cmd(vim, '-g', geometry, servername, '--remote', $1)
+        sleep 1
+        system *cmd(vim, '-g', geometry, servername, '--remote-send', "<ESC>:#$2<CR>")
+      else
+        system *cmd(vim, '-g', geometry, servername, '--remote', a)
+      end
+      if a != argv.last
+        STDOUT.print "Press enter to edit the next file."
+        STDOUT.flush
+        STDIN.gets
+      end
+    end
+  else
+    exec *cmd(vim, '-g', geometry, servername, '--remote', *argv)
+  end
+end
+exit 0

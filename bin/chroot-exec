@@ -1,0 +1,12 @@
+#!/bin/sh
+DIR=$1
+test -z "$DIR" && exit 1
+PRG=$2
+test -z "$PRG" && PRG=/bin/bash
+mount -t proc none $DIR/proc
+mount -o bind /dev $DIR/dev
+[ -e "$DIR/etc/resolv.conf" ] && cp -vLf "$DIR/etc/resolv.conf" "$DIR/etc/resolv.conf.bak"
+cp -vLf /etc/resolv.conf "$DIR/etc/resolv.conf"
+chroot $DIR $PRG
+umount $DIR/proc
+umount $DIR/dev

@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+
+require 'spruz/go'
+include Spruz::GO
+
+class ::String
+  def camelize(first_letter_in_uppercase = true)
+    if first_letter_in_uppercase
+      gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
+    else
+      self[0].chr.downcase + camelize(self)[1..-1]
+    end
+  end
+
+  def underscore
+    word = dup
+    word.gsub!(/::/, '/')
+    word.gsub!(/([A-Z]+)([A-Z][a-z])/,'\1_\2')
+    word.gsub!(/([a-z\d])([A-Z])/,'\1_\2')
+    word.tr!("-", "_")
+    word.downcase!
+    word
+  end
+end
+
+opts = go 'bd'
+
+string  = ARGV.shift or fail "need a class/filepath/filename"
+
+if opts['d']
+  string = string.sub(/.*::/, '') if opts['b']
+  print string.underscore + '.rb'
+else
+  string = File.basename(string) if opts['b']
+  string = string.gsub(/#{Regexp.quote(File.extname(string))}\Z/, '')
+  print string.camelize
+end

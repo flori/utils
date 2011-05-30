@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+require 'utils'
+
+puts 'Install config into home directory? (yes/NO)'
+if gets =~ /^yes$/i
+  Utils::Config.install_config
+else
+  exit 1
+end

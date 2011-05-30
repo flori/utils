@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+require 'spruz/xt/write'
+
+for filename in ARGV
+  File.open(filename) do |input|
+    write(filename) do |output|
+      until input.eof?
+        line = input.readline
+        line.sub!(/^(\s*)test "(.+)" do\s*$/) do
+          "#$1def test_" << $2.downcase.gsub(/\A[^a-z]/, '').gsub(/[ -]/, '_').delete('^0-9a-z_')
+        end
+        output.puts line
+      end
+    end
+  end
+end

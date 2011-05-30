@@ -1,0 +1,18 @@
+#!/usr/bin/env ruby
+
+require 'fileutils'
+include FileUtils::Verbose
+
+msg = "Usage: #$0 EXECUTABLE DIR [LIB ..]"
+executable = ARGV.shift or fail msg
+dir = ARGV.shift or fail msg 
+dir = File.expand_path dir
+mkdir_p dir
+
+executable = `which #{executable}`.chomp
+libs = `ldd #{executable}`.gsub(/^(?:.*?\s+=>\s+|\s+)(.*?)\(.*/, '\1').grep(/\S/).map { |x| x.strip }
+libs.concat ARGV
+cd dir
+for l in libs
+  cp l, File.basename(l)
+end

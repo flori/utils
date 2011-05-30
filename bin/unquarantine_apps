@@ -1,0 +1,8 @@
+#!/bin/sh
+
+prefix=$1
+if [ -d $prefix/Applications ]
+then
+  cd $prefix/Applications
+  xattr -rd com.apple.quarantine
+fi

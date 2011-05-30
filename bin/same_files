@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+
+require 'utils'
+include Utils::MD5
+
+def find_same(*pathes)
+  files = Hash.new { |h,k| h[k] = {} }
+  Utils::Find.find(*pathes) do |filename|
+    file_stat = File.stat(filename)
+    if file_stat.file?
+      size = file_stat.size
+      $DEBUG and warn "Encountered '#{filename}' (#{size} bytes)."
+      files[size][filename] = true
+    end
+  end
+
+  files = files.inject({}) do |h, (_,fs)|
+    keys = fs.keys
+    if keys.size >= 2
+      keys.each { |k| h[k] = true }
+    end
+    h
+  end.keys
+
+  md5s = Hash.new { |h,k| h[k] = [] }
+  for filename in files
+    md5sum = md5 filename
+    md5s[md5sum] << filename
+  end
+  files = md5s.values
+  files.reject! { |fs| fs.size < 2 }
+  files
+end
+
+puts find_same(*ARGV).map { |fs| [ fs.size, fs ] }.sort.map { |c, fs|
+  "#{c}\t#{fs.sort.map { |f| "'#{f}'" } * "\t"}"
+}

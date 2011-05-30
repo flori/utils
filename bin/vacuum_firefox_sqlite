@@ -1,0 +1,22 @@
+#!/bin/sh
+
+case `uname -s` in
+Darwin)
+  profiles="$HOME/Library/Application Support/Firefox/Profiles/"
+  ;;
+*)
+  profiles="$HOME/.mozilla/firefox/"
+  ;;
+esac
+
+cd "$profiles"
+for p in *.default
+do
+  cd $p
+  for db in *.sqlite
+  do
+    echo "Vacuuming $db..."
+    sqlite3 $db VACUUM
+  done
+  cd -
+done
