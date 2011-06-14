@@ -1,5 +1,5 @@
 begin
-  require 'rake/gempackagetask'
+  require 'rubygems/package_task'
 rescue LoadError
 end
 require 'rake/clean'
@@ -38,7 +38,7 @@ if defined? Gem
     end
   end
 
-  Rake::GemPackageTask.new(spec) do |pkg|
+  Gem::PackageTask.new(spec) do |pkg|
     pkg.need_tar = true
     pkg.package_files += PKG_FILES
   end
@@ -61,8 +61,8 @@ EOT
   end
 end
 
-desc "Default task: write version and test"
-task :default => [ :version, :test ]
+desc "Default task: write version"
+task :default => [ :version ]
 
 desc "Prepare a release"
 task :release => [ :clean, :version, :gemspec, :package ]
