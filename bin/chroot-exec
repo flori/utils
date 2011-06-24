@@ -1,12 +1,15 @@
-#!/bin/sh
-DIR=$1
-test -z "$DIR" && exit 1
-PRG=$2
-test -z "$PRG" && PRG=/bin/bash
-mount -t proc none $DIR/proc
-mount -o bind /dev $DIR/dev
-[ -e "$DIR/etc/resolv.conf" ] && cp -vLf "$DIR/etc/resolv.conf" "$DIR/etc/resolv.conf.bak"
-cp -vLf /etc/resolv.conf "$DIR/etc/resolv.conf"
-chroot $DIR $PRG
-umount $DIR/proc
-umount $DIR/dev
+#!/usr/bin/env ruby
+
+require 'fileutils'
+include FileUtils
+
+dir = ARGV.shift or fail 'require directory to chroot into'
+prg = ARGV.shift || '/bin/bash'
+system "mount -t proc none #{dir}/proc"
+system "mount -o bind /dev #{dir}/dev"
+File.exist?(resolv = "#{dir}/etc/resolv.conf") and
+  cp resolv, resolv + '.bak'
+cp '/etc/resolv.conf', resolv
+system "chroot #{dir} #{prg}"
+system "umount #{dir}/proc"
+system "umount #{dir}/dev"
