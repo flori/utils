@@ -1,36 +1,17 @@
 #!/usr/bin/env ruby
 
+require 'spruz/go'
+include Spruz::GO
+require 'utils/edit'
+include Utils::Edit
 require 'tempfile'
 
-def cmd(*parts)
-  command = parts.inject([]) do |a, p|
-    case
-    when p == nil, p == []
-      a
-    when p.respond_to?(:to_ary)
-      a.concat p.to_ary
-    else
-      a << p.to_s
-    end
-  end
-  $DEBUG and warn command * ' '
-  command
-end
+$opt = go 'w'
 
-case `uname -s`
-when /\Adarwin/i
-  vim = if File.directory?('/Applications/Installed')
-          '/Applications/Installed/MacVim.app/Contents/MacOS/Vim'
-        elsif File.directory?('/Applications')
-          '/Applications/MacVim.app/Contents/MacOS/Vim'
-        else
-          fail "cannot find MacVim.app"
-        end
-else
-  vim       = 'gvim'
-  geometry  = [ '-geometry', '80x59' ]
-end
+vim = locate_vim_binary
 servername  = [ '--servername', "G#{ENV['USER'].upcase}" ]
+serverlist = `#{vim} -g --serverlist`.split
+remote = $opt['w'] ? '--remote-wait' : '--remote'
 
 argv = ARGV.dup
 if argv.empty?
@@ -42,12 +23,12 @@ if argv.empty?
     end
     file.close
     argv << file.path
-  elsif `#{vim} -g --serverlist`.split.member?(servername)
-    system *cmd(vim, '-g', geometry, servername, '--remote', "stupid_trick#{rand}")
+  elsif serverlist.member?(servername)
+    system *cmd(vim, '-g', servername, remote, "stupid_trick#{rand}")
     sleep 1
-    exec *cmd(vim, '-g', geometry, servername, '--remote-send', '<ESC>:bw<CR>')
+    exec *cmd(vim, '-g', servername, '--remote-send', '<ESC>:bw<CR>')
   else
-    exec *cmd(vim, '-g', geometry, servername)
+    exec *cmd(vim, '-g', servername, remote)
   end
 end
 unless argv.empty?
@@ -55,11 +36,11 @@ unless argv.empty?
   if argv.first =~ lineno_re
     for a in argv
       if a =~ lineno_re
-        system *cmd(vim, '-g', geometry, servername, '--remote', $1)
+        system *cmd(vim, '-g', servername, remote, $1)
         sleep 1
-        system *cmd(vim, '-g', geometry, servername, '--remote-send', "<ESC>:#$2<CR>")
+        system *cmd(vim, '-g', servername, '--remote-send', "<ESC>:#$2<CR>")
       else
-        system *cmd(vim, '-g', geometry, servername, '--remote', a)
+        system *cmd(vim, '-g', servername, remote, a)
       end
       if a != argv.last
         STDOUT.print "Press enter to edit the next file."
@@ -68,7 +49,7 @@ unless argv.empty?
       end
     end
   else
-    exec *cmd(vim, '-g', geometry, servername, '--remote', *argv)
+    exec *cmd(vim, '-g', servername, remote, *argv)
   end
 end
 exit 0
