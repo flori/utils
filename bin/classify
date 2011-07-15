@@ -2,26 +2,7 @@
 
 require 'spruz/go'
 include Spruz::GO
-
-class ::String
-  def camelize(first_letter_in_uppercase = true)
-    if first_letter_in_uppercase
-      gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
-    else
-      self[0].chr.downcase + camelize(self)[1..-1]
-    end
-  end
-
-  def underscore
-    word = dup
-    word.gsub!(/::/, '/')
-    word.gsub!(/([A-Z]+)([A-Z][a-z])/,'\1_\2')
-    word.gsub!(/([a-z\d])([A-Z])/,'\1_\2')
-    word.tr!("-", "_")
-    word.downcase!
-    word
-  end
-end
+require 'spruz/xt/string'
 
 opts = go 'bd'
 

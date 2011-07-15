@@ -22,8 +22,8 @@ when 'prefix', 'postfix'
     path.push part
   end
 when 'edit'
-  if path = ARGV.first
-    path = path.split(path_separator)
+  if path_argument = ARGV.first
+    path = path_argument.split(path_separator)
     path.map! { |part| File.expand_path(part) }
   end
   path_file = File.join(Dir.tmpdir, "path_temp.#$$")

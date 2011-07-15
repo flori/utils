@@ -24,7 +24,7 @@ if defined? Gem
 
     s.bindir = "bin"
     s.executables.concat Dir['bin/*'].map { |f| File.basename(f) }
-    s.add_dependency 'spruz'
+    s.add_dependency 'spruz', '~>0.2.10'
     s.add_dependency 'term-ansicolor'
 
     s.author = "Florian Frank"

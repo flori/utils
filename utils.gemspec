@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{utils}
-  s.version = "0.0.4"
+  s.version = "0.0.5"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = [%q{Florian Frank}]
-  s.date = %q{2011-06-26}
+  s.date = %q{2011-07-15}
   s.description = %q{This ruby gem provides some useful command line utilities}
   s.email = %q{flori@ping.de}
   s.executables = [%q{untest}, %q{chroot-libs}, %q{edit_wait}, %q{chroot-exec}, %q{number_files}, %q{search}, %q{path}, %q{edit}, %q{git-empty}, %q{classify}, %q{utils-install-config}, %q{xmp}, %q{discover}, %q{sshscreen}, %q{myex}, %q{errf}, %q{same_files}, %q{unquarantine_apps}, %q{vacuum_firefox_sqlite}, %q{sedit}]
@@ -20,14 +20,14 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<spruz>, [">= 0"])
+      s.add_runtime_dependency(%q<spruz>, ["~> 0.2.10"])
       s.add_runtime_dependency(%q<term-ansicolor>, [">= 0"])
     else
-      s.add_dependency(%q<spruz>, [">= 0"])
+      s.add_dependency(%q<spruz>, ["~> 0.2.10"])
       s.add_dependency(%q<term-ansicolor>, [">= 0"])
     end
   else
-    s.add_dependency(%q<spruz>, [">= 0"])
+    s.add_dependency(%q<spruz>, ["~> 0.2.10"])
     s.add_dependency(%q<term-ansicolor>, [">= 0"])
   end
 end
