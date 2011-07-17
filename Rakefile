@@ -1,68 +1,32 @@
-begin
-  require 'rubygems/package_task'
-rescue LoadError
-end
-require 'rake/clean'
-require 'rbconfig'
-include Config
+# vim: set filetype=ruby et sw=2 ts=2:
 
-PKG_NAME    = 'utils'
-PKG_VERSION = File.read('VERSION').chomp
-PKG_FILES   = Dir['**/*']#FileList['**/*'].exclude(/(CVS|\.svn|pkg|.git*)/)
-PKG_FILES.reject! { |f| f =~ /\Apkg/ }
+require 'gem_hadar'
 
-if defined? Gem
-  spec = Gem::Specification.new do |s|
-    s.name = PKG_NAME
-    s.version = PKG_VERSION
-    s.summary = "Some useful command line utilities"
-    s.description = "This ruby gem provides some useful command line utilities"
+GemHadar do
+  name        'utils'
+  author      'Florian Frank'
+  email       'flori@ping.de'
+  homepage    "http://github.com/flori/#{name}"
+  summary     'Some useful command line utilities'
+  description 'This ruby gem provides some useful command line utilities'
+  bindir      'bin'
+  executables = Dir['bin/*'].map(&File.method(:basename))
+  test_dir    'tests'
+  ignore      '.*.sw[pon]', 'pkg', 'Gemfile.lock'
+  readme      'README.rdoc'
+  executables  << 'bs_compare'
 
-    s.files = PKG_FILES
+  dependency  'spruz', '~>0.2.10'
+  dependency  'term-ansicolor', '1.0.5'
 
-    s.require_path = 'lib'
-
-    s.bindir = "bin"
-    s.executables.concat Dir['bin/*'].map { |f| File.basename(f) }
-    s.add_dependency 'spruz', '~>0.2.10'
-    s.add_dependency 'term-ansicolor'
-
-    s.author = "Florian Frank"
-    s.email = "flori@ping.de"
-    s.homepage = "http://flori.github.com/utils"
-  end
-
-  task :gemspec do
-    File.open('utils.gemspec', 'w') do |output|
-      output.write spec.to_ruby
+  install_library do
+    libdir = CONFIG["sitelibdir"]
+    install('lib/bullshit.rb', libdir, :mode => 0644)
+    mkdir_p subdir = File.join(libdir, 'bullshit')
+    for f in Dir['lib/bullshit/*.rb']
+      install(f, subdir)
     end
-  end
-
-  Gem::PackageTask.new(spec) do |pkg|
-    pkg.need_tar = true
-    pkg.package_files += PKG_FILES
+    bindir = CONFIG["bindir"]
+    install('bin/bs_compare', bindir, :mode => 0755)
   end
 end
-
-desc m = "Writing version information for #{PKG_VERSION}"
-task :version do
-  puts m
-  File.open(File.join('lib', PKG_NAME, 'version.rb'), 'w') do |v|
-    v.puts <<EOT
-module Utils
-  # Utils version
-  VERSION         = '#{PKG_VERSION}'
-  VERSION_ARRAY   = VERSION.split(/\\./).map { |x| x.to_i } # :nodoc:
-  VERSION_MAJOR   = VERSION_ARRAY[0] # :nodoc:
-  VERSION_MINOR   = VERSION_ARRAY[1] # :nodoc:
-  VERSION_BUILD   = VERSION_ARRAY[2] # :nodoc:
-end
-EOT
-  end
-end
-
-desc "Default task: write version"
-task :default => [ :version ]
-
-desc "Prepare a release"
-task :release => [ :clean, :version, :gemspec, :package ]
