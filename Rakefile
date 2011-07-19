@@ -10,11 +10,10 @@ GemHadar do
   summary     'Some useful command line utilities'
   description 'This ruby gem provides some useful command line utilities'
   bindir      'bin'
-  executables = Dir['bin/*'].map(&File.method(:basename))
+  executables Dir['bin/*'].map(&File.method(:basename))
   test_dir    'tests'
   ignore      '.*.sw[pon]', 'pkg', 'Gemfile.lock'
   readme      'README.rdoc'
-  executables cd('bin') { Dir['*'] }
 
   dependency  'spruz', '~>0.2.10'
   dependency  'term-ansicolor', '1.0.5'
