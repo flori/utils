@@ -14,19 +14,25 @@ GemHadar do
   test_dir    'tests'
   ignore      '.*.sw[pon]', 'pkg', 'Gemfile.lock'
   readme      'README.rdoc'
-  executables  << 'bs_compare'
+  executables cd('bin') { Dir['*'] }
 
   dependency  'spruz', '~>0.2.10'
   dependency  'term-ansicolor', '1.0.5'
 
   install_library do
     libdir = CONFIG["sitelibdir"]
-    install('lib/bullshit.rb', libdir, :mode => 0644)
-    mkdir_p subdir = File.join(libdir, 'bullshit')
-    for f in Dir['lib/bullshit/*.rb']
-      install(f, subdir)
+    cd 'lib' do
+      for file in Dir['**/*.rb']
+        dest = File.join(libdir, File.dirname(file))
+        mkdir_p dest
+        install(file, dest)
+      end
     end
     bindir = CONFIG["bindir"]
-    install('bin/bs_compare', bindir, :mode => 0755)
+    cd 'bin' do
+      for file in executables
+        install(file, bindir, :mode => 0755)
+      end
+    end
   end
 end
