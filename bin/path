@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+
+require 'spruz/go'
+include Spruz::GO
+require 'spruz/xt/write'
+require 'tempfile'
+
+path_separator = RUBY_PLATFORM =~ /mswin32/ ? ';' : ':'
+path = (ENV['PATH'] || '').split(path_separator)
+path.map! { |part| File.expand_path(part) }
+
+$opt = go('e')
+
+case cmd = ARGV.shift
+when 'prefix', 'postfix'
+  part = ARGV.shift or fail 'need a path part to prefix'
+  part = File.expand_path(part)
+  path.delete part
+  if cmd == 'prefix'
+    path.unshift part
+  else
+    path.push part
+  end
+when 'edit'
+  if path_argument = ARGV.first
+    path = path_argument.split(path_separator)
+    path.map! { |part| File.expand_path(part) }
+  end
+  path_file = File.join(Dir.tmpdir, "path_temp.#$$")
+  File.write path_file, path * "\n"
+  system "edit -w #{path_file.inspect}"
+  path = File.read(path_file).split(/\n/)
+  path.map! { |part| File.expand_path(part) }
+end
+
+path.uniq!
+
+puts "#{'export ' if $opt['e']}PATH=#{path * path_separator}"

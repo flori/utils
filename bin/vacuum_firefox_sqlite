@@ -1,22 +1,23 @@
-#!/bin/sh
+#!/usr/bin/env ruby
 
-case `uname -s` in
-Darwin)
-  profiles="$HOME/Library/Application Support/Firefox/Profiles/"
-  ;;
-*)
-  profiles="$HOME/.mozilla/firefox/"
-  ;;
-esac
+require 'fileutils'
+include FileUtils
 
-cd "$profiles"
-for p in *.default
-do
-  cd $p
-  for db in *.sqlite
-  do
-    echo "Vacuuming $db..."
-    sqlite3 $db VACUUM
-  done
-  cd -
-done
+case `uname -s`.chomp
+when 'Darwin'
+  profiles="#{ENV['HOME']}/Library/Application Support/Firefox/Profiles"
+else
+  profiles="#{ENV['HOME']}/.mozilla/firefox"
+end
+
+cd profiles do
+  for p in Dir['*.default']
+    cd p do
+      for db in Dir['*.sqlite']
+        print "Vacuuming #{db}..."
+        system "sqlite3 #{db} VACUUM"
+        puts "done."
+      end
+    end
+  end
+end

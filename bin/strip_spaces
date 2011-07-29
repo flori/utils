@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+
+require 'spruz/write'
+include Spruz::Write
+
+for file in ARGV
+  write(file) do |output|
+    File.open(file) do |file|
+      old_mode = file.stat.mode
+      file.each do |line|
+        line.gsub!(/[ \t\v]+$/, '')
+        output.write line
+      end
+      File.chmod old_mode, output.path
+    end
+  end
+end
