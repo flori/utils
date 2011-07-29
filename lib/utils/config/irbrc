@@ -448,8 +448,17 @@ def ls(*args)
   puts `ls #{args.map { |x| "'#{x}'" } * ' '}`
 end
 
-if ENV['RAILS_LOG'].to_i == 1
-  require 'logger'
-  Object.const_defined?(:RAILS_DEFAULT_LOGGER) or
-  Object.const_set :RAILS_DEFAULT_LOGGER, Logger.new(STDOUT)
+if defined?(ActiveRecord::Base)
+  $logger = Logger.new(STDERR)
+  def irb_toggle_logging
+    require 'logger'
+    if ActiveRecord::Base.logger != $logger
+      $old_logger = ActiveRecord::Base.logger
+      ActiveRecord::Base.logger = $logger
+      true
+    else
+      ActiveRecord::Base.logger = $old_logger
+      false
+    end
+  end
 end
