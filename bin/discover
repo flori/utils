@@ -54,7 +54,9 @@ class Finder
     pathes.flatten!
     pathes.uniq!
     pathes.map! { |p| a = File.split(p) ; a.unshift(p) ; a }
+    @suffix = @args['I']
     pathes = pathes.map! do |path, dir, file|
+      @suffix && @suffix != File.extname(file)[1..-1] and next
       if do_match = attempt_match?(path) and $DEBUG
         warn "Attempt match of #{path.inspect}"
       end
@@ -113,13 +115,14 @@ Options are
   -i          use case insensitive matches
   -e          open the matching files with edit command
   -a CSET     use only character set CSET from PATTERN
+  -I SUFFIX   only include files with suffix SUFFIX during finding
   -h          display this help
 
   EOT
   exit 1
 end
 
-args = go 'a:rdDcieh'
+args = go 'I:a:rdDcieh'
 args['h'] and usage 
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }

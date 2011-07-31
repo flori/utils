@@ -143,8 +143,13 @@ class Grepper
   end
 
   def search
+    @suffix = @args['I']
     for dir in @roots
-      Utils::Find.find(dir) { |filename| match(filename) }
+      Utils::Find.find(dir) do |filename|
+        if !@suffix || @suffix == File.extname(filename)[1..-1]
+          match(filename)
+        end
+      end
     end
     @pathes.sort!
     self
@@ -178,6 +183,7 @@ Options are
   -R          interpret PATTERN argument as fuzzy not regex
   -c          disable color output
   -i          use case insensitive matches
+  -I SUFFIX   only include files with suffix SUFFIX in search
   -e          open the matching files with edit command
   -a CSET     use only character set CSET from PATTERN
   -h          display this help
@@ -186,7 +192,7 @@ Options are
   exit 1
 end
 
-args = go 'A:B:C:s:S:n:N:a:RcilLeh'
+args = go 'I:A:B:C:s:S:n:N:a:RcilLeh'
 args['h'] and usage 
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }
