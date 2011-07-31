@@ -107,7 +107,7 @@ directory and file pathes that are searched.
 Options are
 
   -r          interpret PATTERN argument as regex not fuzzy
-  -d          discover directorіes as well
+  -d          discover directories as well
   -D          discover only directories
   -c          disable color output
   -i          use case insensitive matches
