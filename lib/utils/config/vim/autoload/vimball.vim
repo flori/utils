@@ -122,7 +122,7 @@ fun! vimball#MkVimball(line1,line2,writelevel,...) range
   while linenr <= a:line2
    let svfile  = getline(linenr)
 "   call Decho("svfile<".svfile.">")
- 
+
    if !filereadable(svfile)
     call vimball#ShowMesg(s:ERROR,"unable to read file<".svfile.">")
 	call s:ChgDir(curdir)
@@ -130,7 +130,7 @@ fun! vimball#MkVimball(line1,line2,writelevel,...) range
 "    call Dret("MkVimball")
     return
    endif
- 
+
    " create/switch to mkvimball tab
    if !exists("vbtabnr")
     tabnew
@@ -139,7 +139,7 @@ fun! vimball#MkVimball(line1,line2,writelevel,...) range
    else
     exe "tabn ".vbtabnr
    endif
- 
+
    let lastline= line("$") + 1
    if lastline == 2 && getline("$") == ""
 	call setline(1,'" Vimball Archiver by Charles E. Campbell, Jr., Ph.D.')
@@ -189,7 +189,7 @@ endfun
 
 " ---------------------------------------------------------------------
 " vimball#Vimball: extract and distribute contents from a vimball {{{2
-"                  (invoked the the UseVimball command embedded in 
+"                  (invoked the the UseVimball command embedded in
 "                  vimballs' prologue)
 fun! vimball#Vimball(really,...)
 "  call Dfunc("vimball#Vimball(really=".a:really.") a:0=".a:0)
@@ -242,7 +242,7 @@ fun! vimball#Vimball(really,...)
   " give title to listing of (extracted) files from Vimball Archive
   if a:really
    echohl Title     | echomsg "Vimball Archive"         | echohl None
-  else             
+  else
    echohl Title     | echomsg "Vimball Archive Listing" | echohl None
    echohl Statement | echomsg "files would be placed under: ".home | echohl None
   endif
@@ -421,7 +421,7 @@ fun! vimball#RmVimball(...)
   if filereadable(".VimballRecord")
 "   call Decho(".VimballRecord is readable")
 "   call Decho("curfile<".curfile.">")
-   keepalt keepjumps 1split 
+   keepalt keepjumps 1split
    sil! keepalt keepjumps e .VimballRecord
    let keepsrch= @/
 "   call Decho('search for ^\M'.curfile.'.\m: ')
@@ -606,7 +606,7 @@ fun! s:RecordInFile(home)
   if exists("s:recordfile") || exists("s:recorddir")
    let curdir= getcwd()
    call s:ChgDir(a:home)
-   keepalt keepjumps 1split 
+   keepalt keepjumps 1split
 
    let cmd= expand("%:tr").": "
 "   call Decho("cmd<".cmd.">")

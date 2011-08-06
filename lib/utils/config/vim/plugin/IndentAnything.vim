@@ -1,12 +1,12 @@
 "
-" Copyright 2006 Tye Zdrojewski 
+" Copyright 2006 Tye Zdrojewski
 "
 " Licensed under the Apache License, Version 2.0 (the "License"); you may not
 " use this file except in compliance with the License. You may obtain a copy of
 " the License at
-" 
+"
 " 	http://www.apache.org/licenses/LICENSE-2.0
-" 
+"
 " Unless required by applicable law or agreed to in writing, software distributed
 " under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 " CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -240,7 +240,7 @@ function! IndentAnything()
     " Find non-blank lines above the current line.
     let lastlnum = prevnonblank(currlnum - 1)
     let prevlnum = prevnonblank(lastlnum - 1)
-    if lastlnum != 0 
+    if lastlnum != 0
         let lastline = getline(lastlnum)
     endif
     if prevlnum != 0
@@ -249,7 +249,7 @@ function! IndentAnything()
     if b:contTraversesLineComments
         let lastcodelnum = GetPrevNonBlankNonComment(currlnum - 1)
         let prevcodelnum = GetPrevNonBlankNonComment(lastcodelnum - 1)
-        if lastcodelnum !=0 
+        if lastcodelnum !=0
             let lastcodeline = getline(lastcodelnum)
         endif
     endif
@@ -281,7 +281,7 @@ function! IndentAnything()
         " If we're not in the middle of a block comment (because we haven't
         " made any adjustments for that), then process block indentation.
         for trio in b:indentTrios
-            let b:pairadj += s:GetPairIndent(currline, lastline, lastlnum, 
+            let b:pairadj += s:GetPairIndent(currline, lastline, lastlnum,
                         \ trio[0], trio[1], trio[2])
         endfor
     endif
@@ -392,8 +392,8 @@ function! s:GetPostBlockCommentIndent(LastLNum)
 
     let l:ind = indent(l:comment_start_lnum)
 
-    if 1 || l:ind != 0 && b:indent_anything_echo 
-        let g:lastindent = g:lastindent . 
+    if 1 || l:ind != 0 && b:indent_anything_echo
+        let g:lastindent = g:lastindent .
                     \ "GetPostBlockCommentIndent: " . l:ind
     endif
 
@@ -460,7 +460,7 @@ function! s:GetPairIndent(CurrLine, LastLine, LastLNum, Head, Mid, Tail)
         " If the line starts with an open, The close shouldn't be counted as
         " such, because we're looking for closes that didn't start on this
         " line.
-        if a:LastLine =~ '^\s*' . a:Head || 
+        if a:LastLine =~ '^\s*' . a:Head ||
                     \ (a:Mid != '' && a:LastLine =~ '^\s*' . a:Mid)
             let levels = 1
         endif
@@ -479,19 +479,19 @@ function! s:GetPairIndent(CurrLine, LastLine, LastLNum, Head, Mid, Tail)
                 " *if* there was a match, and not worry about where it is.
                 "
                 "let pairend = searchpair(a:Head, a:Mid, a:Tail, 'W')
-                "if pairend == 0 || a:LastLNum != pairend 
+                "if pairend == 0 || a:LastLNum != pairend
                 "let pairend = searchpair(a:Head, a:Mid, a:Tail, 'W', '', a:LastLNum)
                 let pairend = searchpair(a:Head, a:Mid, a:Tail, 'W',
                             \'InCommentOrString()', a:LastLNum)
-                if pairend == 0 "|| a:LastLNum != pairend 
+                if pairend == 0 "|| a:LastLNum != pairend
 
                     " STARTS with a:Tail, since we already know the line
                     " matches it.
                     if b:lastclosed.at < col('.') && (
-                                \ a:LastLine =~ '^\s*' . a:Tail 
+                                \ a:LastLine =~ '^\s*' . a:Tail
                                 \ || (a:Mid != '' && a:LastLine =~ '^\s*' . a:Mid) )
-                        let b:lastclosed = { 
-                                    \ 'at' : col('.'), 
+                        let b:lastclosed = {
+                                    \ 'at' : col('.'),
                                     \ 'head' : a:Head,
                                     \ 'mid' : a:Mid,
                                     \ 'tail' : a:Tail }
@@ -511,8 +511,8 @@ function! s:GetPairIndent(CurrLine, LastLine, LastLNum, Head, Mid, Tail)
                 " Track the last close to try to match pairs that start on
                 " line continuations
                 if b:lastclosed.at < col('.')
-                    let b:lastclosed = { 
-                                \ 'at'   : col('.'), 
+                    let b:lastclosed = {
+                                \ 'at'   : col('.'),
                                 \ 'head' : a:Head,
                                 \ 'mid'  : a:Mid,
                                 \ 'tail' : a:Tail }
@@ -525,7 +525,7 @@ function! s:GetPairIndent(CurrLine, LastLine, LastLNum, Head, Mid, Tail)
     " If the current line starts with a close, count it.  It won't effect the
     " indentation of the next line because it is the first thing on the line
     " and won't be counted as a "close on the last line".
-    if a:CurrLine =~ '^\s*' . a:Tail 
+    if a:CurrLine =~ '^\s*' . a:Tail
                 \ || (a:Mid != '' && a:CurrLine =~ '^\s*' . a:Mid)
         let levels -= 1
     endif
@@ -535,7 +535,7 @@ function! s:GetPairIndent(CurrLine, LastLine, LastLNum, Head, Mid, Tail)
 
     let adj = &sw*levels
     if adj != 0 && b:indent_anything_echo
-        let g:lastindent = g:lastindent . 
+        let g:lastindent = g:lastindent .
                     \ "GetPairIndent(" . a:Head . "/" . b:lastclosed.at . "):" . adj . " "
     endif
 
@@ -571,7 +571,7 @@ function! s:GetContIndent(Rule, CurrLine, LastLine, LastLNum, PrevLNum)
 
     " Should be able to just search to the line....
     " " Figure out the last and previous continuation status
-    " if lastmatchlnum && lastmatchlnum == a:LastLNum 
+    " if lastmatchlnum && lastmatchlnum == a:LastLNum
     "     let lastcont = 1
     " endif
     if lastmatchlnum == a:LastLNum
@@ -612,7 +612,7 @@ function! s:GetContIndent(Rule, CurrLine, LastLine, LastLNum, PrevLNum)
     endif
 
     " Should be able to just search to the line....
-    " if ( lastmatchlnum && lastmatchlnum == a:PrevLNum ) 
+    " if ( lastmatchlnum && lastmatchlnum == a:PrevLNum )
     "             \ || ( prevmatchlnum && prevmatchlnum == l:prevlnum )
     "     let prevcont = 1
     " endif
@@ -626,11 +626,11 @@ function! s:GetContIndent(Rule, CurrLine, LastLine, LastLNum, PrevLNum)
         let prevcont = 1
     endif
 
-    "echom "lastcont: " . lastcont . 
-    "            \ ", prevcont: " . prevcont . 
+    "echom "lastcont: " . lastcont .
+    "            \ ", prevcont: " . prevcont .
     "            \ ", lastmatchlnum: " . lastmatchlnum .
     "            \ ", prevmatchlnum: " . prevmatchlnum .
-    "            \ ", lastlnum: " . a:LastLNum . 
+    "            \ ", lastlnum: " . a:LastLNum .
     "            \ ", PrevLNum: " . a:PrevLNum
     let firstcont = (lastcont && !prevcont)
     let firstcont = ((lastcont && !prevcont) || (lastcont && b:pairadj))
@@ -645,14 +645,14 @@ function! s:GetContIndent(Rule, CurrLine, LastLine, LastLNum, PrevLNum)
 
 
     "if firstcont && a:CurrLine !~ '^\s*{'
-    if firstcont 
+    if firstcont
         if has_key(a:Rule, 'ignore') && a:CurrLine =~ a:Rule.ignore
             let g:lastindent .= "(ignoring '" . a:Rule.ignore . "') "
         else
             let adj = adj + &sw
         endif
         "elseif postcont && a:LastLine !~ '^\s*{' "&& !b:pairadj
-    elseif postcont 
+    elseif postcont
         if has_key(a:Rule, 'ignore') && a:LastLine =~ a:Rule.ignore
             let g:lastindent .= "(ignoring '" . a:Rule.ignore . "') "
         else
@@ -663,7 +663,7 @@ function! s:GetContIndent(Rule, CurrLine, LastLine, LastLNum, PrevLNum)
     call cursor(origline, origcol)
 
     if adj != 0 && b:indent_anything_echo
-        let g:lastindent = g:lastindent . 
+        let g:lastindent = g:lastindent .
                     \ "GetContIndent('" . a:Rule.pattern . "'):" . adj . " "
     endif
     return adj

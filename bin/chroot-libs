@@ -5,7 +5,7 @@ include FileUtils::Verbose
 
 msg = "Usage: #$0 EXECUTABLE DIR [LIB ..]"
 executable = ARGV.shift or fail msg
-dir = ARGV.shift or fail msg 
+dir = ARGV.shift or fail msg
 dir = File.expand_path dir
 mkdir_p dir
 

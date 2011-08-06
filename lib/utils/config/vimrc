@@ -255,7 +255,7 @@ if has("autocmd")
     autocmd FileType tex map <buffer> <F6> <ESC><F1>:!acroread `echo %\|sed -e 's/tex/pdf/'`<CR><CR>
   augroup END
 
-  augroup c 
+  augroup c
     autocmd!
     autocmd FileType c setl sw=4 ts=4 cinoptions= formatoptions=cqrol cindent
     autocmd FileType c map <buffer> <F1> <ESC>:make<CR>

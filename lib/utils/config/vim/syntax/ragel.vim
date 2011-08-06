@@ -33,10 +33,10 @@ syntax keyword ocKeyword and bitor xor compl bitand and_eq or_eq xor_eq not not_
 syntax keyword ocKeyword static_cast dynamic_cast
 
 " D Keywords
-syntax keyword ocType wchar dchar bit byte ubyte ushort uint ulong cent ucent 
+syntax keyword ocType wchar dchar bit byte ubyte ushort uint ulong cent ucent
 syntax keyword ocType cfloat ifloat cdouble idouble real creal ireal
 syntax keyword ocKeyword abstract alias align asm assert body cast debug delegate
-syntax keyword ocKeyword deprecated export final finally foreach function import in inout 
+syntax keyword ocKeyword deprecated export final finally foreach function import in inout
 syntax keyword ocKeyword interface invariant is mixin module out override package pragma
 syntax keyword ocKeyword super synchronized typeof unittest version with
 
@@ -161,5 +161,5 @@ hi link fsmKeyword Keyword
 hi link anyLabel Label
 hi link caseLabelKeyword Keyword
 hi link beginRL Type
- 
+
 let b:current_syntax = "ragel"

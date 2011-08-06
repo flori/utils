@@ -53,7 +53,7 @@ define rp
   else
     set $rbasic = (struct RBasic*)$arg0
   #  output  $rbasic
-  #  echo \ =\ 
+  #  echo \ =\
   #  output *$rbasic
   #  echo \n
     set $flags = (*$rbasic).flags & 0x3f
@@ -179,32 +179,18 @@ define rp
   end
   end
 end
-document rp
-rubyの組み込みオブジェクトを表示する
-end
 
 define nd_type
   print nodetype($arg0)
-end
-document nd_type
-ruby node の型を表示
 end
 
 define nd_file
   print ((NODE*)$arg0)->nd_file
 end
-document nd_file
-node のソースファイル名を表示
-end
 
 define nd_line
   print nodeline($arg0)
 end
-document nd_line
-node の行番号を表示
-end
-
-# ruby node のメンバを表示
 
 define nd_head
   print "u1.node"

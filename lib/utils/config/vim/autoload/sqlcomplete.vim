@@ -4,19 +4,19 @@
 " Version:     9.0
 " Last Change: 2010 May 13
 " Usage:       For detailed help
-"              ":help sql.txt" 
-"              or ":help ft-sql-omni" 
+"              ":help sql.txt"
+"              or ":help ft-sql-omni"
 "              or read $VIMRUNTIME/doc/sql.txt
 
 " History
 " Version 9.0
 "     This change removes some of the support for tables with spaces in their
-"     names in order to simplify the regexes used to pull out query table 
+"     names in order to simplify the regexes used to pull out query table
 "     aliases for more robust table name and column name code completion.
 "     Full support for "table names with spaces" can be added in again
 "     after 7.3.
 " Version 8.0
-"     Incorrectly re-executed the g:ftplugin_sql_omni_key_right and g:ftplugin_sql_omni_key_left 
+"     Incorrectly re-executed the g:ftplugin_sql_omni_key_right and g:ftplugin_sql_omni_key_left
 "     when drilling in and out of a column list for a table.
 " Version 7.0
 "     Better handling of object names
@@ -25,7 +25,7 @@
 "
 " Set completion with CTRL-X CTRL-O to autoloaded function.
 " This check is in place in case this script is
-" sourced directly instead of using the autoload feature. 
+" sourced directly instead of using the autoload feature.
 if exists('&omnifunc')
     " Do not set the option if already set since this
     " results in an E117 warning.
@@ -35,7 +35,7 @@ if exists('&omnifunc')
 endif
 
 if exists('g:loaded_sql_completion')
-    finish 
+    finish
 endif
 let g:loaded_sql_completion = 70
 
@@ -50,7 +50,7 @@ let s:tbl_alias             = []
 let s:tbl_cols              = []
 let s:syn_list              = []
 let s:syn_value             = []
- 
+
 " Used in conjunction with the syntaxcomplete plugin
 let s:save_inc              = ""
 let s:save_exc              = ""
@@ -60,7 +60,7 @@ endif
 if exists('g:omni_syntax_group_exclude_sql')
     let s:save_exc = g:omni_syntax_group_exclude_sql
 endif
- 
+
 " Used with the column list
 let s:save_prev_table       = ""
 
@@ -91,7 +91,7 @@ if !exists('g:omni_sql_include_owner')
         if g:loaded_dbext >= 300
             " New to dbext 3.00, by default the table lists include the owner
             " name of the table.  This is used when determining how much of
-            " whatever has been typed should be replaced as part of the 
+            " whatever has been typed should be replaced as part of the
             " code replacement.
             let g:omni_sql_include_owner = 1
         endif
@@ -121,7 +121,7 @@ function! sqlcomplete#Complete(findstart, base)
             let begindot = 1
         endif
         while start > 0
-            " Additional code was required to handle objects which 
+            " Additional code was required to handle objects which
             " can contain spaces like "my table name".
             if line[start - 1] !~ '\(\w\|\.\)'
                 " If the previous character is not a period or word character
@@ -131,7 +131,7 @@ function! sqlcomplete#Complete(findstart, base)
             elseif line[start - 1] =~ '\w'
                 " If the previous character is word character continue back
                 let start -= 1
-            elseif line[start - 1] =~ '\.' && 
+            elseif line[start - 1] =~ '\.' &&
                         \ compl_type =~ 'column\|table\|view\|procedure'
                 " If the previous character is a period and we are completing
                 " an object which can be specified with a period like this:
@@ -141,7 +141,7 @@ function! sqlcomplete#Complete(findstart, base)
                 " If lastword has already been set for column completion
                 " break from the loop, since we do not also want to pickup
                 " a table name if it was also supplied.
-                if lastword != -1 && compl_type == 'column' 
+                if lastword != -1 && compl_type == 'column'
                     break
                 endif
                 " If column completion was specified stop at the "." if
@@ -152,8 +152,8 @@ function! sqlcomplete#Complete(findstart, base)
                 endif
                 " If omni_sql_include_owner = 0, do not include the table
                 " name as part of the substitution, so break here
-                if lastword == -1 && 
-                            \ compl_type =~ 'table\|view\|procedure\column_csv' && 
+                if lastword == -1 &&
+                            \ compl_type =~ 'table\|view\|procedure\column_csv' &&
                             \ g:omni_sql_include_owner == 0
                     let lastword = start
                     break
@@ -197,7 +197,7 @@ function! sqlcomplete#Complete(findstart, base)
 
     if compl_type == 'table' ||
                 \ compl_type == 'procedure' ||
-                \ compl_type == 'view' 
+                \ compl_type == 'view'
 
         " This type of completion relies upon the dbext.vim plugin
         if s:SQLCCheck4dbext() == -1
@@ -235,7 +235,7 @@ function! sqlcomplete#Complete(findstart, base)
 
         if base == ""
             " The last time we displayed a column list we stored
-            " the table name.  If the user selects a column list 
+            " the table name.  If the user selects a column list
             " without a table name of alias present, assume they want
             " the previous column list displayed.
             let base = s:save_prev_table
@@ -254,16 +254,16 @@ function! sqlcomplete#Complete(findstart, base)
             " has entered:
             "    owner.table
             "    table.column_prefix
-            " So there are a couple of things we can do to mitigate 
+            " So there are a couple of things we can do to mitigate
             " this issue.
             "    1.  Check if the dbext plugin has the option turned
             "        on to even allow owners
             "    2.  Based on 1, if the user is showing a table list
-            "        and the DrillIntoTable (using <Right>) then 
+            "        and the DrillIntoTable (using <Right>) then
             "        this will be owner.table.  In this case, we can
-            "        check to see the table.column exists in the 
+            "        check to see the table.column exists in the
             "        cached table list.  If it does, then we have
-            "        determined the user has actually chosen 
+            "        determined the user has actually chosen
             "        owner.table, not table.column_prefix.
             let found = -1
             if g:omni_sql_include_owner == 1 && owner == ''
@@ -288,7 +288,7 @@ function! sqlcomplete#Complete(findstart, base)
         endif
 
         " Get anything after the . and consider this the table name
-        " If an owner has been specified, then we must consider the 
+        " If an owner has been specified, then we must consider the
         " base to be a partial column name
         " let base  = matchstr( base, '^\(.*\.\)\?\zs.*' )
 
@@ -342,8 +342,8 @@ function! sqlcomplete#Complete(findstart, base)
 
     if base != ''
         " Filter the list based on the first few characters the user entered.
-        " Check if the text matches at the beginning 
-        " or 
+        " Check if the text matches at the beginning
+        " or
         " Match to a owner.table or alias.column type match
         " or
         " Handle names with spaces "my table name"
@@ -363,7 +363,7 @@ endfunc
 
 function! sqlcomplete#PreCacheSyntax(...)
     let syn_group_arr = []
-    if a:0 > 0 
+    if a:0 > 0
         let syn_group_arr = a:1
     else
         let syn_group_arr = g:omni_sql_precache_syntax_groups
@@ -404,7 +404,7 @@ function! sqlcomplete#DrillIntoTable()
 	" If the popup is not visible, simple perform the normal
 	" key behaviour.
 	" Must use exec since they key must be preceeded by "\"
-	" or feedkeys will simply push each character of the string 
+	" or feedkeys will simply push each character of the string
 	" rather than the "key press".
         exec 'call feedkeys("\'.g:ftplugin_sql_omni_key_right.'", "n")'
     endif
@@ -421,7 +421,7 @@ function! sqlcomplete#DrillOutOfColumns()
 	" If the popup is not visible, simple perform the normal
 	" key behaviour.
 	" Must use exec since they key must be preceeded by "\"
-	" or feedkeys will simply push each character of the string 
+	" or feedkeys will simply push each character of the string
 	" rather than the "key press".
         exec 'call feedkeys("\'.g:ftplugin_sql_omni_key_left.'", "n")'
     endif
@@ -430,16 +430,16 @@ endfunction
 
 function! s:SQLCWarningMsg(msg)
     echohl WarningMsg
-    echomsg a:msg 
+    echomsg a:msg
     echohl None
 endfunction
-      
+
 function! s:SQLCErrorMsg(msg)
     echohl ErrorMsg
-    echomsg a:msg 
+    echomsg a:msg
     echohl None
 endfunction
-      
+
 function! s:SQLCGetSyntaxList(syn_group)
     let syn_group  = a:syn_group
     let compl_list = []
@@ -450,7 +450,7 @@ function! s:SQLCGetSyntaxList(syn_group)
         " Return previously cached value
         let compl_list = s:syn_value[list_idx]
     else
-        " Request the syntax list items from the 
+        " Request the syntax list items from the
         " syntax completion plugin
         if syn_group == 'syntax'
             " Handle this special case.  This allows the user
@@ -498,7 +498,7 @@ function! s:SQLCAddAlias(table_name, table_alias, cols)
     let table_alias = a:table_alias
     let cols        = a:cols
 
-    if g:omni_sql_use_tbl_alias != 'n' 
+    if g:omni_sql_use_tbl_alias != 'n'
         if table_alias == ''
             if 'da' =~? g:omni_sql_use_tbl_alias
                 if table_name =~ '_'
@@ -508,13 +508,13 @@ function! s:SQLCAddAlias(table_name, table_alias, cols)
                     setlocal iskeyword-=_
 
                     " Get the first letter of each word
-                    " [[:alpha:]] is used instead of \w 
+                    " [[:alpha:]] is used instead of \w
                     " to catch extended accented characters
                     "
-                    let table_alias = substitute( 
-                                \ table_name, 
-                                \ '\<[[:alpha:]]\+\>_\?', 
-                                \ '\=strpart(submatch(0), 0, 1)', 
+                    let table_alias = substitute(
+                                \ table_name,
+                                \ '\<[[:alpha:]]\+\>_\?',
+                                \ '\=strpart(submatch(0), 0, 1)',
                                 \ 'g'
                                 \ )
                     " Restore original value
@@ -542,7 +542,7 @@ function! s:SQLCAddAlias(table_name, table_alias, cols)
     return cols
 endfunction
 
-function! s:SQLCGetObjectOwner(object) 
+function! s:SQLCGetObjectOwner(object)
     " The owner regex matches a word at the start of the string which is
     " followed by a dot, but doesn't include the dot in the result.
     " ^           - from beginning of line
@@ -555,7 +555,7 @@ function! s:SQLCGetObjectOwner(object)
     " let owner = matchstr( a:object, '^\s*\zs.*\ze\.' )
     let owner = matchstr( a:object, '^\("\|\[\)\?\zs\.\{-}\ze\("\|\]\)\?\.' )
     return owner
-endfunction 
+endfunction
 
 function! s:SQLCGetColumns(table_name, list_type)
     " Check if the table name was provided as part of the column name
@@ -582,7 +582,7 @@ function! s:SQLCGetColumns(table_name, list_type)
     if list_idx > -1
         let table_cols = split(s:tbl_cols[list_idx], '\n')
     else
-        " Check if we have already cached the column list for this table 
+        " Check if we have already cached the column list for this table
         " by its alias, assuming the table_name provided was actually
         " the alias for the table instead
         "     select *
@@ -600,7 +600,7 @@ function! s:SQLCGetColumns(table_name, list_type)
     " And the table ends in a "." or we are looking for a column list
     " if list_idx == -1 && (a:table_name =~ '\.' || b:sql_compl_type =~ 'column')
     " if list_idx == -1 && (a:table_name =~ '\.' || a:list_type =~ 'csv')
-    if list_idx == -1 
+    if list_idx == -1
          let saveY      = @y
          let saveSearch = @/
          let saveWScan  = &wrapscan
@@ -611,7 +611,7 @@ function! s:SQLCGetColumns(table_name, list_type)
          setlocal nowrapscan
          " If . was entered, look at the word just before the .
          " We are looking for something like this:
-         "    select * 
+         "    select *
          "      from customer c
          "     where c.
          " So when . is pressed, we need to find 'c'
@@ -638,15 +638,15 @@ function! s:SQLCGetColumns(table_name, list_type)
          " if query =~? '^\c\(select\)'
          if query =~? '^\(select\|update\|delete\)'
              let found = 1
-             "  \(\(\<\w\+\>\)\.\)\?   - 
+             "  \(\(\<\w\+\>\)\.\)\?   -
              " '\c\(from\|join\|,\).\{-}'  - Starting at the from clause (case insensitive)
              " '\zs\(\(\<\w\+\>\)\.\)\?' - Get the owner name (optional)
-             " '\<\w\+\>\ze' - Get the table name 
+             " '\<\w\+\>\ze' - Get the table name
              " '\s\+\<'.table_name.'\>' - Followed by the alias
              " '\s*\.\@!.*'  - Cannot be followed by a .
              " '\(\<where\>\|$\)' - Must be followed by a WHERE clause
              " '.*'  - Exclude the rest of the line in the match
-             " let table_name_new = matchstr(@y, 
+             " let table_name_new = matchstr(@y,
              "             \ '\c\(from\|join\|,\).\{-}'.
              "             \ '\zs\(\("\|\[\)\?.\{-}\("\|\]\)\.\)\?'.
              "             \ '\("\|\[\)\?.\{-}\("\|\]\)\?\ze'.
@@ -657,7 +657,7 @@ function! s:SQLCGetColumns(table_name, list_type)
              "             \ '\(\<where\>\|$\)'.
              "             \ '.*'
              "             \ )
-             let table_name_new = matchstr(@y, 
+             let table_name_new = matchstr(@y,
                          \ '\c\(\<from\>\|\<join\>\|,\)\s*'.
                          \ '\zs\(\("\|\[\)\?\w\+\("\|\]\)\?\.\)\?'.
                          \ '\("\|\[\)\?\w\+\("\|\]\)\?\ze'.
@@ -699,7 +699,7 @@ function! s:SQLCGetColumns(table_name, list_type)
 
          " Return to previous location
          call cursor(curline, curcol)
-         
+
          if found == 0
              if g:loaded_dbext > 300
                  exec 'DBSetOption use_tbl_alias='.saveSettingAlias
@@ -708,7 +708,7 @@ function! s:SQLCGetColumns(table_name, list_type)
              " Not a SQL statement, do not display a list
              return []
          endif
-    endif 
+    endif
 
     if empty(table_cols)
         " Specify silent mode, no messages to the user (tbl, 1)

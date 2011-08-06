@@ -14,7 +14,7 @@ let b:indent_anything_echo = 1
 
 "
 " Adjust the default indentation for comments.  Set the comments for html to
-" look like this: 
+" look like this:
 "
 "       <!--
 "          - comment here

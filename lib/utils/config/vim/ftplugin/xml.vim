@@ -1,6 +1,6 @@
 " Vim script file                                           vim600:fdm=marker:
 " FileType:     XML
-" Author:       Devin Weaver <vim (at) tritarget.com> 
+" Author:       Devin Weaver <vim (at) tritarget.com>
 " Maintainer:   Devin Weaver <vim (at) tritarget.com>
 " Last Change:  $Date: 2008-10-16 10:01:12 -0400 (Thu, 16 Oct 2008) $
 " Version:      $Revision: 78 $
@@ -16,14 +16,14 @@
 "                 install documentation code and providing good bug fixes.
 "               Guo-Peng Wen for the self install documentation code.
 "               Shawn Boles <ickybots (at) gmail.com> for fixing the
-"                 <Leader>x cancelation bug. 
+"                 <Leader>x cancelation bug.
 "               Martijn van der Kwast <mvdkwast@gmx.net> for patching
 "                 problems with multi-languages (XML and PHP).
 
 " This script provides some convenience when editing XML (and some SGML)
 " formated documents.
 
-" Section: Documentation 
+" Section: Documentation
 " ----------------------
 "
 " Documentation should be available by ":help xml-plugin" command, once the
@@ -31,11 +31,11 @@
 "
 " You still can read the documentation at the end of this file. Locate it by
 " searching the "xml-plugin" string (and set ft=help to have
-" appropriate syntaxic coloration). 
+" appropriate syntaxic coloration).
 
 " Note: If you used the 5.x version of this file (xmledit.vim) you'll need to
 " comment out the section where you called it since it is no longer used in
-" version 6.x. 
+" version 6.x.
 
 " TODO: Revamp ParseTag to pull appart a tag a rebuild it properly.
 " a tag like: <  test  nowrap  testatt=foo   >
@@ -53,9 +53,9 @@ let b:last_wrap_atts_used = ""
 
 " WrapTag -> Places an XML tag around a visual selection.            {{{1
 " Brad Phelan: Wrap the argument in an XML tag
-" Added nice GUI support to the dialogs. 
+" Added nice GUI support to the dialogs.
 " Rewrote function to implement new algorythem that addresses several bugs.
-if !exists("*s:WrapTag") 
+if !exists("*s:WrapTag")
 function s:WrapTag(text)
     if (line(".") < line("'<"))
         let insert_cmd = "o"
@@ -125,7 +125,7 @@ function s:Callback( xml_tag, isHtml )
         let text = HtmlAttribCallback (a:xml_tag)
     elseif exists ("*XmlAttribCallback")
         let text = XmlAttribCallback (a:xml_tag)
-    endif       
+    endif
     if text != '0'
         execute "normal! i " . text ."\<Esc>l"
     endif
@@ -148,7 +148,7 @@ function s:IsParsableTag( tag )
     if strpart (a:tag, strlen (a:tag) - 2, 1) == '/'
         let parse = 0
     endif
-    
+
     return parse
 endfunction
 endif
@@ -257,7 +257,7 @@ function s:BuildTagName( )
   "forwards command will jump to the next tag otherwise
 
   " Store contents of register x in a variable
-  let b:xreg = @x 
+  let b:xreg = @x
 
   exec "normal! v\"xy"
   if @x=='>'
@@ -289,7 +289,7 @@ function s:BuildTagName( )
 endfunction
 endif
 
-" TagMatch1 -> First step in tag matching.                           {{{1 
+" TagMatch1 -> First step in tag matching.                           {{{1
 " Brad Phelan: First step in tag matching.
 if !exists("*s:TagMatch1")
 function s:TagMatch1()
@@ -306,13 +306,13 @@ function s:TagMatch1()
   if match(b:xreg, '^/')==-1
     let endtag = 0
   else
-    let endtag = 1  
+    let endtag = 1
   endif
 
  " Extract the tag from the whole tag block
  " eg if the block =
  "   tag attrib1=blah attrib2=blah
- " we will end up with 
+ " we will end up with
  "   tag
  " with no trailing or leading spaces
  let b:xreg=substitute(b:xreg,'^/','','g')
@@ -320,7 +320,7 @@ function s:TagMatch1()
  " Make sure the tag is valid.
  " Malformed tags could be <?xml ?>, <![CDATA[]]>, etc.
  if match(b:xreg,'^[[:alnum:]_:\-]') != -1
-     " Pass the tag to the matching 
+     " Pass the tag to the matching
      " routine
      call <SID>TagMatch2(b:xreg, endtag)
  endif
@@ -349,7 +349,7 @@ function s:TagMatch2(tag,endtag)
   endif
 
   if a:endtag==0
-     let stk = 1 
+     let stk = 1
   else
      let stk = 1
   end
@@ -360,7 +360,7 @@ function s:TagMatch2(tag,endtag)
  let wrapval = &wrapscan
  let &wrapscan = 1
 
-  "Get the current location of the cursor so we can 
+  "Get the current location of the cursor so we can
   "detect if we wrap on ourselves
   let lpos = line(".")
   let cpos = col(".")
@@ -375,8 +375,8 @@ function s:TagMatch2(tag,endtag)
       let iter = -1
   endif
 
-  "Loop until stk == 0. 
-  while 1 
+  "Loop until stk == 0.
+  while 1
      " exec search.
      " Make sure to avoid />$/ as well as /\s$/ and /$/.
      exec "normal! " . match_type . '<\s*\/*\s*' . a:tag . '\([[:blank:]>]\|$\)' . "\<Cr>"
@@ -404,7 +404,7 @@ function s:TagMatch2(tag,endtag)
 
      if match(b:xreg,'^/')==-1
         " Found start tag
-        let stk = stk + iter 
+        let stk = stk + iter
      else
         " Found end tag
         let stk = stk - iter
@@ -412,7 +412,7 @@ function s:TagMatch2(tag,endtag)
 
      if stk == 0
         break
-     endif    
+     endif
   endwhile
 
   let &wrapscan = wrapval
@@ -453,7 +453,7 @@ endif
 " VisualTag -> Selects Tag body in a visual selection.                {{{1
 " Modifies mark z
 if !exists("*s:VisualTag")
-function s:VisualTag( ) 
+function s:VisualTag( )
     if strpart (getline ("."), col (".") - 1, 1) == "<"
         normal! l
     endif
@@ -467,7 +467,7 @@ function s:VisualTag( )
     normal! `z
 endfunction
 endif
- 
+
 " InsertGt -> close tags only if the cursor is in a HTML or XML context {{{1
 " Else continue editing
 if !exists("*s:InsertGt")
@@ -488,7 +488,7 @@ function s:InsertGt( )
   else
     if col(".") == col("$") - 1
       startinsert!
-    else 
+    else
       execute "normal! l"
       startinsert
     endif
@@ -559,7 +559,7 @@ function! s:XmlInstallDocumentation(full_name, revision)
     " Figure out document path based on full name of this script:
     let l:vim_plugin_path = fnamemodify(a:full_name, ':h')
     "let l:vim_doc_path   = fnamemodify(a:full_name, ':h:h') . l:doc_path
-    let l:vim_doc_path    = matchstr(l:vim_plugin_path, 
+    let l:vim_doc_path    = matchstr(l:vim_plugin_path,
             \ '.\{-}\ze\%(\%(ft\)\=plugin\|macros\)') . l:doc_path
     if (!(filewritable(l:vim_doc_path) == 2))
         echomsg "Doc path: " . l:vim_doc_path
@@ -740,7 +740,7 @@ ex. <hr> becomes <hr /> (see |xml-plugin-settings|)
 
 NOTE: If you used the VIM 5.x version of this file (xmledit.vim) you'll need
 to comment out the section where you called it. It is no longer used in the
-VIM 6.x version. 
+VIM 6.x version.
 
 Known Bugs {{{2 ~
 
@@ -938,4 +938,4 @@ The following is a sample html.vim file type plugin you could use:
 === END_DOC
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim: set tabstop=8 shiftwidth=4 softtabstop=4 smartindent
-" vim600: set foldmethod=marker smarttab fileencoding=iso-8859-15 
+" vim600: set foldmethod=marker smarttab fileencoding=iso-8859-15

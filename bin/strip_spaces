@@ -2,10 +2,22 @@
 
 require 'spruz/secure_write'
 include Spruz::SecureWrite
+require 'utils'
+include Utils::Find
 
-for file in ARGV
-  secure_write(file) do |output|
-    File.open(file) do |file|
+class ::File
+  include Utils::FileXt
+end
+
+argv = ARGV.empty? ?  %w[.] : ARGV
+
+find(*argv) do |path|
+  File.basename(path) =~ /\A\./ and prune
+  File.directory?(path) and next
+  File.ascii?(path) or next
+  STDOUT.puts "Stripping spaces from #{path.inspect}."
+  secure_write(path) do |output|
+    File.open(path) do |file|
       old_mode = file.stat.mode
       file.each do |line|
         line.gsub!(/[ \t\v]+$/, '')

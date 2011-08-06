@@ -141,7 +141,7 @@ class WrapperBase
   def hash
     @name.hash
   end
- 
+
   def <=>(other)
     @name <=> other.name
   end
@@ -367,7 +367,7 @@ class Regexp
   end
 end
 
-if IRB.conf[:PROMPT] 
+if IRB.conf[:PROMPT]
   IRB.conf[:PROMPT][:CUSTOM] = {
     :PROMPT_I =>  ">> ",
     :PROMPT_N =>  ">> ",
