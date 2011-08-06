@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 
-require 'spruz/write'
-include Spruz::Write
+require 'spruz/secure_write'
+include Spruz::SecureWrite
 
 for file in ARGV
-  write(file) do |output|
+  secure_write(file) do |output|
     File.open(file) do |file|
       old_mode = file.stat.mode
       file.each do |line|

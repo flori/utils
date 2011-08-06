@@ -16,7 +16,7 @@ GemHadar do
   readme      'README.rdoc'
 
   dependency  'spruz', '~>0.2.12'
-  dependency  'term-ansicolor', '1.0.5'
+  dependency  'term-ansicolor', '~>1.0'
 
   install_library do
     libdir = CONFIG["sitelibdir"]

@@ -63,24 +63,24 @@ class Finder
       if do_match and match = @pattern.match(file)
         if FuzzyPattern === @pattern
           current = 0
-          bold_file = ''
+          marked_file = ''
           score, e = 0, 0
           for i in 1...(match.size)
             match[i] or next
             b = match.begin(i)
-            bold_file << file[current...b]
-            bold_file << file[b, 1].bold
+            marked_file << file[current...b]
+            marked_file << file[b, 1].red
             score += (b - e)
             e = match.end(i)
             current = b + 1
           end
-          bold_file << match.post_match
-          [ score, file.size, path, File.join(dir, bold_file) ]
+          marked_file << match.post_match
+          [ score, file.size, path, File.join(dir, marked_file) ]
         else
-          bold_file = file[0...match.begin(0)] <<
-            file[match.begin(0)...match.end(0)].bold <<
+          marked_file = file[0...match.begin(0)] <<
+            file[match.begin(0)...match.end(0)].red <<
             file[match.end(0)..-1]
-          [ 0, file.size, path, File.join(dir, bold_file) ]
+          [ 0, file.size, path, File.join(dir, marked_file) ]
         end
       end
     end

@@ -11,6 +11,8 @@ begin
   require 'ap'
 rescue LoadError
 end
+require 'utils/edit'
+$editor = Utils::Edit::Editor.new
 
 $pager = ENV['PAGER'] || 'less -r'
 
@@ -355,7 +357,7 @@ def irb_load_each(*files)
 end
 
 def irb_edit(*files)
-  system "edit #{files.map { |f| %{'#{f}'} } * ' '}"
+  $editor.edit(*files)
 end
 
 class Regexp

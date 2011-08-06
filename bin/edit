@@ -6,12 +6,12 @@ require 'utils/edit'
 include Utils::Edit
 require 'tempfile'
 
-$opt = go 'w'
+$opt = go 'wp'
 
-vim = locate_vim_binary
-servername  = [ '--servername', "G#{ENV['USER'].upcase}" ]
-serverlist = `#{vim} -g --serverlist`.split
-remote = $opt['w'] ? '--remote-wait' : '--remote'
+editor = Editor.new do |config|
+  config.wait           = $opt['w']
+  config.pause_duration = ($opt['p'] || 1).to_i
+end
 
 argv = ARGV.dup
 if argv.empty?
@@ -23,33 +23,19 @@ if argv.empty?
     end
     file.close
     argv << file.path
-  elsif serverlist.member?(servername)
-    system *cmd(vim, '-g', servername, remote, "stupid_trick#{rand}")
-    sleep 1
-    exec *cmd(vim, '-g', servername, '--remote-send', '<ESC>:bw<CR>')
   else
-    exec *cmd(vim, '-g', servername, remote)
+    editor.ensure_running
   end
 end
 unless argv.empty?
-  lineno_re = /^\s*([^:]+):(\d+)/
-  if argv.first =~ lineno_re
-    for a in argv
-      if a =~ lineno_re
-        system *cmd(vim, '-g', servername, remote, $1)
-        sleep 1
-        system *cmd(vim, '-g', servername, '--remote-send', "<ESC>:#$2<CR>")
-      else
-        system *cmd(vim, '-g', servername, remote, a)
-      end
-      if a != argv.last
-        STDOUT.print "Press enter to edit the next file."
-        STDOUT.flush
-        STDIN.gets
-      end
+  if editor.file_linenumber?(argv.first)
+    editor.wait = argv.size > 1
+    for current_file in argv
+      STDOUT.puts "Edit #{current_file}"
+      editor.edit current_file
     end
   else
-    exec *cmd(vim, '-g', servername, remote, *argv)
+    editor.edit(*argv)
   end
 end
 exit 0

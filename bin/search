@@ -2,6 +2,7 @@
 # encoding: UTF-8
 
 require 'utils'
+require 'utils/edit'
 include Utils::Patterns
 require 'term/ansicolor'
 require 'spruz/xt'
@@ -114,9 +115,9 @@ class Grepper
         @skip_pattern and @skip_pattern =~ line and next
         line[m.begin(0)...m.end(0)] = m[0].on_yellow
         @queue and @queue << line
-        if @args['l'] or @args['e']
+        if @args['l']
           @output << @filename
-        elsif @args['L']
+        elsif @args['L'] or @args['e']
           @output << "#{@filename}:#{file.lineno}"
         else
           @output << "#{@filename}:#{file.lineno}".red
@@ -159,7 +160,13 @@ end
 include Spruz::GO
 
 def edit_files(pathes)
-  system "edit #{pathes.map { |x| "'#{x}'" } * ' '}"
+  editor = Utils::Edit::Editor.new do |config|
+    config.wait = true
+  end
+  for (file, linenumber) in pathes.map { |p| p.split(':') }
+    STDERR.puts "Edit #{file}:#{linenumber}"
+    editor.edit_linenumber(file, linenumber) 
+  end
 end
 
 def usage
