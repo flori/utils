@@ -11,8 +11,8 @@ begin
   require 'ap'
 rescue LoadError
 end
-require 'utils/edit'
-$editor = Utils::Edit::Editor.new
+require 'utils/editor'
+$editor = Utils::Editor.new
 
 $pager = ENV['PAGER'] || 'less -r'
 

@@ -47,7 +47,9 @@ finder = Finder.new(
   :pattern => pattern,
   :args    => args,
   :roots   => roots
-).search
+).search do |output|
+  puts output
+end
 if args['e']
   edit_files finder.pathes
 end

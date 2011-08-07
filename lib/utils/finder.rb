@@ -30,6 +30,8 @@ class Utils::Finder
 
   attr_reader :pathes
 
+  attr_reader :output
+
   def attempt_match?(path)
     stat = File.stat(path)
     stat.symlink? and stat = File.lstat(path)
@@ -81,9 +83,9 @@ class Utils::Finder
       end
     end
     pathes.compact!
-    @pathes, output = pathes.sort.transpose.values_at(-2, -1)
-    if !@args['e'] && output && !output.empty?
-      puts output
+    @pathes, @output = pathes.sort.transpose.values_at(-2, -1)
+    if !@args['e'] && @output && !@output.empty?
+      yield @output if block_given?
     end
     self
   end
