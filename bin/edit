@@ -2,8 +2,8 @@
 
 require 'spruz/go'
 include Spruz::GO
-require 'utils/edit'
-include Utils::Edit
+require 'utils'
+include Utils
 require 'tempfile'
 
 $opt = go 'wp'
