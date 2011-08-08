@@ -15,8 +15,6 @@ set expandtab shiftwidth=2 tabstop=2
 set foldcolumn=0
 set formatoptions=cqrt
 set fsync
-set grepformat+=%f
-set grepformat+=%f:%l
 set hidden
 set history=1000
 set hlsearch
@@ -372,25 +370,37 @@ if has("autocmd")
 endif
 
 function! Cfind(...)
+  redraw
+  echo "Finding..."
   if a:0 == 0
     let args = [ expand( '<cword>') ]
   else
     let args = copy(a:000)
   endif
+  set grepformat=%f
   set grepprg=discover
-  exec "silent gr -a 'a-zA-Z0-9' -c -i " . join(map(copy(args), 'shellescape(v:val)'), ' ')
+  set hlsearch
+  let @/=args[0]
+  silent exec "silent gr -a 'a-zA-Z0-9' -c -i " . join(map(copy(args), 'shellescape(v:val)'), ' ')
   copen
+  redraw!
 endfunction
 
 function! Cgrep(...)
+  redraw
+  echo "Grepping..."
   if a:0 == 0
     let args = [ expand( '<cword>') ]
   else
     let args = copy(a:000)
   endif
+  set grepformat=%f:%l
   set grepprg=search
-  exec "silent gr -c -i " . join(map(args, 'shellescape(v:val)'), ' ')
+  set hlsearch
+  let @/=args[0]
+  silent exec "silent gr -c -i " . join(map(args, 'shellescape(v:val)'), ' ')
   copen
+  redraw!
 endfunction
 
 function! Ctest(...)
