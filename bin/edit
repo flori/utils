@@ -6,36 +6,65 @@ require 'utils'
 include Utils
 require 'tempfile'
 
-$opt = go 'wp'
+def usage
+  puts <<-EOT
+Usage: #{File.basename($0)} [OPTS] [PATHES]
+
+PATHES are the directory and file pathes that are opened in the vim.
+
+Options are
+
+  -w          open a buffer in vim and wait until it is deleted
+  -s          read files and files:linenumbers from stdin and open them
+  -p DURATION pause for this many seconds to wait for vim's reaction
+  -h          display this help
+
+  EOT
+  exit 1
+end
+
+$opt = go 'wp:sh'
+$opt['h'] and usage
 
 editor = Editor.new do |config|
   config.wait           = $opt['w']
   config.pause_duration = ($opt['p'] || 1).to_i
 end
 
-argv = ARGV.dup
-if argv.empty?
-  if !STDIN.tty?
-    file = File.new(File.join(Dir.tmpdir, "edit_tmp.#$$"), 'w')
+if $opt['s']
+  begin
     until STDIN.eof?
-      buffer = STDIN.read(8192)
-      file.write buffer
+      line = STDIN.gets
+      line = line.sub(/.*?([^:\s]+:)/, '\1')
+      editor.edit(line)
     end
-    file.close
-    argv << file.path
-  else
-    editor.ensure_running
+  rescue Interrupt
   end
-end
-unless argv.empty?
-  if editor.file_linenumber?(argv.first)
-    editor.wait = argv.size > 1
-    for current_file in argv
-      STDOUT.puts "Edit #{current_file}"
-      editor.edit current_file
+else
+  argv = ARGV.dup
+  if argv.empty?
+    if !STDIN.tty?
+      file = File.new(File.join(Dir.tmpdir, "edit_tmp.#$$"), 'w')
+      until STDIN.eof?
+        buffer = STDIN.read(8192)
+        file.write buffer
+      end
+      file.close
+      argv << file.path
+    else
+      editor.ensure_running
     end
-  else
-    editor.edit(*argv)
+  end
+  unless argv.empty?
+    if editor.file_linenumber?(argv.first)
+      editor.wait = argv.size > 1
+      for current_file in argv
+        STDOUT.puts "Edit #{current_file}"
+        editor.edit current_file
+      end
+    else
+      editor.edit(*argv)
+    end
   end
 end
 exit 0

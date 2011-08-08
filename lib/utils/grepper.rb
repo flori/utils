@@ -124,6 +124,7 @@ class Utils::Grepper
           end
           if @args['A'] or @args['C']
             where = file.tell
+            lineno = file.lineno
             @queue.max_size.times do
               file.eof? and break
               line = file.readline
@@ -131,6 +132,7 @@ class Utils::Grepper
               @output << line
             end
             file.seek where
+            file.lineno = lineno
           end
         end
       else
