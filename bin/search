@@ -10,9 +10,9 @@ def edit_files(pathes)
   editor = Utils::Editor.new do |config|
     config.wait = true
   end
-  for (file, linenumber) in pathes.map { |p| p.split(':') }
-    STDERR.puts "Edit #{file}:#{linenumber}"
-    editor.edit_linenumber(file, linenumber)
+  for path in pathes
+    STDERR.puts "Edit #{path}"
+    editor.edit(path)
   end
 end
 
