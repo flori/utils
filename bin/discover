@@ -6,7 +6,7 @@ require 'spruz/go'
 include Spruz::GO
 
 def edit_files(pathes)
-  editor = Utils::Edit::Editor.new do |config|
+  editor = Utils::Editor.new do |config|
     config.wait = true
   end
   editor.edit(*pathes)
