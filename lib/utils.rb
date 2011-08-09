@@ -8,4 +8,5 @@ module Utils
   require 'utils/editor'
   require 'utils/finder'
   require 'utils/grepper'
+  require 'utils/lines_file'
 end
