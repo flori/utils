@@ -9,9 +9,10 @@ class ::File
   include Utils::FileXt
 end
 
-argv = ARGV.empty? ?  %w[.] : ARGV
+pathes = ARGV.empty? ?  %w[.] : ARGV
+pathes = pathes.map { |p| File.expand_path(p) }
 
-find(*argv) do |path|
+find(*pathes) do |path|
   File.basename(path) =~ /\A\./ and prune
   File.directory?(path) and next
   File.ascii?(path) or next
