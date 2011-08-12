@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{utils}
-  s.version = "0.0.16"
+  s.version = "0.0.17"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = [%q{Florian Frank}]
-  s.date = %q{2011-08-10}
+  s.date = %q{2011-08-12}
   s.description = %q{This ruby gem provides some useful command line utilities}
   s.email = %q{flori@ping.de}
   s.executables = [%q{chroot-exec}, %q{chroot-libs}, %q{classify}, %q{discover}, %q{edit}, %q{edit_wait}, %q{errf}, %q{git-empty}, %q{myex}, %q{number_files}, %q{path}, %q{probe}, %q{same_files}, %q{search}, %q{sedit}, %q{sshscreen}, %q{strip_spaces}, %q{unquarantine_apps}, %q{untest}, %q{utils-install-config}, %q{vacuum_firefox_sqlite}, %q{xmp}]

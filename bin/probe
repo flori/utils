@@ -9,7 +9,7 @@ include Utils
 
 def cmd(*args)
   puts args * ' '
-  system *args
+  exec *args
 end
 
 filename = ARGV.shift or fail "require filename or filename:linenumber as first argument"
