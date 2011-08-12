@@ -2,7 +2,7 @@
 
 require 'spruz/go'
 include Spruz::GO
-require 'spruz/xt/write'
+require 'spruz/xt/secure_write'
 require 'tempfile'
 
 path_separator = RUBY_PLATFORM =~ /mswin32/ ? ';' : ':'
@@ -27,7 +27,7 @@ when 'edit'
     path.map! { |part| File.expand_path(part) }
   end
   path_file = File.join(Dir.tmpdir, "path_temp.#$$")
-  File.write path_file, path * "\n"
+  File.secure_write path_file, path * "\n"
   system "edit -w #{path_file.inspect}"
   path = File.read(path_file).split(/\n/)
   path.map! { |part| File.expand_path(part) }
