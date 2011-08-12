@@ -32,7 +32,7 @@ class Utils::LinesFile
       line.instance_variable_set :@line_number, i + 1
       line.instance_variable_set :@lines_file, self
     end
-    self.line_number = line_number || @lines.empty? ? 0 : 1
+    self.line_number = line_number || (@lines.empty? ? 0 : 1)
   end
 
   attr_accessor :filename

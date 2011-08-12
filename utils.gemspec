@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = [%q{Florian Frank}]
-  s.date = %q{2011-08-09}
+  s.date = %q{2011-08-12}
   s.description = %q{This ruby gem provides some useful command line utilities}
   s.email = %q{flori@ping.de}
   s.executables = [%q{untest}, %q{chroot-libs}, %q{edit_wait}, %q{chroot-exec}, %q{number_files}, %q{search}, %q{strip_spaces}, %q{path}, %q{edit}, %q{git-empty}, %q{classify}, %q{utils-install-config}, %q{xmp}, %q{discover}, %q{sshscreen}, %q{myex}, %q{probe}, %q{errf}, %q{same_files}, %q{unquarantine_apps}, %q{vacuum_firefox_sqlite}, %q{sedit}]
