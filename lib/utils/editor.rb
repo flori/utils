@@ -40,7 +40,7 @@ module Utils
         end
       end
       $DEBUG and warn command * ' '
-      system *command
+      system(*command)
     end
 
     def fullscreen=(enabled)

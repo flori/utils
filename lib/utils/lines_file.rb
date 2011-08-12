@@ -45,13 +45,15 @@ class Utils::LinesFile
   end
 
   def next!
+    old = line_number
     self.line_number += 1
-    self
+    line_number > old ? self : nil
   end
 
   def previous!
+    old = line_number
     self.line_number -= 1
-    self
+    line_number < old ? self : nil
   end
 
   def line_number=(number)
@@ -70,7 +72,7 @@ class Utils::LinesFile
   end
 
   def each(&block)
-    @lines.empty? and return
+    empty? and return self
     old_line_number = line_number
     1.upto(last_line_number) do |number|
       self.line_number = number
@@ -91,25 +93,21 @@ class Utils::LinesFile
   end
 
   def match_backward(regexp, previous_after_match = false)
-    empty? and return
-    while line_number >= 1
+    begin
       if line =~ regexp
         previous_after_match and previous!
         return $~.captures
       end
-      previous!
-    end
+    end while previous!
   end
 
   def match_forward(regexp, next_after_match = false)
-    empty? and return
     begin
       if line =~ regexp
         next_after_match and next!
         return $~.captures
       end
-      next!
-    end while line_number < last_line_number
+    end while next!
   end
 
   def to_s
