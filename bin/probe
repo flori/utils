@@ -2,7 +2,7 @@
 # encoding: UTF-8
 
 require 'spruz/xt'
-require 'spruz/go'
+require 'spruz/lines_file'
 include Spruz::GO
 require 'utils'
 include Utils
@@ -12,19 +12,21 @@ def cmd(*args)
   exec *args
 end
 
-filename = ARGV.shift or fail "require filename or filename:linenumber as first argument"
+filename = ARGV.shift or fail "require filename or filename:line_number as first argument"
 $opt = go 'n:'
 if testname = $opt['n']
   cmd "testrb", '-I', 'lib:test:ext', '-n', testname , filename
 elsif filename =~ /^\s*([^:]+):(\d+)/
-  filename, linenumber = $1, $2
-  lf = LinesFile.for_filename filename, linenumber
+  filename, line_number = $1, $2
+  lf = Spruz::LinesFile.for_filename filename, line_number.to_i
   if testname = lf.match_backward(/def\s+(\S+?)(?:\(|\s*$)/).full?(:first)
+    puts "Running test #{testname.inspect} at #{filename}:#{lf.line_number}"
     cmd "testrb", '-I', 'lib:test:ext', '-n', testname , filename
   else
-    warn "no test found before line #{linenumber}"
+    warn "no test found before line #{line_number}"
     exit 1
   end
 else
+  puts "Running ALL tests in #{filename}"
   cmd "testrb", '-Ilib:test:ext', filename
 end

@@ -15,7 +15,7 @@ GemHadar do
   ignore      '.*.sw[pon]', 'pkg', 'Gemfile.lock'
   readme      'README.rdoc'
 
-  dependency  'spruz', '~>0.2.12'
+  dependency  'spruz', '~>0.2.13'
   dependency  'term-ansicolor', '~>1.0'
 
   install_library do
