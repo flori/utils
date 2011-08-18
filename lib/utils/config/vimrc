@@ -371,34 +371,36 @@ endif
 
 function! Cfind(...)
   redraw
-  echo "Finding..."
   if a:0 == 0
     let args = [ expand( '<cword>') ]
   else
     let args = copy(a:000)
   endif
+  let args_string = join(map(copy(args), 'shellescape(v:val)'), ' ')
+  echo 'Finding ' . args_string . '...'
   set grepformat=%f
   set grepprg=discover
   set hlsearch
   let @/=args[0]
-  silent exec "silent gr -a 'a-zA-Z0-9' -c -i " . join(map(copy(args), 'shellescape(v:val)'), ' ')
+  silent exec "silent gr -a 'a-zA-Z0-9' -c -i " . args_string
   copen
   redraw!
 endfunction
 
 function! Cgrep(...)
   redraw
-  echo "Grepping..."
   if a:0 == 0
     let args = [ expand( '<cword>') ]
   else
     let args = copy(a:000)
   endif
+  let args_string = join(map(args, 'shellescape(v:val)'), ' ')
+  echo 'Grepping ' . args_string . '...'
   set grepformat=%f:%l
   set grepprg=search
   set hlsearch
   let @/=args[0]
-  silent exec "silent gr -c -i " . join(map(args, 'shellescape(v:val)'), ' ')
+  silent exec "silent gr -c -i " . args_string
   copen
   redraw!
 endfunction
