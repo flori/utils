@@ -29,6 +29,7 @@ $opt['h'] and usage
 editor = Editor.new do |config|
   config.wait           = $opt['w']
   config.pause_duration = ($opt['p'] || 1).to_i
+  config.fullscreen     = true
 end
 
 if $opt['s']
