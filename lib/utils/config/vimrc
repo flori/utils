@@ -63,7 +63,7 @@ if has("gui_running")
   set guipty
   colorscheme flori
   hi Pmenu ctermbg=Grey guibg=DarkGrey
-	set guioptions-=r
+	set guioptions-=rRlL
   if exists("+guioptions")
     set guioptions+=c
   end
@@ -175,6 +175,7 @@ if has("fullscreen")
     endif
   endfunction
   map <silent> <F11> :call Cfullscreen()<CR>
+  au GUIEnter * set fullscreen
 endif
 function! Ctoggle()
   if &buftype == "quickfix"
