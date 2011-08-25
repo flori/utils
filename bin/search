@@ -6,10 +6,11 @@ include Utils
 require 'spruz/go'
 include Spruz::GO
 
-def edit_files(pathes)
+def edit_files(pattern, pathes)
   editor = Utils::Editor.new do |config|
     config.wait = true
   end
+  editor.edit_remote_send("<ESC>/#{pattern}<CR>")
   for path in pathes
     STDERR.puts "Edit #{path}"
     editor.edit(path)
@@ -60,6 +61,6 @@ grepper = Grepper.new(
   :roots   => roots
 ).search
 case
-when args['e'] then edit_files grepper.pathes
+when args['e'] then edit_files pattern, grepper.pathes
 when args['l'] then puts grepper.pathes
 end
