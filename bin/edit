@@ -39,6 +39,7 @@ if $opt['s']
       editor.edit(line)
     end
   rescue Interrupt
+    exit 1
   end
 else
   argv = ARGV.dup
