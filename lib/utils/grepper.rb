@@ -150,7 +150,15 @@ class Utils::Grepper
         end
       end
     end
-    @pathes.sort!
+    if @args['L'] or @args['e']
+      @pathes = @pathes.sort_by do |path|
+        pair = path.split(':')
+        pair[1] = pair[1].to_i
+        pair
+      end
+    else
+      @pathes.sort!
+    end
     self
   end
 end
