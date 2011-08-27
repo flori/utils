@@ -1,0 +1,3 @@
+- Implement support for a configuration file
+- A default for searched/discovered files should be configurable, and be
+  modifiable via command line options.
