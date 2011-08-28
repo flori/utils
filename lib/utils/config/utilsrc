@@ -1,0 +1,14 @@
+# vim: set ft=ruby:
+
+search do
+  prune_dirs /\A(\.svn|\.git|CVS|tmp)\Z/
+  skip_files /(\A\.|\.sw[pon]\Z|~\Z)/, /\.log\Z/
+end
+
+discover do
+#  skip_files /(\A\.|\.sw[pon]\Z|~\Z)/, /\.log\Z/
+end
+
+strip_spaces do
+  prune_dirs /\A(\..*|CVS)\Z/
+end

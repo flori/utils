@@ -1,10 +1,6 @@
 require 'term/ansicolor'
 require 'spruz/xt'
 
-class ::String
-  include Term::ANSIColor
-end
-
 class ::File
   include Utils::FileXt
 end
@@ -12,10 +8,12 @@ end
 class Utils::Finder
   include Utils::Find
   include Utils::Patterns
+  include Term::ANSIColor
 
   def initialize(opts = {})
     @args    = opts[:args] || {}
     @roots   = opts[:roots] || []
+    @config = opts[:config] || Utils::Config::ConfigFile.new
     pattern_opts = opts.subhash(:pattern) | {
       :cset  => @args['a'],
       :icase => @args['i'],
@@ -49,7 +47,22 @@ class Utils::Finder
 
   def search
     pathes = []
-    find(*@roots) { |file| pathes << file }
+    find(*@roots) do |filename|
+      begin
+        bn, s = File.basename(filename), File.stat(filename)
+        if s.directory? && @config.discover.prune?(bn)
+          $DEBUG and warn "Pruning #{filename.inspect}."
+          Utils::Find.prune
+        end
+        if s.file? && @config.discover.skip?(bn)
+          $DEBUG and warn "Skipping #{filename.inspect}."
+          next
+        end
+        pathes << filename
+      rescue SystemCallError => e
+        warn "Caught #{e.class}: #{e}"
+      end
+    end
     pathes.uniq!
     pathes.map! { |p| a = File.split(p) ; a.unshift(p) ; a }
     @suffix = @args['I']
@@ -67,7 +80,7 @@ class Utils::Finder
             match[i] or next
             b = match.begin(i)
             marked_file << file[current...b]
-            marked_file << file[b, 1].red
+            marked_file << red(file[b, 1])
             score += (b - e)
             e = match.end(i)
             current = b + 1
@@ -76,7 +89,7 @@ class Utils::Finder
           [ score, file.size, path, File.join(dir, marked_file) ]
         else
           marked_file = file[0...match.begin(0)] <<
-            file[match.begin(0)...match.end(0)].red <<
+            red(file[match.begin(0)...match.end(0)]) <<
             file[match.end(0)..-1]
           [ 0, file.size, path, File.join(dir, marked_file) ]
         end

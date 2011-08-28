@@ -12,13 +12,20 @@ end
 pathes = ARGV.empty? ?  %w[.] : ARGV
 pathes = pathes.map { |p| File.expand_path(p) }
 
-find(*pathes) do |path|
-  File.basename(path) =~ /\A\./ and prune
-  File.directory?(path) and next
-  File.ascii?(path) or next
-  STDOUT.puts "Stripping spaces from #{path.inspect}."
-  secure_write(path) do |output|
-    File.open(path) do |file|
+config = Utils::Config::ConfigFile.new
+config.parse_config_file File.expand_path('~/.utilsrc')
+
+find(*pathes) do |filename|
+  bn, s = File.basename(filename), File.stat(filename)
+  if s.directory?
+    config.strip_spaces.prune?(bn) and prune
+    next
+  end
+  config.strip_spaces.skip?(bn) and next
+  File.ascii?(filename) or next
+  STDOUT.puts "Stripping spaces from #{filename.inspect}."
+  secure_write(filename) do |output|
+    File.open(filename) do |file|
       old_mode = file.stat.mode
       file.each do |line|
         line.gsub!(/[ \t\v]+$/, '')

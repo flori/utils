@@ -1,19 +1,13 @@
 require 'term/ansicolor'
 require 'spruz/xt'
 
-class ::String
-  include Term::ANSIColor
-end
-
 class ::File
   include Utils::FileXt
 end
 
 class Utils::Grepper
-  PRUNE = /\A(\.svn|\.git|CVS|tmp)\Z/
-  SKIP  = /(\A\.|\.sw[pon]\Z|~\Z)/
-
   include Utils::Patterns
+  include Term::ANSIColor
 
   class Queue
     def initialize(max_size)
@@ -37,6 +31,7 @@ class Utils::Grepper
   def initialize(opts = {})
     @args  = opts[:args] || {}
     @roots = opts[:roots] || []
+    @config = opts[:config] || Utils::Config::ConfigFile.new
     if n = @args.values_at(*%w[A B C]).compact.first
       if n.to_s =~ /\A\d+\Z/ and (n = n.to_i) >= 1
         @queue = Queue.new n
@@ -70,24 +65,23 @@ class Utils::Grepper
 
   def match(filename)
     @filename = filename
-    bn = File.basename(filename)
     @output = []
-    s = File.stat(filename)
-    if s.directory? && bn =~ PRUNE
-      $DEBUG and warn "Pruning '#{filename}'."
+    bn, s = File.basename(filename), File.stat(filename)
+    if s.directory? && @config.search.prune?(bn)
+      $DEBUG and warn "Pruning #{filename.inspect}."
       Utils::Find.prune
     end
-    if s.file? && bn !~ SKIP && (!@name_pattern || @name_pattern.match(bn))
+    if s.file? && !@config.search.skip?(bn) && (!@name_pattern || @name_pattern.match(bn))
       File.open(filename, 'rb') do |file|
         if file.binary? != true
-          $DEBUG and warn "Matching '#{filename}'."
+          $DEBUG and warn "Matching #{filename.inspect}."
           match_lines file
         else
-          $DEBUG and warn "Skipping binary file '#{filename}'."
+          $DEBUG and warn "Skipping binary file #{filename.inspect}."
         end
       end
     else
-      $DEBUG and warn "Skipping '#{filename}'."
+      $DEBUG and warn "Skipping #{filename.inspect}."
     end
     unless @output.empty?
       case
@@ -109,14 +103,14 @@ class Utils::Grepper
     for line in file
       if m = @pattern.match(line)
         @skip_pattern and @skip_pattern =~ line and next
-        line[m.begin(0)...m.end(0)] = m[0].black.on_white
+        line[m.begin(0)...m.end(0)] = black on_white m[0]
         @queue and @queue << line
         if @args['l']
           @output << @filename
         elsif @args['L'] or @args['e']
           @output << "#{@filename}:#{file.lineno}"
         else
-          @output << "#{@filename}:#{file.lineno}".red
+          @output << red("#{@filename}:#{file.lineno}")
           if @args['B'] or @args['C']
             @output.concat @queue.data
           else

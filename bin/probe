@@ -7,13 +7,28 @@ include Spruz::GO
 require 'utils'
 include Utils
 
+def usage
+  puts <<-EOT
+Usage: #{File.basename($0)} [OPTS] FILENAME[:LINENO]
+
+Options are
+
+  -n TESTNAME run the test TESTNAME in file FILENAME
+  -h          display this help
+
+Version is #{File.basename($0)} #{Utils::VERSION}.
+  EOT
+  exit 1
+end
+
 def cmd(*args)
   puts args * ' '
   exec *args
 end
 
 filename = ARGV.shift or fail "require filename or filename:line_number as first argument"
-$opt = go 'n:'
+$opt = go 'n:h'
+$opt['h'] and usage
 if testname = $opt['n']
   cmd "testrb", '-I', 'lib:test:ext', '-n', testname , filename
 elsif filename =~ /^\s*([^:]+):(\d+)/

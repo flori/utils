@@ -43,6 +43,7 @@ Options are
   -a CSET     use only character set CSET from PATTERN
   -h          display this help
 
+Version is #{File.basename($0)} #{Utils::VERSION}.
   EOT
   exit 1
 end
@@ -54,11 +55,13 @@ roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }
 
 Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args['c']
 STDOUT.sync = true
-
+config = Utils::Config::ConfigFile.new
+config.parse_config_file File.expand_path('~/.utilsrc')
 grepper = Grepper.new(
   :pattern => pattern,
   :args    => args,
-  :roots   => roots
+  :roots   => roots,
+  :config  => config
 ).search
 case
 when args['e'] then edit_files pattern, grepper.pathes

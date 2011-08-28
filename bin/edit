@@ -19,6 +19,7 @@ Options are
   -p DURATION pause for this many seconds to wait for vim's reaction
   -h          display this help
 
+Version is #{File.basename($0)} #{Utils::VERSION}.
   EOT
   exit 1
 end

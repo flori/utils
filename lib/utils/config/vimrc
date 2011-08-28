@@ -52,6 +52,15 @@ set visualbell t_vb=
 set wildchar=<TAB>
 set wildmenu
 set winminheight=0
+set undofile
+if has("win32") || has("win64")
+  set undodir=$TMP
+  set directory=$TMP
+else
+  set undodir=/tmp
+  set directory=/tmp
+end
+
 
 filetype on
 filetype indent on
@@ -63,7 +72,10 @@ if has("gui_running")
   set guipty
   colorscheme flori
   hi Pmenu ctermbg=Grey guibg=DarkGrey
-	set guioptions-=rRlL
+	set guioptions-=r
+	set guioptions-=R
+	set guioptions-=l
+	set guioptions-=L
   if exists("+guioptions")
     set guioptions+=c
   end
