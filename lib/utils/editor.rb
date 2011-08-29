@@ -66,7 +66,7 @@ module Utils
         else
           edit_file(filename)
         end
-      else
+      elsif !filenames.empty?
         edit_file(*filenames)
       end
     end

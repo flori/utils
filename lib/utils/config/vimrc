@@ -3,7 +3,6 @@
 " General Settings
 "set autochdir
 "set wildmode=list:full
-"set swapsync=
 set autoindent
 set autowrite
 set backspace=indent,eol,start
@@ -205,21 +204,23 @@ map <C-k> <C-W>k<C-W>_
 map <C-l> <ESC>:bn<CR>
 map <C-h> <ESC>:bp<CR>
 " Configure navigation keys
-" noremap <Up> <Nop>
-" noremap <Down> <Nop>
-" noremap <Left> <Nop>
-" noremap <Right> <Nop>
-" noremap <Ins> <Nop>
-" noremap <End> <Nop>
-" noremap <Home> <Nop>
-" noremap <End> <Nop>
-" noremap <PageUp> <Nop>
-" noremap <PageDown> <Nop>
-cnoremap <C-A> <Home>
-cnoremap <C-F> <Right>
-cnoremap <C-B> <Left>
-cnoremap <Esc>b <S-Left>
-cnoremap <Esc>f <S-Right>
+noremap <Up> <Nop>
+noremap <Down> <Nop>
+noremap <Left> <Nop>
+noremap <Right> <Nop>
+noremap <Ins> <Nop>
+noremap <End> <Nop>
+noremap <Home> <Nop>
+noremap <End> <Nop>
+noremap <PageUp> <Nop>
+noremap <PageDown> <Nop>
+cnoremap <C-0> <Home>
+cnoremap <C-^> <Home>
+cnoremap <C-$> <End>
+cnoremap <C-H> <Left>
+cnoremap <C-L> <Right>
+cnoremap <C-K> <Up>
+cnoremap <C-J> <Down>
 vnoremap < <gv
 vnoremap > >gv
 " Marks

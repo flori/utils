@@ -1,3 +1,5 @@
 - A default for searched/discovered files should be configurable, and be
   modifiable via command line options.
 - Mark trailing spaces in vim
+- When finding many places in the same file only jump to the first occurence if
+  a cli option is given.
