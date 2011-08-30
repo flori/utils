@@ -3,3 +3,6 @@
 - Mark trailing spaces in vim
 - When finding many places in the same file only jump to the first occurence if
   a cli option is given.
+- Make it configurable to find the same file many times via different symlinks
+  or to find it only once.
+- Stop finder from going in infinite symlink circles
