@@ -107,8 +107,11 @@ class Utils::Grepper
         @queue and @queue << line
         if @args['l']
           @output << @filename
-        elsif @args['L'] or @args['e']
+        elsif @args['L']
           @output << "#{@filename}:#{file.lineno}"
+        elsif @args['e']
+          @output << "#{@filename}:#{file.lineno}"
+          break
         else
           @output << red("#{@filename}:#{file.lineno}")
           if @args['B'] or @args['C']

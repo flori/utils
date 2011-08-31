@@ -10,7 +10,7 @@ def edit_files(pattern, pathes)
   editor = Utils::Editor.new do |config|
     config.wait = true
   end
-  editor.edit_remote_send("<ESC>/#{pattern}<CR>")
+  editor.edit_remote_send("<ESC>/#{pattern.source}<CR>")
   for path in pathes
     STDERR.puts "Edit #{path}"
     editor.edit(path)
