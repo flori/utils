@@ -51,15 +51,19 @@ set visualbell t_vb=
 set wildchar=<TAB>
 set wildmenu
 set winminheight=0
-set undofile
+if has("persistent_undo")
+  set undofile
+  if has("win32") || has("win64")
+    set undodir=$TMP
+  else
+    set undodir=/tmp
+  end
+end
 if has("win32") || has("win64")
-  set undodir=$TMP
   set directory=$TMP
 else
-  set undodir=/tmp
   set directory=/tmp
 end
-
 
 filetype on
 filetype indent on
