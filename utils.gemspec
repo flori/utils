@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Florian Frank"]
-  s.date = "2011-09-05"
+  s.date = "2011-09-07"
   s.description = "This ruby gem provides some useful command line utilities"
   s.email = "flori@ping.de"
   s.executables = ["chroot-exec", "chroot-libs", "classify", "discover", "edit", "edit_wait", "errf", "git-empty", "myex", "number_files", "path", "probe", "same_files", "search", "sedit", "sshscreen", "strip_spaces", "unquarantine_apps", "untest", "utils-install-config", "vacuum_firefox_sqlite", "xmp"]
@@ -22,18 +22,18 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency(%q<gem_hadar>, ["~> 0.0.11"])
+      s.add_development_dependency(%q<gem_hadar>, ["~> 0.0.12"])
       s.add_runtime_dependency(%q<spruz>, ["~> 0.2.13"])
       s.add_runtime_dependency(%q<term-ansicolor>, ["~> 1.0"])
       s.add_runtime_dependency(%q<dslkit>, ["~> 0.2"])
     else
-      s.add_dependency(%q<gem_hadar>, ["~> 0.0.11"])
+      s.add_dependency(%q<gem_hadar>, ["~> 0.0.12"])
       s.add_dependency(%q<spruz>, ["~> 0.2.13"])
       s.add_dependency(%q<term-ansicolor>, ["~> 1.0"])
       s.add_dependency(%q<dslkit>, ["~> 0.2"])
     end
   else
-    s.add_dependency(%q<gem_hadar>, ["~> 0.0.11"])
+    s.add_dependency(%q<gem_hadar>, ["~> 0.0.12"])
     s.add_dependency(%q<spruz>, ["~> 0.2.13"])
     s.add_dependency(%q<term-ansicolor>, ["~> 1.0"])
     s.add_dependency(%q<dslkit>, ["~> 0.2"])
