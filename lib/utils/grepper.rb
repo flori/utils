@@ -63,6 +63,8 @@ class Utils::Grepper
 
   attr_reader :pathes
 
+  attr_reader :pattern
+
   def match(filename)
     @filename = filename
     @output = []
