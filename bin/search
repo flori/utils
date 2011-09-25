@@ -64,6 +64,6 @@ grepper = Grepper.new(
   :config  => config
 ).search
 case
-when args['e'] then edit_files pattern, grepper.pathes
+when args['e'] then edit_files grepper.pattern, grepper.pathes
 when args['l'] then puts grepper.pathes
 end

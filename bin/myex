@@ -37,7 +37,7 @@ def bell(n = 1, s = 1)
 end
 
 cmd = ARGV.shift or usage
-opts = go('dtD')
+opts = go('dtDi')
 
 STDOUT.sync = true
 case cmd
@@ -68,8 +68,9 @@ when 'truncate'
   end
 when 'insert'
   truncated = {}
-  STDIN.grep(/^INSERT INTO `(#{ARGV.empty? ? '[^`]+' : ARGV * '|'})`/) do |stmt|
+  STDIN.grep(/^INSERT (?:IGNORE )?INTO `(#{ARGV.empty? ? '[^`]+' : ARGV * '|'})`/) do |stmt|
     table = $1
+    stmt.sub!(/(^INSERT) (INTO)/, '\1 IGNORE \2') if opts['i']
     if opts['t'] and not truncated.key?(table)
       puts "TRUNCATE TABLE `#{table}`;"
       truncated[table] = true
