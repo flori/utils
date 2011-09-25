@@ -3,8 +3,8 @@
 
 require 'utils'
 include Utils
-require 'spruz/go'
-include Spruz::GO
+require 'tins/go'
+include Tins::GO
 
 def edit_files(pattern, pathes)
   editor = Utils::Editor.new do |config|

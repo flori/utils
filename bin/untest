@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'spruz/xt/secure_write'
+require 'tins/xt/secure_write'
 
 for filename in ARGV
   File.open(filename) do |input|

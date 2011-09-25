@@ -1,5 +1,5 @@
 require 'dslkit/polite'
-require 'spruz/xt/string'
+require 'tins/xt/string'
 
 class Utils::Config::ConfigFile
   include DSLKit::Interpreter

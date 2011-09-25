@@ -2,8 +2,8 @@
 
 require 'fileutils'
 include FileUtils::Verbose
-require 'spruz/go'
-include Spruz::GO
+require 'tins/go'
+include Tins::GO
 
 =begin
 ~/.ssh/config:

@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
-require 'spruz/go'
-include Spruz::GO
+require 'tins/go'
+include Tins::GO
 require 'utils'
 include Utils
 require 'tempfile'

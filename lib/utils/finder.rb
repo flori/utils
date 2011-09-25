@@ -1,5 +1,5 @@
 require 'term/ansicolor'
-require 'spruz/xt'
+require 'tins/xt'
 
 class ::File
   include Utils::FileXt

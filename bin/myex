@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
-require 'spruz'
-include Spruz::GO
+require 'tins/go'
+include Tins::GO
 
 def usage
   puts <<EOT

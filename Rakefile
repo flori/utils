@@ -15,7 +15,7 @@ GemHadar do
   ignore      '.*.sw[pon]', 'pkg', 'Gemfile.lock'
   readme      'README.rdoc'
 
-  dependency  'spruz',          '~>0.2.13'
+  dependency  'tins',           '~>0.3'
   dependency  'term-ansicolor', '~>1.0'
   dependency  'dslkit',         '~>0.2'
 

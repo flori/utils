@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 # encoding: UTF-8
 
-require 'spruz/xt'
-require 'spruz/lines_file'
-include Spruz::GO
+require 'tins/xt'
+require 'tins/lines_file'
+include Tins::GO
 require 'utils'
 include Utils
 
@@ -33,7 +33,7 @@ if testname = $opt['n']
   cmd "testrb", '-I', 'lib:test:ext', '-n', testname , filename
 elsif filename =~ /^\s*([^:]+):(\d+)/
   filename, line_number = $1, $2
-  lf = Spruz::LinesFile.for_filename filename, line_number.to_i
+  lf = Tins::LinesFile.for_filename filename, line_number.to_i
   if testname = lf.match_backward(/def\s+(\S+?)(?:\(|\s*$)/).full?(:first)
     puts "Running test #{testname.inspect} at #{filename}:#{lf.line_number}"
     cmd "testrb", '-I', 'lib:test:ext', '-n', testname , filename

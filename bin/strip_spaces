@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
-require 'spruz/secure_write'
-include Spruz::SecureWrite
+require 'tins/secure_write'
+include Tins::SecureWrite
 require 'utils'
 include Utils::Find
 

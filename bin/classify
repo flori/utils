@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'spruz/go'
-include Spruz::GO
-require 'spruz/xt/string'
+require 'tins/go'
+include Tins::GO
+require 'tins/xt/string'
 
 opts = go 'bd'
 

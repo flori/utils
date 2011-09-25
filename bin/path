@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'spruz/go'
-include Spruz::GO
-require 'spruz/xt/secure_write'
+require 'tins/go'
+include Tins::GO
+require 'tins/xt/secure_write'
 require 'tempfile'
 
 path_separator = RUBY_PLATFORM =~ /mswin32/ ? ';' : ':'
