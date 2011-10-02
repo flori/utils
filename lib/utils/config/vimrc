@@ -221,10 +221,10 @@ noremap <PageDown> <Nop>
 cnoremap <C-0> <Home>
 cnoremap <C-^> <Home>
 cnoremap <C-$> <End>
-cnoremap <C-H> <Left>
-cnoremap <C-L> <Right>
-cnoremap <C-K> <Up>
-cnoremap <C-J> <Down>
+cnoremap <C-h> <Left>
+cnoremap <C-l> <Right>
+cnoremap <C-k> <Up>
+cnoremap <C-j> <Down>
 vnoremap < <gv
 vnoremap > >gv
 " Marks
