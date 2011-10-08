@@ -4,6 +4,8 @@ require 'tins/xt/string'
 class Utils::Config::ConfigFile
   include DSLKit::Interpreter
 
+  class ConfigFileError < StandardError; end
+
   def initialize
   end
 
@@ -51,6 +53,30 @@ class Utils::Config::ConfigFile
       end
       result << "end\n"
     end
+  end
+
+  class Probe < BlockConfig
+    config :test_framework, :'test-unit'
+
+    config :include_dirs, %w[lib test tests ext spec]
+
+    def include_dirs_argument
+      Array(include_dirs) * ':'
+    end
+
+    def initialize(&block)
+      super
+      test_frameworks_allowed = [ :'test-unit', :rspec ]
+      test_frameworks_allowed.include?(test_framework) or raise ConfigFileError,
+        "test_framework has to be in #{test_frameworks_allowed.inspect}"
+    end
+  end
+
+  def probe(&block)
+    if block
+      @probe = Probe.new(&block)
+    end
+    @probe ||= Probe.new
   end
 
   class FileFinder < BlockConfig
@@ -104,7 +130,7 @@ class Utils::Config::ConfigFile
 
   def to_ruby
     result = "# vim: set ft=ruby:\n"
-    for bc in %w[search discover]
+    for bc in %w[search discover strip_spaces probe]
       result << "\n" << __send__(bc).to_ruby
     end
     result

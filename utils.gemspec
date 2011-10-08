@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Florian Frank"]
-  s.date = "2011-10-02"
+  s.date = "2011-10-08"
   s.description = "This ruby gem provides some useful command line utilities"
   s.email = "flori@ping.de"
   s.executables = ["untest", "chroot-libs", "edit_wait", "chroot-exec", "number_files", "search", "strip_spaces", "path", "enum", "edit", "git-empty", "classify", "utils-install-config", "xmp", "discover", "sshscreen", "myex", "probe", "errf", "same_files", "unquarantine_apps", "vacuum_firefox_sqlite", "sedit"]
