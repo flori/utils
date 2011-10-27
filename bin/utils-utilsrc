@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+require 'tempfile'
+require 'utils'
+include Utils
+
+$config = Utils::Config::ConfigFile.new
+$utilsrc = File.expand_path('~/.utilsrc')
+
+def create_default_utilsrc
+  if File.exist?($utilsrc)
+    Tempfile.open('utilsrc') do |tmp|
+      tmp.puts $config.to_ruby
+      tmp.flush
+      yield tmp.path, $utilsrc
+    end
+  end
+end
+
+case cmd = ARGV.shift
+when 'show'
+  if File.exist?($utilsrc)
+    puts File.read($utilsrc)
+  else
+    puts $config.to_ruby
+  end
+when 'diff'
+  create_default_utilsrc do |default_utilsrc, utilsrc|
+    system "diff -u #{default_utilsrc.inspect} #{utilsrc.inspect} | cdiff"
+  end
+when 'edit'
+  create_default_utilsrc do |default_utilsrc, utilsrc|
+    system "vimdiff #{default_utilsrc.inspect} #{utilsrc.inspect}"
+  end
+else
+  puts <<EOT
+Usage: #{File.basename($0)} show|diff|edit
+EOT
+end
