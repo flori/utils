@@ -29,6 +29,7 @@ Options are
   -e          open the matching files with edit command
   -a CSET     use only character set CSET from PATTERN
   -I SUFFIX   only include files with suffix SUFFIX during finding
+  -b          match also binary files
   -h          display this help
 
 Version is #{File.basename($0)} #{Utils::VERSION}.
@@ -36,7 +37,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'I:a:rdDcieh'
+args = go 'I:a:rdDciebh'
 args['h'] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }
@@ -45,6 +46,7 @@ Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args['c']
 STDOUT.sync = true
 config = Utils::Config::ConfigFile.new
 config.parse_config_file File.expand_path('~/.utilsrc')
+args['b'] ||= config.discover.binary
 finder = Finder.new(
   :pattern => pattern,
   :args    => args,

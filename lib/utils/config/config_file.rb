@@ -106,6 +106,8 @@ class Utils::Config::ConfigFile
     config :prune_dirs, /\A(\.svn|\.git|CVS|tmp)\Z/
 
     config :skip_files, /(\A\.|\.sw[pon]\Z|\.log\Z|~\Z)/
+
+    config :binary, false
   end
 
   def discover(&block)

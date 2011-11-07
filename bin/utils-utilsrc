@@ -24,6 +24,8 @@ when 'show'
   else
     puts $config.to_ruby
   end
+when 'default'
+  puts $config.to_ruby
 when 'diff'
   create_default_utilsrc do |default_utilsrc, utilsrc|
     system "diff -u #{default_utilsrc.inspect} #{utilsrc.inspect} | cdiff"

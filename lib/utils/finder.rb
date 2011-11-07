@@ -18,6 +18,7 @@ class Utils::Finder
       :cset  => @args['a'],
       :icase => @args['i'],
     }
+    @binary = @args['b']
     @pattern = @args['r'] ?
       RegexpPattern.new(pattern_opts) :
       FuzzyPattern.new(pattern_opts)
@@ -30,15 +31,19 @@ class Utils::Finder
 
   attr_reader :output
 
+  def ascii_file?(stat, path)
+    stat.file? && (@binary || stat.size == 0 || File.ascii?(path))
+  end
+
   def attempt_match?(path)
     stat = File.stat(path)
     stat.symlink? and stat = File.lstat(path)
     if @only_directory
       stat.directory?
     elsif @directory
-      stat.directory? || stat.file? && (stat.size == 0 || File.ascii?(path))
+      stat.directory? || ascii_file?(stat, path)
     else
-      stat.file? && (stat.size == 0 || File.ascii?(path))
+      ascii_file?(stat, path)
     end
   rescue SystemCallError => e
     warn "Caught #{e.class}: #{e}"
