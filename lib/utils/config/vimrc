@@ -178,6 +178,7 @@ map <leader>e :e <C-R>=substitute(expand("%:p:h") . "/", " ", "\\\\ ", "g")<CR>
 map <leader>t :tabe <C-R>=substitute(expand("%:p:h") . "/", " ", "\\\\ ", "g")<CR>
 map <leader>s :split <C-R>=substitute(expand("%:p:h") . "/", " ", "\\\\ ", "g")<CR>
 map <leader>c :cd <C-R>=substitute(expand("%:p:h") . "/", " ", "\\\\ ", "g")<CR>
+map <leader>K :%s/\([^:]\):\([^:'" ]\{1,\}\) *=>/\1\2:/g<CR>
 " Switch of search highlighting
 map <silent> <F9> :nohlsearch<CR>
 if has("fullscreen")
@@ -221,10 +222,10 @@ noremap <PageDown> <Nop>
 cnoremap <C-0> <Home>
 cnoremap <C-^> <Home>
 cnoremap <C-$> <End>
-cnoremap <C-h> <Left>
-cnoremap <C-l> <Right>
-cnoremap <C-k> <Up>
-cnoremap <C-j> <Down>
+cnoremap <C-H> <Left>
+cnoremap <C-L> <Right>
+cnoremap <C-K> <Up>
+cnoremap <C-J> <Down>
 vnoremap < <gv
 vnoremap > >gv
 " Marks
@@ -315,6 +316,7 @@ if has("autocmd")
     autocmd FileType ruby setl path+=lib/**
     autocmd FileType ruby setl path+=test/**
     autocmd FileType ruby setl path+=tests/**
+    autocmd FileType ruby setl path+=spec/**
     autocmd FileType ruby imap <C-l> <C-k>l*
   augroup END
 
