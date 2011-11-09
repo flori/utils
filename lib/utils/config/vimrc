@@ -7,7 +7,7 @@ set autoindent
 set autowrite
 set backspace=indent,eol,start
 set dictionary=/usr/dict/words
-set digraph
+set nodigraph
 set encoding=utf8
 set errorformat+=%f:%l
 set expandtab shiftwidth=2 tabstop=2
