@@ -56,7 +56,7 @@ end
 ssh_dir = File.expand_path('~/.ssh')
 mkdir_p ssh_dir
 sock_file = "#{ssh_dir}/#{user}@#{remote}:#{rport}.sock"
-user = ENV['USER'] and opts['n'] ||= user
+env_user = ENV['USER'] and opts['n'] ||= env_user
 if opts['N']
   exec "ssh -p #{rport} -S #{sock_file} #{user}@#{remote} screen -ls"
 elsif lport
