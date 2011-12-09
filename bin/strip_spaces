@@ -17,6 +17,7 @@ config.parse_config_file File.expand_path('~/.utilsrc')
 
 find(*pathes) do |filename|
   bn, s = File.basename(filename), File.stat(filename)
+  s.symlink? and next
   if s.directory?
     config.strip_spaces.prune?(bn) and prune
     next
