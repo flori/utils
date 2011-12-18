@@ -450,16 +450,26 @@ def ls(*args)
   puts `ls #{args.map { |x| "'#{x}'" } * ' '}`
 end
 
-if RUBY_VERSION < '1.9' && defined?(ActiveRecord::Base)
-  require 'logger'
-  $real_logger = Logger.new(STDERR)
-  $logger = Tins::NULL
+if defined?(ActiveRecord::Base)
+  $logger = Logger.new(STDERR)
   def irb_toggle_logging
-    case $logger
-    when Tins::NULL
-      $logger = $real_logger
-    when Logger
-      $logger = Tins::NULL
+    require 'logger'
+    if ActiveRecord::Base.logger != $logger
+      $old_logger = ActiveRecord::Base.logger
+      ActiveRecord::Base.logger = $logger
+      true
+    else
+      ActiveRecord::Base.logger = $old_logger
+      false
+    end
+  end
+
+end
+
+if defined?(ActiveRecord::Relation)
+  class ActiveRecord::Relation
+    def explain
+      connection.select_all("EXPLAIN #{to_sql}")
     end
   end
 end
