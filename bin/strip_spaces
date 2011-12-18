@@ -22,7 +22,7 @@ find(*pathes) do |filename|
     config.strip_spaces.prune?(bn) and prune
     next
   end
-  s.file?(filename) or next
+  s.file? or next
   config.strip_spaces.skip?(bn) and next
   File.ascii?(filename) or next
   STDOUT.puts "Stripping spaces from #{filename.inspect}."
