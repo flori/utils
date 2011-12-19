@@ -179,6 +179,8 @@ map <leader>t :tabe <C-R>=substitute(expand("%:p:h") . "/", " ", "\\\\ ", "g")<C
 map <leader>s :split <C-R>=substitute(expand("%:p:h") . "/", " ", "\\\\ ", "g")<CR>
 map <leader>c :cd <C-R>=substitute(expand("%:p:h") . "/", " ", "\\\\ ", "g")<CR>
 map <leader>K :%s/\([^:]\):\([^:'" ]\{1,\}\) *=>/\1\2:/g<CR>
+map <leader>C :call Ccamelunderscore()<CR>
+
 " Switch of search highlighting
 map <silent> <F9> :nohlsearch<CR>
 if has("fullscreen")
@@ -203,11 +205,11 @@ endfunction
 nnoremap <silent> <F12> :call Ctoggle()<CR>
 
 " Switch Windows
-map <C-j> <C-W>j<C-W>_
-map <C-k> <C-W>k<C-W>_
+map <A-j> <C-W>j<C-W>_
+map <A-k> <C-W>k<C-W>_
 " Switch Buffers
-map <C-l> <ESC>:bn<CR>
-map <C-h> <ESC>:bp<CR>
+map <A-l> <ESC>:bn<CR>
+map <A-h> <ESC>:bp<CR>
 " Configure navigation keys
 noremap <Up> <Nop>
 noremap <Down> <Nop>
@@ -222,10 +224,10 @@ noremap <PageDown> <Nop>
 cnoremap <C-0> <Home>
 cnoremap <C-^> <Home>
 cnoremap <C-$> <End>
-cnoremap <C-H> <Left>
-cnoremap <C-L> <Right>
-cnoremap <C-K> <Up>
-cnoremap <C-J> <Down>
+cnoremap <C-h> <Left>
+cnoremap <C-l> <Right>
+cnoremap <C-k> <Up>
+cnoremap <C-j> <Down>
 vnoremap < <gv
 vnoremap > >gv
 " Marks
@@ -461,8 +463,15 @@ function! Cdeclassify(...)
   else
     let args = copy(a:000)
   endif
-  let output = system("classify -d " . join(map(copy(args), 'shellescape(v:val)'), ' '))
-  execute "normal a" . output
+  let output = system("classify -s -d " . join(map(copy(args), 'shellescape(v:val)'), ' '))
+  exec "normal a" . output
+endfunction
+
+function! Ccamelunderscore(...)
+  exec 'w'
+  let name = expand('<cWORD>')
+  let output = system('classify -t ' . name)
+  exec "normal ciW" . output
 endfunction
 
 comclear
