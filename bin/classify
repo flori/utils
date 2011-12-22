@@ -4,15 +4,32 @@ require 'tins/go'
 include Tins::GO
 require 'tins/xt/string'
 
-opts = go 'bd'
+$opts = go 'bdts'
 
 string  = ARGV.shift or fail "need a class/filepath/filename"
 
-if opts['d']
-  string = string.sub(/.*::/, '') if opts['b']
-  print string.underscore + '.rb'
-else
-  string = File.basename(string) if opts['b']
+def underscore(string)
+  string = string.sub(/.*::/, '') if $opts['b']
+  string = string.underscore
+  $opts['s'] and string << '.rb'
+  print string
+end
+
+def camelize(string)
+  string = File.basename(string) if $opts['b']
   string = string.gsub(/#{Regexp.quote(File.extname(string))}\Z/, '')
   print string.camelize
+end
+
+case
+when $opts['t']
+  if string[0, 1] =~ /[A-Z]/
+    underscore string
+  else
+    camelize string
+  end
+when $opts['d']
+  underscore string
+else
+  camelize string
 end
