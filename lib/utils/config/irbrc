@@ -6,6 +6,7 @@ require 'enumerator'
 require 'pp'
 require 'fileutils'
 require 'find'
+require 'pry-editline'
 include FileUtils
 begin
   require 'ap'

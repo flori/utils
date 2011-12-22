@@ -18,6 +18,7 @@ GemHadar do
   dependency  'tins',           '~>0.3'
   dependency  'term-ansicolor', '~>1.0'
   dependency  'dslkit',         '~>0.2'
+  dependency  'pry-editline'
 
   install_library do
     libdir = CONFIG["sitelibdir"]
