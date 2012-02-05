@@ -18,6 +18,7 @@ set hidden
 set history=1000
 set hlsearch
 set laststatus=2
+set macmeta
 set makeprg=errf
 set modelines=5
 set mouse=nv
