@@ -60,7 +60,10 @@ module Utils
     end
 
     def edit(*filenames)
-      filenames.map! { |f| Dir[f] }.flatten!
+      filenames_with_colon, filenames_without_colon =
+        filenames.partition { |x| x =~ /:/ }
+      filenames_without_colon.map! { |f| Dir[f] }.flatten!
+      filenames = filenames_with_colon + filenames_without_colon
       if filenames.size == 1
         filename = filenames.first
         if m = file_linenumber?(filename)
