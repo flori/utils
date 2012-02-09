@@ -337,7 +337,6 @@ if has("autocmd")
     autocmd FileType ruby setl path+=test/**
     autocmd FileType ruby setl path+=tests/**
     autocmd FileType ruby setl path+=spec/**
-    autocmd FileType ruby imap <C-l> <C-k>l*
   augroup END
 
   augroup javascript
