@@ -22,6 +22,7 @@ let g:colors_name="flori"
 
 " general highlight groups
 hi Normal guifg=lightyellow guibg=grey20
+hi ColorColumn guibg=grey25
 hi Cursor guibg=khaki guifg=slategrey
 hi CursorIM guibg=khaki guifg=slategrey
 hi CursorColumn guibg=grey25

@@ -6,6 +6,8 @@
 set autoindent
 set autowrite
 set backspace=indent,eol,start
+set colorcolumn=79
+set textwidth=80
 set dictionary=/usr/dict/words
 set nodigraph
 set encoding=utf8
@@ -18,11 +20,10 @@ set hidden
 set history=1000
 set hlsearch
 set laststatus=2
-set macmeta
 set makeprg=errf
 set modelines=5
-set mouse=nv
 set mousehide
+set mouse=nv
 set nocindent
 set nocompatible
 set nocursorcolumn
@@ -45,6 +46,7 @@ set smarttab
 set statusline=%<%f%m%r%=%(%Bh=%bd%)@%(%l:%c\%)%4P
 set swapsync="fsync"
 set termencoding=utf8
+set tildeop
 set title
 set ttyfast
 set viminfo='20,<50,s10,h,!
@@ -90,14 +92,14 @@ if has("gui_running")
       set guioptions-=T
       set guioptions-=m
       set guioptions+=p
-    endif
+    end
   elseif has("gui_gtk2")
     set guifont=DejaVu\ Sans\ Mono\ 12
     if exists("+guioptions")
       set guioptions-=T
       set guioptions-=m
       set guioptions+=p
-    endif
+    end
     set guiheadroom=0
     set columns=80
     set lines=59
@@ -107,7 +109,7 @@ if has("gui_running")
       set guioptions-=T
       set guioptions-=m
       set guioptions+=p
-    endif
+    end
     set antialias
     set guiheadroom=0
     "set macatsui
@@ -118,10 +120,11 @@ if has("gui_running")
     if exists("+guioptions")
       set guioptions-=T
       set guioptions-=m
-    endif
+    end
   end
 else
   set background=dark
+  colorscheme darkblue
   hi DiffAdd ctermbg=green
   hi DiffChange ctermbg=blue
   hi DiffText ctermbg=gray
@@ -132,7 +135,7 @@ end
 let ruby_operators=1
 if has("syntax")
   syntax on
-endif
+end
 
 " Browsing
 if has("browse")
@@ -145,7 +148,7 @@ if has("browse")
   let g:explDateFormat="%Y-%m-%d %H:%M:%S"
   " let g:explHideFiles='^\.,\.gz$,\.exe$,\.zip$'
   let g:explUseSeparators=1    " Use separator lines
-endif
+end
 
 let g:netrw_longlist=1
 let g:netrw_use_noswf= 0
@@ -167,9 +170,9 @@ if has("cscope")
   " else add database pointed to by environment
   elseif $CSCOPE_DB != ""
       cs add $CSCOPE_DB
-  endif
+  end
   set csverb
-endif
+end
 
 " Mappings
 let mapleader=","
@@ -191,26 +194,40 @@ if has("fullscreen")
       set nofullscreen
     else
       set fullscreen
-    endif
+    end
   endfunction
   map <silent> <F11> :call Cfullscreen()<CR>
+  if has("gui_mac")  || has("gui_macvim")
+    map <silent> <D-Enter> :call Cfullscreen()<CR>
+  end
   au GUIEnter * set fullscreen
-endif
+end
 function! Ctoggle()
   if &buftype == "quickfix"
     cclose
   else
     copen
-  endif
+  end
 endfunction
 nnoremap <silent> <F12> :call Ctoggle()<CR>
 
 " Switch Windows
 map <A-j> <C-W>j<C-W>_
+map ∆ <C-W>j<C-W>_
 map <A-k> <C-W>k<C-W>_
+map ˚ <C-W>k<C-W>_
 " Switch Buffers
 map <A-l> <ESC>:bn<CR>
+map ¬ <ESC>:bn<CR>
 map <A-h> <ESC>:bp<CR>
+map ˙ <ESC>:bp<CR>
+map <A-=> <C-W>=
+map ≠ <C-W>=
+map <A-,> <C-W>+
+map ≥ <C-W>+
+map <A-.> <C-W>-
+map ≤ <C-W>-
+
 " Configure navigation keys
 noremap <Up> <Nop>
 noremap <Down> <Nop>
@@ -390,7 +407,7 @@ if has("autocmd")
     autocmd!
     autocmd BufNewFile,BufRead mutt-* setl textwidth=72
   augroup END
-endif
+end
 
 function! Cfind(...)
   redraw
@@ -398,7 +415,7 @@ function! Cfind(...)
     let args = [ expand( '<cword>') ]
   else
     let args = copy(a:000)
-  endif
+  end
   let args_string = join(map(copy(args), 'shellescape(v:val)'), ' ')
   echo 'Finding ' . args_string . '...'
   set grepformat=%f
@@ -415,7 +432,7 @@ function! Cgrep(...)
     let args = [ expand( '<cword>') ]
   else
     let args = copy(a:000)
-  endif
+  end
   let args_string = join(map(args, 'shellescape(v:val)'), ' ')
   echo 'Grepping ' . args_string . '...'
   set grepformat=%f:%l
@@ -433,7 +450,7 @@ function! Ctest(...)
     let name = expand('<cword>')
   else
     let name = a:1
-  endif
+  end
   exec 'make ' . expand('%') . ' ' . name
 endfunction
 
@@ -442,7 +459,7 @@ function! Cclassify(...)
     let args = [ expand( '<cword>') ]
   else
     let args = copy(a:000)
-  endif
+  end
   let output = system("classify -b " . join(map(copy(args), 'shellescape(v:val)'), ' '))
   execute "normal a" . output
 endfunction
@@ -452,7 +469,7 @@ function! CpathClassify(...)
     let args = [ expand( '<cword>') ]
   else
     let args = copy(a:000)
-  endif
+  end
   let output = system("classify " . join(map(copy(args), 'shellescape(v:val)'), ' '))
   execute "normal a" . output
 endfunction
@@ -462,7 +479,7 @@ function! Cdeclassify(...)
     let args = [ expand( '<cword>') ]
   else
     let args = copy(a:000)
-  endif
+  end
   let output = system("classify -s -d " . join(map(copy(args), 'shellescape(v:val)'), ' '))
   exec "normal a" . output
 endfunction

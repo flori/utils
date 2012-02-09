@@ -16,20 +16,21 @@ module Utils
     alias wait? wait
 
     def vim
-      @vim ||= case `uname -s`
-      when /\Adarwin/i
-        if File.directory?('/Applications')
-          '/Applications/MacVim.app/Contents/MacOS/Vim'
+      @vim ||=
+        case `uname -s`
+        when /\Adarwin/i
+          if File.directory?('/Applications')
+            '/Applications/MacVim.app/Contents/MacOS/Vim'
+          else
+            'vim'
+          end
         else
-          'gvim'
+          'vim'
         end
-      else
-        'gvim'
-      end
     end
 
     def cmd(*parts)
-      command = parts.inject([]) do |a, p|
+      command = parts.compact.inject([]) do |a, p|
         case
         when p == nil, p == []
           a
@@ -59,6 +60,7 @@ module Utils
     end
 
     def edit(*filenames)
+      filenames.map! { |f| Dir[f] }.flatten!
       if filenames.size == 1
         filename = filenames.first
         if m = file_linenumber?(filename)
@@ -93,8 +95,12 @@ module Utils
       self
     end
 
+    def gui
+      ENV['TERM'] =~ /xterm/ ? '-g' : nil
+    end
+
     def start
-      cmd(vim, '-g', '--servername', servername)
+      cmd(vim, gui, '--servername', servername)
     end
 
     def stop
@@ -108,7 +114,7 @@ module Utils
     end
 
     def serverlist
-      @serverlist ||= `#{vim} -g --serverlist`.split
+      @serverlist ||= `#{vim} #{gui} --serverlist`.split
     end
 
     def started?(name = servername)
@@ -116,15 +122,15 @@ module Utils
     end
 
     def edit_remote(*args)
-      cmd(vim, '-g', '--servername', servername, '--remote', *args)
+      cmd(vim, gui, '--servername', servername, '--remote', *args)
     end
 
     def edit_remote_wait(*args)
-      cmd(vim, '-g', '--servername', servername, '--remote-wait', *args)
+      cmd(vim, gui, '--servername', servername, '--remote-wait', *args)
     end
 
     def edit_remote_send(*args)
-      cmd(vim, '-g', '--servername', servername, '--remote-send', *args)
+      cmd(vim, gui, '--servername', servername, '--remote-send', *args)
     end
 
     def edit_remote_file(*filenames)

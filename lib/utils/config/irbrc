@@ -12,7 +12,7 @@ begin
   require 'ap'
 rescue LoadError
 end
-require 'utils/editor'
+require 'utils'
 $editor = Utils::Editor.new
 
 $pager = ENV['PAGER'] || 'less -r'
@@ -344,13 +344,28 @@ def irb_read(filename, chunk_size = 8_192)
   end
 end
 
-def irb_load_each(*files)
+def irb_load!(*files)
   files = files.map { |f| f.gsub(/(\.rb)?\Z/, '.rb') }
+  loaded = {}
   for file in files
-    Find.find('.') do |f|
-      if file == File.basename(f)
-        load f
-        STDERR.puts "Loaded '#{f}'."
+    catch :found do
+      Find.find('.') do |f|
+        File.directory?(f) and next
+        md5_f = Utils::MD5.md5(f)
+        if f.end_with?(file) and !loaded[md5_f]
+          Kernel.load f
+          loaded[md5_f] = true
+          STDERR.puts "Loaded '#{f}'."
+        end
+      end
+      Find.find('.') do |f|
+        File.directory?(f) and next
+        md5_f = Utils::MD5.md5(f)
+        if f.end_with?(file) and !loaded[md5_f]
+          Kernel.load f
+          loaded[md5_f] = true
+          STDERR.puts "Loaded '#{f}'."
+        end
       end
     end
   end
