@@ -72,11 +72,11 @@ filetype on
 filetype indent on
 filetype plugin on
 source $VIMRUNTIME/macros/matchit.vim
+colorscheme flori
 
 " Configure GUIs
 if has("gui_running")
   set guipty
-  colorscheme flori
   hi Pmenu ctermbg=Grey guibg=DarkGrey
 	set guioptions-=r
 	set guioptions-=R
@@ -123,8 +123,6 @@ if has("gui_running")
     end
   end
 else
-  set background=dark
-  colorscheme darkblue
   hi DiffAdd ctermbg=green
   hi DiffChange ctermbg=blue
   hi DiffText ctermbg=gray
