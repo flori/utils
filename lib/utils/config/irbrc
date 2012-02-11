@@ -6,7 +6,9 @@ require 'enumerator'
 require 'pp'
 require 'fileutils'
 require 'find'
-require 'pry-editline'
+if Readline.respond_to?(:point) && Readline.respond_to?(:line_buffer)
+  require 'pry-editline'
+end
 include FileUtils
 begin
   require 'ap'
