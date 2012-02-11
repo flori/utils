@@ -165,7 +165,7 @@ module Utils
     end
 
     def edit_remote_file(*filenames)
-      if wait?
+      if gui && wait?
         edit_remote_wait(*filenames)
       else
         edit_remote(*filenames)
