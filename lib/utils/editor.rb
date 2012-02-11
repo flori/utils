@@ -1,5 +1,25 @@
 module Utils
   class Editor
+    FILE_LINENUMBER_REGEXP = /^\s*([^:]+):(\d+)/
+
+    module SourceLocationExtension
+      def source_location
+        if respond_to?(:to_str)
+          if (string = to_str) =~ FILE_LINENUMBER_REGEXP
+            [ $1, $2.to_i ]
+          else
+            [ string, 1 ]
+          end
+        else
+          [ to_s, 1 ]
+        end
+      end
+    end
+
+    class ::Object
+      include SourceLocationExtension
+    end
+
     def initialize
       self.wait           = false
       self.pause_duration = 1
@@ -41,7 +61,7 @@ module Utils
         end
       end
       $DEBUG and warn command * ' '
-      system(*command)
+      system(*command.map(&:to_s))
     end
 
     def fullscreen=(enabled)
@@ -56,22 +76,22 @@ module Utils
     end
 
     def file_linenumber?(filename)
-      filename.match(/^\s*([^:]+):(\d+)/)
+      filename.match(FILE_LINENUMBER_REGEXP)
+    end
+
+    def expand_globs(filenames)
+      filenames.map { |f| Dir[f] }.flatten.uniq.sort 
     end
 
     def edit(*filenames)
-      filenames_with_colon, filenames_without_colon =
-        filenames.partition { |x| x =~ /:/ }
-      filenames_without_colon.map! { |f| Dir[f] }.flatten!
-      filenames = filenames_with_colon + filenames_without_colon
-      if filenames.size == 1
-        filename = filenames.first
-        if m = file_linenumber?(filename)
-          edit_file_linenumber(*m.captures)
-        else
-          edit_file(filename)
-        end
-      elsif !filenames.empty?
+      if filenames.size == 1 and
+        source_location = filenames.first.source_location
+      then
+        edit_source_location(source_location) ||
+          edit_file(expand_globs(source_location[0, 1]))
+      else
+        filenames =
+          expand_globs(filenames.map(&:source_location).map(&:first))
         edit_file(*filenames)
       end
     end
@@ -90,6 +110,14 @@ module Utils
         edit_remote(filename)
         sleep pause_duration
         edit_remote_send("<ESC>:#{linenumber}<CR>")
+      end
+    end
+
+    def edit_source_location(source_location)
+      if File.exist?(source_location[0])
+        edit_file_linenumber(source_location[0], source_location[1])
+      else
+        false
       end
     end
 
