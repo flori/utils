@@ -80,7 +80,7 @@ module Utils
     end
 
     def expand_globs(filenames)
-      filenames.map { |f| Dir[f] }.flatten.uniq.sort 
+      filenames.map { |f| Dir[f] }.flatten.uniq.sort
     end
 
     def edit(*filenames)

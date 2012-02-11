@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require 'tins/go'
+include Tins::GO
 require 'tins/secure_write'
 include Tins::SecureWrite
 require 'utils'
@@ -8,6 +10,25 @@ include Utils::Find
 class ::File
   include Utils::FileXt
 end
+
+def usage
+  puts <<-EOT
+Usage: #{File.basename($0)} [OPTS] [PATHES]
+
+PATHES are the directory and file pathes that are search for files to be
+stripped.
+
+Options are
+
+  -h          display this help
+
+Version is #{File.basename($0)} #{Utils::VERSION}.
+  EOT
+  exit 1
+end
+
+args = go 'h'
+args['h'] and usage
 
 pathes = ARGV.empty? ?  %w[.] : ARGV
 pathes = pathes.map { |p| File.expand_path(p) }
