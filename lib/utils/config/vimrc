@@ -6,7 +6,9 @@
 set autoindent
 set autowrite
 set backspace=indent,eol,start
-set colorcolumn=79
+if exists('&colorcolumn')
+  set colorcolumn=79
+end
 set textwidth=80
 set dictionary=/usr/dict/words
 set nodigraph
