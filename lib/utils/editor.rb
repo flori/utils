@@ -23,7 +23,7 @@ module Utils
     def initialize
       self.wait           = false
       self.pause_duration = 1
-      self.servername     = "G#{ENV['USER'].upcase}"
+      self.servername     = ENV['VIM_SERVER'] || "G#{ENV['USER'].upcase}"
       yield self if block_given?
     end
 

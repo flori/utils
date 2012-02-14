@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'tins/go'
+require 'tins/xt'
 include Tins::GO
 require 'utils'
 include Utils
@@ -17,6 +17,7 @@ Options are
   -w          open a buffer in vim and wait until it is deleted
   -s          read files and files:linenumbers from stdin and open them
   -p DURATION pause for this many seconds to wait for vim's reaction
+  -S SERVER   specify the server for this edit command
   -h          display this help
 
 Version is #{File.basename($0)} #{Utils::VERSION}.
@@ -24,12 +25,13 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-$opt = go 'wp:sh'
+$opt = go 'p:S:wsh'
 $opt['h'] and usage
 
 editor = Editor.new do |config|
   config.wait           = $opt['w']
   config.pause_duration = ($opt['p'] || 1).to_i
+  s = $opt['S'] and config.servername = s
 end
 
 if $opt['s']
