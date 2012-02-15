@@ -114,11 +114,7 @@ module Utils
     end
 
     def edit_source_location(source_location)
-      if File.exist?(source_location[0])
-        edit_file_linenumber(source_location[0], source_location[1])
-      else
-        false
-      end
+      edit_file_linenumber(source_location[0], source_location[1])
     end
 
     def ensure_running
