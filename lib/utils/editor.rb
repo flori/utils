@@ -39,8 +39,10 @@ module Utils
       @vim ||=
         case `uname -s`
         when /\Adarwin/i
-          if File.directory?('/Applications')
-            '/Applications/MacVim.app/Contents/MacOS/Vim'
+          if File.directory?(path = File.expand_path('~/Applications/MacVim.app')) or
+            File.directory?(path = File.expand_path('/Applications/MacVim.app'))
+          then
+            File.join(path, 'Contents/MacOS/Vim')
           else
             'vim'
           end
