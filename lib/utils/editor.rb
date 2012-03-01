@@ -1,3 +1,5 @@
+require 'tins/xt/full'
+
 module Utils
   class Editor
     FILE_LINENUMBER_REGEXP = /^\s*([^:]+):(\d+)/
@@ -82,7 +84,7 @@ module Utils
     end
 
     def expand_globs(filenames)
-      filenames.map { |f| Dir[f] }.flatten.uniq.sort
+      filenames.map { |f| Dir[f] }.flatten.uniq.sort.full? || filenames
     end
 
     def edit(*filenames)
