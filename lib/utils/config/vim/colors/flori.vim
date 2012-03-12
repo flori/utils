@@ -111,3 +111,6 @@ hi DiffAdd guibg=green guifg=white ctermbg=green ctermfg=white
 hi DiffChange guibg=blue guifg=white ctermbg=blue ctermfg=white
 hi DiffText guifg=yellow ctermbg=yellow ctermfg=white
 hi DiffDelete guibg=red guifg=white ctermbg=red ctermfg=white
+
+hi ExtraWhitespace ctermbg=red guibg=red
+match ExtraWhitespace /\s\+$/
