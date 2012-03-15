@@ -6,11 +6,18 @@ include Utils
 require 'tins/go'
 include Tins::GO
 
+def convert_ruby_to_vim_regexp(pattern)
+  regexp = pattern.source.dup
+  regexp.gsub!(/([^\\])\?/, '\1\\?')
+  pattern.casefold? and regexp << '\c'
+  regexp
+end
+
 def edit_files(pattern, pathes)
   editor = Utils::Editor.new do |config|
     config.wait = true
   end
-  editor.edit_remote_send("<ESC>/#{pattern.source}<CR>")
+  editor.edit_remote_send("<ESC>/#{convert_ruby_to_vim_regexp(pattern)}<CR>")
   for path in pathes
     STDERR.puts "Edit #{path}"
     editor.edit(path)
