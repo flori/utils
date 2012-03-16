@@ -70,9 +70,11 @@ class Utils::Finder
     end
     pathes.uniq!
     pathes.map! { |p| a = File.split(p) ; a.unshift(p) ; a }
-    @suffix = @args['I']
+    @suffixes = @args['I'].ask_and_send(:split, /[\s,]+/).to_a
     pathes = pathes.map! do |path, dir, file|
-      @suffix && @suffix != File.extname(file)[1..-1] and next
+      if @suffixes.full?
+        @suffixes.include?(File.extname(file)[1..-1]) or next
+      end
       if do_match = attempt_match?(path) and $DEBUG
         warn "Attempt match of #{path.inspect}"
       end

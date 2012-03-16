@@ -40,6 +40,7 @@ Options are
   -A NUMBER   displays NUMBER lines of context after the match
   -B NUMBER   displays NUMBER lines of context before the match
   -C NUMBER   displays NUMBER lines of context around the match
+  -f          just list the pathes of the files that would be searched
   -l          just list the pathes of the files with matches
   -L          list only the path:linenumber of the files with matches
   -R          interpret PATTERN argument as fuzzy not regex
@@ -55,7 +56,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'I:A:B:C:s:S:n:N:a:RcilLeh'
+args = go 'I:A:B:C:s:S:n:N:a:RciflLeh'
 args['h'] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }

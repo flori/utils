@@ -112,5 +112,5 @@ hi DiffChange guibg=blue guifg=white ctermbg=blue ctermfg=white
 hi DiffText guifg=yellow ctermbg=yellow ctermfg=white
 hi DiffDelete guibg=red guifg=white ctermbg=red ctermfg=white
 
-hi ExtraWhitespace ctermbg=red guibg=red
+hi ExtraWhitespace ctermbg=red guibg=#663333
 match ExtraWhitespace /\s\+$/

@@ -77,7 +77,11 @@ class Utils::Grepper
       File.open(filename, 'rb') do |file|
         if file.binary? != true
           $DEBUG and warn "Matching #{filename.inspect}."
-          match_lines file
+          if @args['f']
+            @output << filename
+          else
+            match_lines file
+          end
         else
           $DEBUG and warn "Skipping binary file #{filename.inspect}."
         end
@@ -141,10 +145,10 @@ class Utils::Grepper
   end
 
   def search
-    @suffix = @args['I']
+    @suffixes = @args['I'].ask_and_send(:split, /[\s,]+/).to_a
     for dir in @roots
       Utils::Find.find(dir) do |filename|
-        if !@suffix || @suffix == File.extname(filename)[1..-1]
+        if @suffixes.empty? || @suffixes.include?(File.extname(filename)[1..-1])
           match(filename)
         end
       end
