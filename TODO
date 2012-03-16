@@ -1,5 +1,4 @@
-- option for search to display all files that would be searched
-- make -I option take a list (comma <- or spaces seperated?)
+- improve backup mechanism for new configuration, interactivity?
 
 CHECK
 - When finding many places in the same file only jump to the first occurence if
