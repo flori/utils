@@ -38,6 +38,7 @@ module Utils
     alias wait? wait
 
     def vim
+      vim_in_path = [`which gvim`, `which vim`].map(&:chomp).find(&:full?)
       @vim ||=
         case `uname -s`
         when /\Adarwin/i
@@ -46,10 +47,10 @@ module Utils
           then
             File.join(path, 'Contents/MacOS/Vim')
           else
-            'vim'
+            vim_in_path
           end
         else
-          'vim'
+          vim_in_path
         end
     end
 

@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Florian Frank"]
-  s.date = "2012-03-16"
+  s.date = "2012-03-21"
   s.description = "This ruby gem provides some useful command line utilities"
   s.email = "flori@ping.de"
   s.executables = ["chroot-exec", "chroot-libs", "classify", "discover", "edit", "edit_wait", "enum", "errf", "git-empty", "myex", "number_files", "path", "probe", "same_files", "search", "sedit", "sshscreen", "strip_spaces", "unquarantine_apps", "untest", "utils-install-config", "utils-utilsrc", "vacuum_firefox_sqlite", "xmp"]
@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/flori/utils"
   s.rdoc_options = ["--title", "Utils - Some useful command line utilities", "--main", "README.rdoc"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.17"
+  s.rubygems_version = "1.8.19"
   s.summary = "Some useful command line utilities"
 
   if s.respond_to? :specification_version then
@@ -23,20 +23,20 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_development_dependency(%q<gem_hadar>, ["~> 0.1.7"])
-      s.add_runtime_dependency(%q<tins>, ["~> 0.3"])
+      s.add_runtime_dependency(%q<tins>, ["~> 0.3.11"])
       s.add_runtime_dependency(%q<term-ansicolor>, ["~> 1.0"])
       s.add_runtime_dependency(%q<dslkit>, ["~> 0.2"])
       s.add_runtime_dependency(%q<pry-editline>, [">= 0"])
     else
       s.add_dependency(%q<gem_hadar>, ["~> 0.1.7"])
-      s.add_dependency(%q<tins>, ["~> 0.3"])
+      s.add_dependency(%q<tins>, ["~> 0.3.11"])
       s.add_dependency(%q<term-ansicolor>, ["~> 1.0"])
       s.add_dependency(%q<dslkit>, ["~> 0.2"])
       s.add_dependency(%q<pry-editline>, [">= 0"])
     end
   else
     s.add_dependency(%q<gem_hadar>, ["~> 0.1.7"])
-    s.add_dependency(%q<tins>, ["~> 0.3"])
+    s.add_dependency(%q<tins>, ["~> 0.3.11"])
     s.add_dependency(%q<term-ansicolor>, ["~> 1.0"])
     s.add_dependency(%q<dslkit>, ["~> 0.2"])
     s.add_dependency(%q<pry-editline>, [">= 0"])
