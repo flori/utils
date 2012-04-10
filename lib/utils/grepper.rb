@@ -6,6 +6,7 @@ class ::File
 end
 
 class Utils::Grepper
+  include Utils::Find
   include Utils::Patterns
   include Term::ANSIColor
 
@@ -71,7 +72,7 @@ class Utils::Grepper
     bn, s = File.basename(filename), File.stat(filename)
     if s.directory? && @config.search.prune?(bn)
       $DEBUG and warn "Pruning #{filename.inspect}."
-      Utils::Find.prune
+      prune
     end
     if s.file? && !@config.search.skip?(bn) && (!@name_pattern || @name_pattern.match(bn))
       File.open(filename, 'rb') do |file|
@@ -147,7 +148,7 @@ class Utils::Grepper
   def search
     @suffixes = @args['I'].ask_and_send(:split, /[\s,]+/).to_a
     for dir in @roots
-      Utils::Find.find(dir) do |filename|
+      find(dir) do |filename|
         if @suffixes.empty? || @suffixes.include?(File.extname(filename)[1..-1])
           match(filename)
         end

@@ -57,7 +57,7 @@ class Utils::Finder
         bn, s = File.basename(filename), File.stat(filename)
         if s.directory? && @config.discover.prune?(bn)
           $DEBUG and warn "Pruning #{filename.inspect}."
-          Utils::Find.prune
+          prune
         end
         if s.file? && @config.discover.skip?(bn)
           $DEBUG and warn "Skipping #{filename.inspect}."
