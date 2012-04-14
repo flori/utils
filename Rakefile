@@ -17,7 +17,7 @@ GemHadar do
 
   dependency  'tins',           '~>0.3.12'
   dependency  'term-ansicolor', '~>1.0'
-  dependency  'dslkit',         '~>0.2'
+  dependency  'dslkit',         '~>0.2.10'
   dependency  'pry-editline'
 
   install_library do

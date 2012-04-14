@@ -6,15 +6,26 @@ module Utils
 
     module SourceLocationExtension
       def source_location
+        filename   = nil
+        linenumber = nil
         if respond_to?(:to_str)
           if (string = to_str) =~ FILE_LINENUMBER_REGEXP
-            [ $1, $2.to_i ]
+            filename = $1
+            linenumber = $2.to_i
+            [ $1, linenumber ]
           else
-            [ string, 1 ]
+            filename = string
           end
         else
-          [ to_s, 1 ]
+          filename = to_s
         end
+        array = linenumber ? [ filename, linenumber ] : [ filename, 1 ]
+        array.singleton_class.instance_eval do
+          define_method(:filename) { filename }
+          define_method(:linenumber) { linenumber }
+          define_method(:to_s) { [ filename, linenumber ].compact * ':' }
+        end
+        array
       end
     end
 

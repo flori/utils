@@ -15,7 +15,8 @@ class Utils::Config::ConfigFile
     end
     self
   rescue SystemCallError => e
-    $DEBUG and warn "Couldn't read config file #{config_file_name.inspect}."
+    $DEBUG and warn "Couldn't read config file "\
+      "#{config_file_name.inspect}: #{e.class} #{e}"
     return nil
   end
 
@@ -67,8 +68,9 @@ class Utils::Config::ConfigFile
     def initialize(&block)
       super
       test_frameworks_allowed = [ :'test-unit', :rspec ]
-      test_frameworks_allowed.include?(test_framework) or raise ConfigFileError,
-        "test_framework has to be in #{test_frameworks_allowed.inspect}"
+      test_frameworks_allowed.include?(test_framework) or
+        raise ConfigFileError,
+          "test_framework has to be in #{test_frameworks_allowed.inspect}"
     end
   end
 
@@ -81,11 +83,11 @@ class Utils::Config::ConfigFile
 
   class FileFinder < BlockConfig
     def prune?(basename)
-      Array(prune_dirs).any? { |pd| pd.match(basename) }
+      Array(prune_dirs).any? { |pd| pd.match(basename.to_s) }
     end
 
     def skip?(basename)
-      Array(skip_files).any? { |sf| sf.match(basename) }
+      Array(skip_files).any? { |sf| sf.match(basename.to_s) }
     end
   end
 

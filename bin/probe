@@ -9,7 +9,7 @@ include Utils
 
 def usage
   puts <<-EOT
-Usage: #{File.basename($0)} [OPTS] FILENAME[:LINENO]
+Usage: #{File.basename($0)} [OPTS] FILENAME[:LINENO] [FILENAME]
 
 Options are
 
@@ -24,7 +24,7 @@ end
 
 def cmd(*args)
   puts args * ' '
-  exec *args
+  system(*args)
 end
 
 $config = Utils::Config::ConfigFile.new
@@ -32,38 +32,43 @@ $config.parse_config_file File.expand_path('~/.utilsrc')
 testrunner_args = []
 if i = ARGV.index('--')
   testrunner_args.concat ARGV[(i + 1)..-1]
-  ARGV[i..-1] = []
+  args = ARGV[0...i]
+else
+  args = ARGV.dup
 end
-$opt = go 't:n:h-'
-filename = ARGV.shift or fail "require filename or filename:line_number as first argument"
+$opt = go 't:n:h', args
+args.empty? and fail "require filename or filename:linenumber as arguments"
 $opt['h'] and usage
+
+puts "Running tests in #{args.inspect}"
+
 case ($opt['t'] || $config.probe.test_framework).to_sym
 when :rspec
-  if line_number = $opt['n']
-    cmd "rspec", '-I', $config.probe.include_dirs_argument, '-l', line_number, filename, *testrunner_args
-  elsif filename =~ /^\s*([^:]+):(\d+)/
-    filename, line_number = $1, $2
-    puts "Running test at #{filename}:#{line_number}"
-    cmd "rspec", '-I', $config.probe.include_dirs_argument, '-l', line_number, filename, *testrunner_args
+  if linenumber = $opt['n']
+    cmd "rspec", '-I', $config.probe.include_dirs_argument, '-l', linenumber,
+      *args, *testrunner_args
   else
-    puts "Running ALL tests in #{filename}"
-    cmd "rspec", '-I', $config.probe.include_dirs_argument, filename, *testrunner_args
+    cmd "rspec", '-I', $config.probe.include_dirs_argument, *args, *testrunner_args
   end
 when :'test-unit'
   if testname = $opt['n']
-    cmd "testrb", '-I', $config.probe.include_dirs_argument, '-n', testname, filename, *testrunner_args
-  elsif filename =~ /^\s*([^:]+):(\d+)/
-    filename, line_number = $1, $2
-    lf = Tins::LinesFile.for_filename filename, line_number.to_i
-    if testname = lf.match_backward(/def\s+(\S+?)(?:\(|\s*$)/).full?(:first)
-      puts "Running test #{testname.inspect} at #{filename}:#{lf.line_number}"
-      cmd "testrb", '-I', $config.probe.include_dirs_argument, '-n', testname, filename, *testrunner_args
-    else
-      warn "no test found before line #{line_number}"
-      exit 1
-    end
+    cmd "testrb", '-I', $config.probe.include_dirs_argument, '-n', testname,
+      *args, *testrunner_args
   else
-    puts "Running ALL tests in #{filename}"
-    cmd "testrb", '-I', $config.probe.include_dirs_argument, filename, *testrunner_args
+    for filename in args
+      sl = filename.source_location
+      if sl.linenumber
+        lf = Tins::LinesFile.for_filename(*sl)
+        if testname = lf.match_backward(/def\s+(\S+?)(?:\(|\s*$)/).full?(:first)
+          cmd "testrb", '-I', $config.probe.include_dirs_argument,
+            '-n', testname, sl.filename, *testrunner_args
+        else
+          warn "no test found before line #{sl.linenumber}"
+        end
+      else
+        cmd "testrb", '-I', $config.probe.include_dirs_argument, sl.filename,
+          *testrunner_args
+      end
+    end
   end
 end

@@ -1,5 +1,8 @@
+require 'dslkit/polite'
+
 module Utils
   module FileXt
+    extend DSLKit::Concern
     include File::Constants
 
     SEEK_SET = File::SEEK_SET
@@ -27,12 +30,6 @@ module Utils
       case binary?
       when true   then false
       when false  then true
-      end
-    end
-
-    def self.included(modul)
-      modul.instance_eval do
-        extend ClassMethods
       end
     end
 

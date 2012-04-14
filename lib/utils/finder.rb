@@ -36,8 +36,8 @@ class Utils::Finder
   end
 
   def attempt_match?(path)
-    stat = File.stat(path)
-    stat.symlink? and stat = File.lstat(path)
+    stat = path.stat
+    stat.symlink? and stat = path.lstat
     if @only_directory
       stat.directory?
     elsif @directory
@@ -54,7 +54,7 @@ class Utils::Finder
     pathes = []
     find(*@roots) do |filename|
       begin
-        bn, s = File.basename(filename), File.stat(filename)
+        bn, s = filename.pathname.basename, filename.stat
         if s.directory? && @config.discover.prune?(bn)
           $DEBUG and warn "Pruning #{filename.inspect}."
           prune
@@ -73,7 +73,7 @@ class Utils::Finder
     @suffixes = @args['I'].ask_and_send(:split, /[\s,]+/).to_a
     pathes = pathes.map! do |path, dir, file|
       if @suffixes.full?
-        @suffixes.include?(File.extname(file)[1..-1]) or next
+        @suffixes.include?(file.pathname.extname[1..-1]) or next
       end
       if do_match = attempt_match?(path) and $DEBUG
         warn "Attempt match of #{path.inspect}"
