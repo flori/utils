@@ -31,6 +31,10 @@ module Utils
           Pathname.new(self)
         end
 
+        def suffix
+          pathname.extname[1..-1]
+        end
+
         def exist?
           !!file
         end

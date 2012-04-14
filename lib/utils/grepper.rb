@@ -74,7 +74,9 @@ class Utils::Grepper
       $DEBUG and warn "Pruning #{filename.inspect}."
       prune
     end
-    if s.file? && !@config.search.skip?(bn) && (!@name_pattern || @name_pattern.match(bn))
+    if s.file? && !@config.search.skip?(bn) &&
+      (!@name_pattern || @name_pattern.match(bn))
+    then
       File.open(filename, 'rb') do |file|
         if file.binary? != true
           $DEBUG and warn "Matching #{filename.inspect}."
@@ -149,7 +151,7 @@ class Utils::Grepper
     @suffixes = @args['I'].ask_and_send(:split, /[\s,]+/).to_a
     for dir in @roots
       find(dir) do |filename|
-        if @suffixes.empty? || @suffixes.include?(File.extname(filename)[1..-1])
+        if @suffixes.empty? || @suffixes.include?(filename.suffix)
           match(filename)
         end
       end

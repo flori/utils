@@ -73,7 +73,7 @@ class Utils::Finder
     @suffixes = @args['I'].ask_and_send(:split, /[\s,]+/).to_a
     pathes = pathes.map! do |path, dir, file|
       if @suffixes.full?
-        @suffixes.include?(file.pathname.extname[1..-1]) or next
+        @suffixes.include?(path.suffix) or next
       end
       if do_match = attempt_match?(path) and $DEBUG
         warn "Attempt match of #{path.inspect}"
