@@ -11,9 +11,9 @@ module Utils
           begin
             file = @finder.get_file(self)
             if file
-              file.closed? and file.reopen
+              file.closed? and file.reopen(file.path, 'rb')
             else
-              file = File.new(self)
+              file = File.new(self, 'rb')
               @finder.add_file self, file
             end
             return file
