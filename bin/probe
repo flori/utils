@@ -48,6 +48,13 @@ when :rspec
     cmd "rspec", '-I', $config.probe.include_dirs_argument, '-l', linenumber,
       *args, *testrunner_args
   else
+    args = args.map do |a|
+      if Utils::Editor::FILE_LINENUMBER_REGEXP =~ a
+        $~.captures * ':'
+      else
+        a
+      end
+    end
     cmd "rspec", '-I', $config.probe.include_dirs_argument, *args, *testrunner_args
   end
 when :'test-unit'
