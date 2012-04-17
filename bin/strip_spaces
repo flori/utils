@@ -20,6 +20,7 @@ stripped.
 
 Options are
 
+  -I SUFFIXES list of suffixes
   -h          display this help
 
 Version is #{File.basename($0)} #{Utils::VERSION}.
@@ -27,16 +28,18 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'h'
+args = go 'I:h'
 args['h'] and usage
 
 pathes = ARGV.empty? ?  %w[.] : ARGV
 pathes = pathes.map { |p| File.expand_path(p) }
 
+suffix = args['I'].ask_and_send(:split, /[\s,]+/).to_a
+
 config = Utils::Config::ConfigFile.new
 config.parse_config_file File.expand_path('~/.utilsrc')
 
-find(*pathes) do |filename|
+find(*pathes, :suffix => suffix) do |filename|
   bn, s = File.basename(filename), File.stat(filename)
   s.symlink? and next
   if s.directory?

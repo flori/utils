@@ -52,7 +52,8 @@ class Utils::Finder
 
   def search
     pathes = []
-    find(*@roots) do |filename|
+    suffixes = @args['I'].ask_and_send(:split, /[\s,]+/).to_a
+    find(*@roots, suffix: suffixes) do |filename|
       begin
         bn, s = filename.pathname.basename, filename.stat
         if s.directory? && @config.discover.prune?(bn)
@@ -70,11 +71,7 @@ class Utils::Finder
     end
     pathes.uniq!
     pathes.map! { |p| a = File.split(p) ; a.unshift(p) ; a }
-    @suffixes = @args['I'].ask_and_send(:split, /[\s,]+/).to_a
     pathes = pathes.map! do |path, dir, file|
-      if @suffixes.full?
-        @suffixes.include?(path.suffix) or next
-      end
       if do_match = attempt_match?(path) and $DEBUG
         warn "Attempt match of #{path.inspect}"
       end
