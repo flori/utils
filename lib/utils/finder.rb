@@ -53,7 +53,7 @@ class Utils::Finder
   def search
     pathes = []
     suffixes = @args['I'].ask_and_send(:split, /[\s,]+/).to_a
-    find(*@roots, suffix: suffixes) do |filename|
+    find(*@roots, :suffix => suffixes) do |filename|
       begin
         bn, s = filename.pathname.basename, filename.stat
         if s.directory? && @config.discover.prune?(bn)

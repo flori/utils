@@ -150,7 +150,7 @@ class Utils::Grepper
   def search
     suffixes = @args['I'].ask_and_send(:split, /[\s,]+/).to_a
     for dir in @roots
-      find(dir, suffix: suffixes) do |filename|
+      find(dir, :suffix => suffixes) do |filename|
         match(filename)
       end
     end
