@@ -3,3 +3,7 @@
 source :rubygems
 
 gemspec
+
+group :developer do
+  gem 'debugger', :platform => :ruby_19
+end

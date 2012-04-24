@@ -113,7 +113,11 @@ module Utils
     end
 
     def edit_file(*filenames)
-      edit_remote_file(*filenames)
+      if gui
+        edit_remote_file(*filenames)
+      else
+        cmd(vim, *filenames)
+      end
     end
 
     def edit_file_linenumber(filename, linenumber)
@@ -165,15 +169,15 @@ module Utils
     end
 
     def edit_remote(*args)
-      cmd(vim, gui, '--servername', servername, '--remote', *args)
+      gui and cmd(vim, gui, '--servername', servername, '--remote', *args)
     end
 
     def edit_remote_wait(*args)
-      cmd(vim, gui, '--servername', servername, '--remote-wait', *args)
+      gui and cmd(vim, gui, '--servername', servername, '--remote-wait', *args)
     end
 
     def edit_remote_send(*args)
-      cmd(vim, gui, '--servername', servername, '--remote-send', *args)
+      gui and cmd(vim, gui, '--servername', servername, '--remote-send', *args)
     end
 
     def edit_remote_file(*filenames)
