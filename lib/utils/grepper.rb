@@ -149,10 +149,8 @@ class Utils::Grepper
 
   def search
     suffixes = @args['I'].ask_and_send(:split, /[\s,]+/).to_a
-    for dir in @roots
-      find(dir, :suffix => suffixes) do |filename|
-        match(filename)
-      end
+    find(*[ @roots, { :suffix => suffixes } ]) do |filename|
+      match(filename)
     end
     if @args['L'] or @args['e']
       @pathes = @pathes.sort_by do |path|
