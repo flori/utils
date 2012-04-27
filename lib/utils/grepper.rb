@@ -149,7 +149,7 @@ class Utils::Grepper
 
   def search
     suffixes = @args['I'].ask_and_send(:split, /[\s,]+/).to_a
-    find(*[ @roots, { :suffix => suffixes } ]) do |filename|
+    find(*(@roots + [ { :suffix => suffixes } ])) do |filename|
       match(filename)
     end
     if @args['L'] or @args['e']
