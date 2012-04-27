@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = "utils"
-  s.version = "0.0.43"
+  s.version = "0.0.44"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Florian Frank"]
-  s.date = "2012-04-25"
+  s.date = "2012-04-27"
   s.description = "This ruby gem provides some useful command line utilities"
   s.email = "flori@ping.de"
   s.executables = ["untest", "chroot-libs", "edit_wait", "chroot-exec", "number_files", "search", "strip_spaces", "path", "enum", "edit", "git-empty", "classify", "utils-install-config", "xmp", "discover", "sshscreen", "myex", "probe", "errf", "same_files", "utils-utilsrc", "unquarantine_apps", "vacuum_firefox_sqlite", "sedit"]
@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/flori/utils"
   s.rdoc_options = ["--title", "Utils - Some useful command line utilities", "--main", "README.rdoc"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.21"
+  s.rubygems_version = "1.8.23"
   s.summary = "Some useful command line utilities"
 
   if s.respond_to? :specification_version then
