@@ -20,7 +20,7 @@ module Utils
           filename = to_s
         end
         array = linenumber ? [ filename, linenumber ] : [ filename, 1 ]
-        array_singletion_class = class << array; self; end
+        array_singleton_class = class << array; self; end
         array_singleton_class.instance_eval do
           define_method(:filename) { filename }
           define_method(:linenumber) { linenumber }
