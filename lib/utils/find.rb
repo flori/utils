@@ -7,21 +7,8 @@ module Utils
         attr_writer :finder
 
         def file
-          tried = false
           begin
-            file = @finder.get_file(self)
-            if file
-              file.closed? and file.reopen(file.path, 'rb')
-            else
-              file = File.new(self, 'rb')
-              @finder.add_file self, file
-            end
-            return file
-          rescue Errno::EMFILE
-            tried and raise
-            @finder.close_files
-            tried = true
-            retry
+            @finder.open_file(self)
           rescue Errno::ENOENT, Errno::EACCES
             return
           end
@@ -70,13 +57,31 @@ module Utils
         path
       end
 
-      def get_file(path)
-        @files[path]
+      def open_file(path, opts = {})
+        retried = false
+        mode = opts.fetch(:mode, 'rb')
+        if file = @files[path]
+          if file.closed?
+            file.reopen(file.path, mode)
+          end
+        else
+          file = File.new(path, mode)
+          add_file path, file
+        end
+        file
+      rescue Errno::EMFILE
+        close_files
+        retried = true
+        retry
       end
 
       def add_file(path, file)
         @files[path] = file
         self
+      end
+
+      def current_open_files
+        @files.inject(0) { |c, f| c + f.closed? ? 0 : 1 }
       end
 
       def close_files
@@ -109,13 +114,7 @@ module Utils
             end
             if s.directory? then
               begin
-                tried = false
                 fs = Dir.entries(file)
-              rescue Errno::EMFILE
-                tried and raise
-                close_files
-                tried = true
-                retry
               rescue Errno::ENOENT, Errno::EACCES, Errno::ENOTDIR, Errno::ELOOP, Errno::ENAMETOOLONG
                 next
               end
