@@ -70,6 +70,7 @@ module Utils
         end
         file
       rescue Errno::EMFILE
+        retried and raise
         close_files
         retried = true
         retry
