@@ -1,11 +1,12 @@
 #!/usr/bin/env ruby
 
 require 'utils'
+require 'tins/find'
 include Utils::MD5
 
-def find_same(*pathes)
+def find_same(*paths)
   files = Hash.new { |h,k| h[k] = {} }
-  Utils::Find.find(*pathes) do |filename|
+  Tins::Find.find(*paths) do |filename|
     file_stat = File.stat(filename)
     if file_stat.file?
       size = file_stat.size

@@ -13,12 +13,12 @@ def convert_ruby_to_vim_regexp(pattern)
   regexp
 end
 
-def edit_files(pattern, pathes)
+def edit_files(pattern, paths)
   editor = Utils::Editor.new do |config|
     config.wait = true
   end
   editor.edit_remote_send("<ESC>/#{convert_ruby_to_vim_regexp(pattern)}<CR>")
-  for path in pathes
+  for path in paths
     STDERR.puts "Edit #{path}"
     editor.edit(path)
   end
@@ -26,10 +26,10 @@ end
 
 def usage
   puts <<-EOT
-Usage: #{File.basename($0)} [OPTS] PATTERN [PATHES]
+Usage: #{File.basename($0)} [OPTS] PATTERN [PATHS]
 
 PATTERN is a pattern expression which is used to match against the content of
-the files. PATHES are the directory and file pathes that are searched.
+the files. PATHS are the directory and file paths that are searched.
 
 Options are
 
@@ -40,8 +40,8 @@ Options are
   -A NUMBER   displays NUMBER lines of context after the match
   -B NUMBER   displays NUMBER lines of context before the match
   -C NUMBER   displays NUMBER lines of context around the match
-  -f          just list the pathes of the files that would be searched
-  -l          just list the pathes of the files with matches
+  -f          just list the paths of the files that would be searched
+  -l          just list the paths of the files with matches
   -L          list only the path:linenumber of the files with matches
   -R          interpret PATTERN argument as fuzzy not regex
   -c          disable color output
@@ -72,6 +72,6 @@ grepper = Grepper.new(
   :config  => config
 ).search
 case
-when args['e'] then edit_files grepper.pattern, grepper.pathes
-when args['l'] then puts grepper.pathes
+when args['e'] then edit_files grepper.pattern, grepper.paths
+when args['l'] then puts grepper.paths
 end

@@ -15,7 +15,7 @@ GemHadar do
   ignore      '.*.sw[pon]', 'pkg', 'Gemfile.lock', '.rvmrc', '.AppleDouble'
   readme      'README.rdoc'
 
-  dependency  'tins'
+  dependency  'tins',           '~>0.5.0'
   dependency  'term-ansicolor', '~>1.0'
   dependency  'dslkit',         '~>0.2.10'
   dependency  'pry-editline'

@@ -8,9 +8,9 @@ require 'tempfile'
 
 def usage
   puts <<-EOT
-Usage: #{File.basename($0)} [OPTS] [PATHES]
+Usage: #{File.basename($0)} [OPTS] [PATHS]
 
-PATHES are the directory and file pathes that are opened in the vim.
+PATHS are the directory and file paths that are opened in the vim.
 
 Options are
 

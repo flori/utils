@@ -6,7 +6,7 @@ class ::File
 end
 
 class Utils::Grepper
-  include Utils::Find
+  include Tins::Find
   include Utils::Patterns
   include Term::ANSIColor
 
@@ -40,7 +40,7 @@ class Utils::Grepper
         raise ArgumentError, "needs to be an integer number >= 1"
       end
     end
-    @pathes  = []
+    @paths  = []
     pattern_opts = opts.subhash(:pattern) | {
       :cset  => @args['a'],
       :icase => @args['i'],
@@ -62,7 +62,7 @@ class Utils::Grepper
       end
   end
 
-  attr_reader :pathes
+  attr_reader :paths
 
   attr_reader :pattern
 
@@ -70,7 +70,7 @@ class Utils::Grepper
     @filename = filename
     @output = []
     bn, s = File.basename(filename), File.stat(filename)
-    if s.directory? && @config.search.prune?(bn)
+    if !s || s.directory? && @config.search.prune?(bn)
       $DEBUG and warn "Pruning #{filename.inspect}."
       prune
     end
@@ -96,16 +96,13 @@ class Utils::Grepper
       case
       when @args['l'], @args['e']
         @output.uniq!
-        @pathes.concat @output
+        @paths.concat @output
       else
         STDOUT.puts @output
       end
       @output.clear
     end
     self
-  rescue SystemCallError => e
-    warn "Caught #{e.class}: #{e}"
-    nil
   end
 
   def match_lines(file)
@@ -153,13 +150,13 @@ class Utils::Grepper
       match(filename)
     end
     if @args['L'] or @args['e']
-      @pathes = @pathes.sort_by do |path|
+      @paths = @paths.sort_by do |path|
         pair = path.split(':')
         pair[1] = pair[1].to_i
         pair
       end
     else
-      @pathes.sort!
+      @paths.sort!
     end
     self
   end

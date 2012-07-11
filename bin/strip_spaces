@@ -4,8 +4,9 @@ require 'tins/go'
 include Tins::GO
 require 'tins/secure_write'
 include Tins::SecureWrite
+require 'tins/find'
+include Tins::Find
 require 'utils'
-include Utils::Find
 
 class ::File
   include Utils::FileXt
@@ -13,9 +14,9 @@ end
 
 def usage
   puts <<-EOT
-Usage: #{File.basename($0)} [OPTS] [PATHES]
+Usage: #{File.basename($0)} [OPTS] [PATHS]
 
-PATHES are the directory and file pathes that are search for files to be
+PATHS are the directory and file paths that are search for files to be
 stripped.
 
 Options are
@@ -31,15 +32,15 @@ end
 args = go 'I:h'
 args['h'] and usage
 
-pathes = ARGV.empty? ?  %w[.] : ARGV
-pathes = pathes.map { |p| File.expand_path(p) }
+paths = ARGV.empty? ?  %w[.] : ARGV
+paths = paths.map { |p| File.expand_path(p) }
 
 suffix = args['I'].ask_and_send(:split, /[\s,]+/).to_a
 
 config = Utils::Config::ConfigFile.new
 config.parse_config_file File.expand_path('~/.utilsrc')
 
-find(*pathes, :suffix => suffix) do |filename|
+find(*paths, :suffix => suffix) do |filename|
   bn, s = File.basename(filename), File.stat(filename)
   s.symlink? and next
   if s.directory?

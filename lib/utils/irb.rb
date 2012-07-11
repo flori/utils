@@ -27,8 +27,7 @@ module Utils
     module Shell
       require 'fileutils'
       include FileUtils
-      require 'utils/find'
-      include Utils::Find
+      include Tins::Find
 
       # Start _ri_ for +pattern+. If +pattern+ is not string like, call it with
       # pattern.class.name as argument.

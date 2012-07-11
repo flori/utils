@@ -5,19 +5,19 @@ include Utils
 require 'tins/go'
 include Tins::GO
 
-def edit_files(pathes)
+def edit_files(paths)
   editor = Utils::Editor.new do |config|
     config.wait = true
   end
-  editor.edit(*pathes)
+  editor.edit(*paths)
 end
 
 def usage
   puts <<-EOT
-Usage: #{File.basename($0)} [OPTS] PATTERN [PATHES]
+Usage: #{File.basename($0)} [OPTS] PATTERN [PATHS]
 
-PATTERN is a pattern expression which is find the files. PATHES are the
-directory and file pathes that are searched.
+PATTERN is a pattern expression which is find the files. PATHS are the
+directory and file paths that are searched.
 
 Options are
 
@@ -56,5 +56,5 @@ finder = Finder.new(
   puts output
 end
 if args['e']
-  edit_files finder.pathes
+  edit_files finder.paths
 end

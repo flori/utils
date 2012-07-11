@@ -6,7 +6,7 @@ class ::File
 end
 
 class Utils::Finder
-  include Utils::Find
+  include Tins::Find
   include Utils::Patterns
   include Term::ANSIColor
 
@@ -24,10 +24,10 @@ class Utils::Finder
       FuzzyPattern.new(pattern_opts)
     @directory = @args['d']
     @only_directory = @args['D']
-    @pathes  = []
+    @paths  = []
   end
 
-  attr_reader :pathes
+  attr_reader :paths
 
   attr_reader :output
 
@@ -51,12 +51,12 @@ class Utils::Finder
   end
 
   def search
-    pathes = []
+    paths = []
     suffixes = @args['I'].ask_and_send(:split, /[\s,]+/).to_a
     find(*(@roots + [ { :suffix => suffixes } ])) do |filename|
       begin
         bn, s = filename.pathname.basename, filename.stat
-        if s.directory? && @config.discover.prune?(bn)
+        if !s || s.directory? && @config.discover.prune?(bn)
           $DEBUG and warn "Pruning #{filename.inspect}."
           prune
         end
@@ -64,14 +64,12 @@ class Utils::Finder
           $DEBUG and warn "Skipping #{filename.inspect}."
           next
         end
-        pathes << filename
-      rescue SystemCallError => e
-        warn "Caught #{e.class}: #{e}"
+        paths << filename
       end
     end
-    pathes.uniq!
-    pathes.map! { |p| a = File.split(p) ; a.unshift(p) ; a }
-    pathes = pathes.map! do |path, dir, file|
+    paths.uniq!
+    paths.map! { |p| a = File.split(p) ; a.unshift(p) ; a }
+    paths = paths.map! do |path, dir, file|
       if do_match = attempt_match?(path) and $DEBUG
         warn "Attempt match of #{path.inspect}"
       end
@@ -99,8 +97,8 @@ class Utils::Finder
         end
       end
     end
-    pathes.compact!
-    @pathes, @output = pathes.sort.transpose.values_at(-2, -1)
+    paths.compact!
+    @paths, @output = paths.sort.transpose.values_at(-2, -1)
     if !@args['e'] && @output && !@output.empty?
       yield @output if block_given?
     end
