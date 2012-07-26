@@ -40,7 +40,7 @@ suffix = args['I'].ask_and_send(:split, /[\s,]+/).to_a
 config = Utils::Config::ConfigFile.new
 config.parse_config_file File.expand_path('~/.utilsrc')
 
-find(*paths, :suffix => suffix) do |filename|
+find(*(paths + [ { :suffix => suffix} ])) do |filename|
   bn, s = File.basename(filename), File.stat(filename)
   s.symlink? and next
   if s.directory?
