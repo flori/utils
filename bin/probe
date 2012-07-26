@@ -44,9 +44,11 @@ puts "Running tests in #{args.inspect}"
 
 case ($opt['t'] || $config.probe.test_framework).to_sym
 when :rspec
+  rspec = `which rspec`.full?(:chomp) || `which spec`.full?(:chomp) or
+    raise fail "no spec or rspec command found"
   if linenumber = $opt['n']
-    cmd "rspec", '-I', $config.probe.include_dirs_argument, '-l', linenumber,
-      *args, *testrunner_args
+    cmd 'ruby', '-I', $config.probe.include_dirs_argument, rspec, '-l',
+      linenumber, *(args + testrunner_args)
   else
     args = args.map do |a|
       if Utils::Editor::FILE_LINENUMBER_REGEXP =~ a
@@ -55,26 +57,28 @@ when :rspec
         a
       end
     end
-    cmd "rspec", '-I', $config.probe.include_dirs_argument, *args, *testrunner_args
+    cmd 'ruby', '-I', $config.probe.include_dirs_argument, rspec,
+      *(args + testrunner_args)
   end
 when :'test-unit'
+  testrb = `which testrb`.full?(:chomp) or raise fail "no testrb command found"
   if testname = $opt['n']
-    cmd "testrb", '-I', $config.probe.include_dirs_argument, '-n', testname,
-      *args, *testrunner_args
+    cmd 'ruby', '-I', $config.probe.include_dirs_argument, '-S', testrb,
+      '-n', testname, *(args + testrunner_args)
   else
     for filename in args
       sl = filename.source_location
       if sl.linenumber
         lf = Tins::LinesFile.for_filename(*sl)
         if testname = lf.match_backward(/def\s+(\S+?)(?:\(|\s*$)/).full?(:first)
-          cmd "testrb", '-I', $config.probe.include_dirs_argument,
+          cmd 'ruby', '-I', $config.probe.include_dirs_argument, testrb,
             '-n', testname, sl.filename, *testrunner_args
         else
           warn "no test found before line #{sl.linenumber}"
         end
       else
-        cmd "testrb", '-I', $config.probe.include_dirs_argument, sl.filename,
-          *testrunner_args
+        cmd 'ruby', '-I', $config.probe.include_dirs_argument, '-S', testrb,
+          sl.filename, *testrunner_args
       end
     end
   end
