@@ -491,6 +491,10 @@ function! Ccamelunderscore(...)
   exec "normal ciW" . output
 endfunction
 
+function! Ccreatetags()
+  call system("ctags --recurse=yes --languages=Ruby,C . `bundle list --paths`")
+endfunction
+
 comclear
 command -bar -nargs=1 OpenURL :!open <args>
 command -bar -nargs=* -complete=file Find :call Cfind(<f-args>)
@@ -499,6 +503,7 @@ command -bar -nargs=* -complete=file Test :call Ctest(<f-args>)
 command -bar -nargs=* -complete=file Classify :call Cclassify(<f-args>)
 command -bar -nargs=* -complete=file PathClassify :call CpathClassify(<f-args>)
 command -bar -nargs=* -complete=file Declassify :call Cdeclassify(<f-args>)
+command Createtags :call Ccreatetags()
 
 function! Iexec(cmd)
   let output = system(a:cmd)
