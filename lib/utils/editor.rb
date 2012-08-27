@@ -1,18 +1,29 @@
 require 'tins/xt/full'
+require 'tins/deep_const_get'
 
 module Utils
   class Editor
-    FILE_LINENUMBER_REGEXP = /^\s*([^:]+):(\d+)/
+    FILE_LINENUMBER_REGEXP = /\A\s*([^:]+):(\d+)/
+    CLASS_METHOD_REGEXP    = /\A([A-Z][\w:]+)([#.])(\S+)/
 
     module SourceLocationExtension
+      include Tins::DeepConstGet
+
       def source_location
         filename   = nil
         linenumber = nil
         if respond_to?(:to_str)
-          if (string = to_str) =~ FILE_LINENUMBER_REGEXP
+          string = to_str
+          case string
+          when FILE_LINENUMBER_REGEXP
             filename = $1
             linenumber = $2.to_i
-            [ $1, linenumber ]
+          when CLASS_METHOD_REGEXP
+            klassname   = $1
+            method_kind = $2 == '#' ? :instance_method : :method
+            methodname  = $3
+            filename, linenumber =
+              deep_const_get(klassname).__send__(method_kind, methodname).source_location
           else
             filename = string
           end
@@ -106,9 +117,8 @@ module Utils
       then
         edit_source_location(source_location) ||
           edit_file(expand_globs(source_location[0, 1]))
-      else
-        filenames =
-          expand_globs(filenames.map(&:source_location).map(&:first))
+      elsif source_locations = filenames.map(&:source_location).compact.full?
+        filenames = expand_globs(source_locations.map(&:first))
         edit_file(*filenames)
       end
     end
