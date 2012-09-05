@@ -492,7 +492,7 @@ function! Ccamelunderscore(...)
 endfunction
 
 function! Ccreatetags()
-  call system("ctags --recurse=yes --languages=Ruby,C . `bundle list --paths`")
+  call system("bundle exec create_tags")
 endfunction
 
 comclear

@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+paths = %w[ . ] + `bundle list --paths`.lines.map(&:chomp)
+cmd = %w[ ctags --recurse=yes --languages=Ruby,C ] + paths
+$DEBUG and warn "Executing #{cmd * ' '}."
+system *cmd
+megabytes = File.size('tags').to_f / 1024 ** 2 rescue nil
+megabytes and warn 'Created %.3fM of tags.' % megabytes
