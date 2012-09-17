@@ -112,7 +112,7 @@ module Utils
 
         attr_reader :description
 
-        alias to_str name
+        alias to_str description
 
         alias inspect description
 
@@ -136,15 +136,27 @@ module Utils
       class MethodWrapper < WrapperBase
         def initialize(obj, name, modul)
           super(name)
-          if modul
-            @arity = obj.instance_method(name).arity
-          else
-            @arity = obj.method(name).arity
-          end
-          @description = "#@name(#@arity)"
+          @method = modul ? obj.instance_method(name) : obj.method(name)
+          @description = "#{owner}##@name(#{arity})"
         end
 
-        attr_reader :arity
+        attr_reader :method
+
+        def owner
+          method.respond_to?(:owner) ? method.owner : nil
+        end
+
+        def arity
+          method.arity
+        end
+
+        def source_location
+          method.source_location
+        end
+
+        def <=>(other)
+          @description <=> other.description
+        end
       end
 
       class ConstantWrapper < WrapperBase
