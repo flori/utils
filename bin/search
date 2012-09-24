@@ -64,7 +64,7 @@ roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }
 Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args['c']
 STDOUT.sync = true
 config = Utils::Config::ConfigFile.new
-config.parse_config_file File.expand_path('~/.utilsrc')
+config.configure_from_paths
 grepper = Grepper.new(
   :pattern => pattern,
   :args    => args,

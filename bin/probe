@@ -28,7 +28,7 @@ def cmd(*args)
 end
 
 $config = Utils::Config::ConfigFile.new
-$config.parse_config_file File.expand_path('~/.utilsrc')
+$config.configure_from_paths
 testrunner_args = []
 if i = ARGV.index('--')
   testrunner_args.concat ARGV[(i + 1)..-1]

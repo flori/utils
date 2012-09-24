@@ -2,6 +2,15 @@ require 'dslkit/polite'
 require 'tins/xt/string'
 
 class Utils::Config::ConfigFile
+  class << self
+    attr_accessor :config_file_paths
+  end
+  self.config_file_paths = [
+    '/etc/utilsrc',
+    '~/.utilsrc',
+    './.utilsrc',
+  ]
+
   include DSLKit::Interpreter
 
   class ConfigFileError < StandardError; end
@@ -9,14 +18,21 @@ class Utils::Config::ConfigFile
   def initialize
   end
 
-  def parse_config_file(config_file_name)
-    File.open(config_file_name) do |cf|
+  def configure_from_paths(paths = self.class.config_file_paths)
+    for config_file_path in paths
+      parse_config_file config_file_path
+    end
+  end
+
+  def parse_config_file(config_file_path)
+    config_file_path = File.expand_path(config_file_path)
+    File.open(config_file_path) do |cf|
       parse cf.read
     end
     self
   rescue SystemCallError => e
     $DEBUG and warn "Couldn't read config file "\
-      "#{config_file_name.inspect}: #{e.class} #{e}"
+      "#{config_file_path.inspect}: #{e.class} #{e}"
     return nil
   end
 

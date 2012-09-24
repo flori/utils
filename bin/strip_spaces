@@ -38,7 +38,7 @@ paths = paths.map { |p| File.expand_path(p) }
 suffix = args['I'].ask_and_send(:split, /[\s,]+/).to_a
 
 config = Utils::Config::ConfigFile.new
-config.parse_config_file File.expand_path('~/.utilsrc')
+config.configure_from_paths
 
 find(*(paths + [ { :suffix => suffix} ])) do |filename|
   bn, s = File.basename(filename), File.stat(filename)
