@@ -49,6 +49,7 @@ Options are
   -I SUFFIX   only include files with suffix SUFFIX in search
   -e          open the matching files with edit command
   -a CSET     use only character set CSET from PATTERN
+  -v          be verbose
   -h          display this help
 
 Version is #{File.basename($0)} #{Utils::VERSION}.
@@ -56,7 +57,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'I:A:B:C:s:S:n:N:a:RciflLeh'
+args = go 'I:A:B:C:s:S:n:N:a:RciflLevh'
 args['h'] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }

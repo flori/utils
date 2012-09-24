@@ -71,7 +71,7 @@ class Utils::Grepper
     @output = []
     bn, s = File.basename(filename), File.stat(filename)
     if !s || s.directory? && @config.search.prune?(bn)
-      $DEBUG and warn "Pruning #{filename.inspect}."
+      @args['v'] and warn "Pruning #{filename.inspect}."
       prune
     end
     if s.file? && !@config.search.skip?(bn) &&
@@ -79,18 +79,18 @@ class Utils::Grepper
     then
       File.open(filename, 'rb') do |file|
         if file.binary? != true
-          $DEBUG and warn "Matching #{filename.inspect}."
+          @args['v'] and warn "Matching #{filename.inspect}."
           if @args['f']
             @output << filename
           else
             match_lines file
           end
         else
-          $DEBUG and warn "Skipping binary file #{filename.inspect}."
+          @args['v'] and warn "Skipping binary file #{filename.inspect}."
         end
       end
     else
-      $DEBUG and warn "Skipping #{filename.inspect}."
+      @args['v'] and warn "Skipping #{filename.inspect}."
     end
     unless @output.empty?
       case
