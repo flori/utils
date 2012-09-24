@@ -64,7 +64,7 @@ class Utils::Config::ConfigFile
 
     def to_ruby
       result = ''
-      result << "#{self.class.name[/::([^:]+)\Z/, 1].underscore} do\n"
+      result << "#{self.class.name[/::([^:]+)\z/, 1].underscore} do\n"
       for da in self.class.dsl_attributes
         result << "  #{da} #{Array(__send__(da)).map(&:inspect) * ', '}\n"
       end
@@ -108,9 +108,9 @@ class Utils::Config::ConfigFile
   end
 
   class Search < FileFinder
-    config :prune_dirs, /\A(\.svn|\.git|CVS|tmp)\Z/
+    config :prune_dirs, /\A(\.svn|\.git|CVS|tmp)\z/
 
-    config :skip_files, /(\A\.|\.sw[pon]\Z|\.log\Z|~\Z)/
+    config :skip_files, /(\A\.|\.sw[pon]\z|\.log\z|~\z)/
   end
 
   def search(&block)
@@ -121,9 +121,9 @@ class Utils::Config::ConfigFile
   end
 
   class Discover < FileFinder
-    config :prune_dirs, /\A(\.svn|\.git|CVS|tmp)\Z/
+    config :prune_dirs, /\A(\.svn|\.git|CVS|tmp)\z/
 
-    config :skip_files, /(\A\.|\.sw[pon]\Z|\.log\Z|~\Z)/
+    config :skip_files, /(\A\.|\.sw[pon]\z|\.log\z|~\z)/
 
     config :binary, false
   end
@@ -136,9 +136,9 @@ class Utils::Config::ConfigFile
   end
 
   class StripSpaces < FileFinder
-    config :prune_dirs, /\A(\..*|CVS)\Z/
+    config :prune_dirs, /\A(\..*|CVS)\z/
 
-    config :skip_files, /(\A\.|\.sw[pon]\Z|\.log\Z|~\Z)/
+    config :skip_files, /(\A\.|\.sw[pon]\z|\.log\z|~\z)/
   end
 
   def strip_spaces(&block)
