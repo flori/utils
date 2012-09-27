@@ -183,7 +183,8 @@ map <leader>e :e <C-R>=substitute(expand("%:p:h") . "/", " ", "\\\\ ", "g")<CR>
 map <leader>t :tabe <C-R>=substitute(expand("%:p:h") . "/", " ", "\\\\ ", "g")<CR>
 map <leader>s :split <C-R>=substitute(expand("%:p:h") . "/", " ", "\\\\ ", "g")<CR>
 map <leader>c :cd <C-R>=substitute(expand("%:p:h") . "/", " ", "\\\\ ", "g")<CR>
-map <leader>K :%s/\([^:]\):\([^:'" ]\{1,\}\) *=>/\1\2:/g<CR>
+map <leader>h :call Csymbolhash()<CR>
+map <leader>H :%call Csymbolhash()<CR>
 map <leader>C :call Ccamelunderscore()<CR>
 
 " Switch of search highlighting
@@ -421,7 +422,7 @@ function! Cfind(...)
   set grepformat=%f
   set grepprg=discover
   let @/=args[0]
-  silent exec "silent gr -a 'a-zA-Z0-9' -c -i " . args_string
+  silent execute "silent gr -a 'a-zA-Z0-9' -c -i " . args_string
   copen
   redraw!
 endfunction
@@ -439,19 +440,19 @@ function! Cgrep(...)
   set grepprg=search
   set hlsearch
   let @/=args[0]
-  silent exec "silent gr -c -i " . args_string
+  silent execute "silent gr -c -i " . args_string
   copen
   redraw!
 endfunction
 
 function! Ctest(...)
-  exec 'w'
+  execute 'w'
   if a:0 == 0
     let name = expand('<cword>')
   else
     let name = a:1
   end
-  exec 'make ' . expand('%') . ' ' . name
+  execute 'make ' . expand('%') . ' ' . name
 endfunction
 
 function! Cclassify(...)
@@ -481,29 +482,40 @@ function! Cdeclassify(...)
     let args = copy(a:000)
   end
   let output = system("classify -s -d " . join(map(copy(args), 'shellescape(v:val)'), ' '))
-  exec "normal a" . output
+  execute "normal a" . output
 endfunction
 
 function! Ccamelunderscore(...)
-  exec 'w'
+  execute 'w'
   let name = expand('<cWORD>')
   let output = system('classify -t ' . name)
-  exec "normal ciW" . output
+  execute "normal ciW" . output
+endfunction
+
+function! Csymbolhash() range
+  execute join([ 'silent ', a:firstline, ',', a:lastline, 's/\([^:]\):\([^:', "'", '" ]\{1,\}\) *=>/\1\2:/g' ])
 endfunction
 
 function! Ccreatetags()
-  call system("bundle exec create_tags")
+  call system("bundle execute create_tags")
+endfunction
+
+function! PrintGivenRange() range
+    echo "firstline ".a:firstline." lastline ".a:lastline
+    " Do some more things
 endfunction
 
 comclear
 command -bar -nargs=1 OpenURL :!open <args>
-command -bar -nargs=* -complete=file Find :call Cfind(<f-args>)
-command -bar -nargs=* -complete=file Grep :call Cgrep(<f-args>)
-command -bar -nargs=* -complete=file Test :call Ctest(<f-args>)
-command -bar -nargs=* -complete=file Classify :call Cclassify(<f-args>)
-command -bar -nargs=* -complete=file PathClassify :call CpathClassify(<f-args>)
-command -bar -nargs=* -complete=file Declassify :call Cdeclassify(<f-args>)
-command Createtags :call Ccreatetags()
+command -bar -nargs=* -complete=file Find call Cfind(<f-args>)
+command -bar -nargs=* -complete=file Grep call Cgrep(<f-args>)
+command -bar -nargs=* -complete=file Test call Ctest(<f-args>)
+command -bar -nargs=* -complete=file Classify call Cclassify(<f-args>)
+command -bar -nargs=* -complete=file PathClassify call CpathClassify(<f-args>)
+command -bar -nargs=* -complete=file Declassify call Cdeclassify(<f-args>)
+command Createtags call Ccreatetags()
+command -range Symbolhash <line1>,<line2>call Csymbolhash()
+command -range PrintGivenRange <line1>,<line2>call PrintGivenRange()
 
 function! Iexec(cmd)
   let output = system(a:cmd)
