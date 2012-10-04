@@ -32,7 +32,7 @@ set nocursorcolumn
 set nocursorline
 set nofoldenable
 set noignorecase
-set noincsearch
+set incsearch
 set nojoinspaces
 set nopaste
 set nosmartcase
@@ -116,8 +116,8 @@ if has("gui_running")
     set antialias
     set guiheadroom=0
     "set macatsui
-    set columns=80
-    set lines=71
+    set columns=160
+    set lines=86
   elseif has("x11")
     set guifont=-b&h-lucidatypewriter-*-*-normal-*-17-*-*-*-*-*-iso10646-*
     if exists("+guioptions")
@@ -505,17 +505,16 @@ function! PrintGivenRange() range
     " Do some more things
 endfunction
 
-comclear
-command -bar -nargs=1 OpenURL :!open <args>
-command -bar -nargs=* -complete=file Find call Cfind(<f-args>)
-command -bar -nargs=* -complete=file Grep call Cgrep(<f-args>)
-command -bar -nargs=* -complete=file Test call Ctest(<f-args>)
-command -bar -nargs=* -complete=file Classify call Cclassify(<f-args>)
-command -bar -nargs=* -complete=file PathClassify call CpathClassify(<f-args>)
-command -bar -nargs=* -complete=file Declassify call Cdeclassify(<f-args>)
-command Createtags call Ccreatetags()
-command -range Symbolhash <line1>,<line2>call Csymbolhash()
-command -range PrintGivenRange <line1>,<line2>call PrintGivenRange()
+command! -bar -nargs=1 OpenURL :!open <args>
+command! -bar -nargs=* -complete=file Find call Cfind(<f-args>)
+command! -bar -nargs=* -complete=file Grep call Cgrep(<f-args>)
+command! -bar -nargs=* -complete=file Test call Ctest(<f-args>)
+command! -bar -nargs=* -complete=file Classify call Cclassify(<f-args>)
+command! -bar -nargs=* -complete=file PathClassify call CpathClassify(<f-args>)
+command! -bar -nargs=* -complete=file Declassify call Cdeclassify(<f-args>)
+command! Createtags call Ccreatetags()
+command! -range Symbolhash <line1>,<line2>call Csymbolhash()
+command! -range PrintGivenRange <line1>,<line2>call PrintGivenRange()
 
 function! Iexec(cmd)
   let output = system(a:cmd)
