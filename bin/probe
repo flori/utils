@@ -27,6 +27,11 @@ def cmd(*args)
   system(*args)
 end
 
+def find_cmd(*cmds)
+  cmds.map { |c| `which #{c}`.full?(:chomp) }.compact.first or
+    raise fail "no #{cmds * '|'} command found"
+end
+
 $config = Utils::Config::ConfigFile.new
 $config.configure_from_paths
 testrunner_args = []
@@ -44,8 +49,7 @@ puts "Running tests in #{args.inspect}"
 
 case ($opt['t'] || $config.probe.test_framework).to_sym
 when :rspec
-  rspec = `which rspec`.full?(:chomp) || `which spec`.full?(:chomp) or
-    raise fail "no spec or rspec command found"
+  rspec = find_cmd('rspec', 'spec')
   if linenumber = $opt['n']
     cmd 'ruby', '-I', $config.probe.include_dirs_argument, rspec, '-l',
       linenumber, *(args + testrunner_args)
@@ -61,7 +65,7 @@ when :rspec
       *(args + testrunner_args)
   end
 when :'test-unit'
-  testrb = `which testrb`.full?(:chomp) or raise fail "no testrb command found"
+  testrb = find_cmd('testrb')
   if testname = $opt['n']
     cmd 'ruby', '-I', $config.probe.include_dirs_argument, '-S', testrb,
       '-n', testname, *(args + testrunner_args)
