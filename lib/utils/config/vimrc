@@ -493,7 +493,7 @@ function! Ccamelunderscore(...)
 endfunction
 
 function! Csymbolhash() range
-  execute join([ 'silent ', a:firstline, ',', a:lastline, 's/\([^:]\):\([^:', "'", '" ]\{1,\}\) *=>/\1\2:/g' ])
+  execute join([ 'silent ', a:firstline, ',', a:lastline, 's/\([^:]\):\([^:=!', "'", '" ]\{1,\}\) *=>/\1\2:/g' ])
 endfunction
 
 function! Ccreatetags()
