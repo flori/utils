@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+
+def execute(*args)
+  cmd = args.map(&:inspect) * ' '
+  puts "Executing: #{cmd}"
+  IO.popen(cmd, 'r') do |io|
+    io.each { |l| puts l }
+  end
+end
+
+argv = ARGV
+filename = argv.shift or fail "require a filename as first argument"
+warn "Observing #{filename.inspect} for changes now and execute #{argv.inspect}."
+argv.empty? and argv << 'true'
+old_mtime = nil
+loop do
+  begin
+    mtime = File.mtime(filename)
+    if old_mtime.nil? || mtime > old_mtime
+      execute(*argv)
+    else
+      sleep 0.1
+    end
+  rescue Interrupt
+    exit 1
+  rescue Errno::ENOENT
+  ensure
+    old_mtime = mtime
+  end
+end
