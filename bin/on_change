@@ -9,10 +9,11 @@ def execute(*args)
   end
 end
 
-argv = ARGV
+argv = ARGV.dup
 filename = argv.shift or fail "require a filename as first argument"
-warn "Observing #{filename.inspect} for changes now and execute #{argv.inspect}."
 argv.empty? and argv << 'true'
+argv.map! { |a| a == '%f' ? filename : a }
+warn "Observing #{filename.inspect} for changes now and execute #{argv.inspect}."
 old_mtime = nil
 loop do
   begin
