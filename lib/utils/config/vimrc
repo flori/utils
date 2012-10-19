@@ -32,7 +32,7 @@ set nocursorcolumn
 set nocursorline
 set nofoldenable
 set noignorecase
-set incsearch
+set noincsearch
 set nojoinspaces
 set nopaste
 set nosmartcase
@@ -186,6 +186,8 @@ map <leader>c :cd <C-R>=substitute(expand("%:p:h") . "/", " ", "\\\\ ", "g")<CR>
 map <leader>h :call Csymbolhash()<CR>
 map <leader>H :%call Csymbolhash()<CR>
 map <leader>C :call Ccamelunderscore()<CR>
+map <leader>f :!echo %\|pbcopy<CR><CR>
+map <leader>n :new <cfile><CR>
 
 " Switch of search highlighting
 map <silent> <F9> :nohlsearch<CR>
@@ -440,7 +442,7 @@ function! Cgrep(...)
   set grepprg=search
   set hlsearch
   let @/=args[0]
-  silent execute "silent gr -c -i " . args_string
+  silent execute "silent gr -c " . args_string
   copen
   redraw!
 endfunction
