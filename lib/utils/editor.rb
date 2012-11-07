@@ -14,11 +14,11 @@ module Utils
         linenumber = nil
         if respond_to?(:to_str)
           string = to_str
-          case string
-          when FILE_LINENUMBER_REGEXP
+          case
+          when string =~ FILE_LINENUMBER_REGEXP && File.exist?($1)
             filename = $1
             linenumber = $2.to_i
-          when CLASS_METHOD_REGEXP
+          when string =~ CLASS_METHOD_REGEXP && !File.exist?(string)
             klassname   = $1
             method_kind = $2 == '#' ? :instance_method : :method
             methodname  = $3
