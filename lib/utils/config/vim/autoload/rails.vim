@@ -942,12 +942,9 @@ function! s:BufCommands()
     command! -buffer -bar -nargs=? -complete=customlist,s:Complete_environments Rdbext  :call s:BufDatabase(2,<q-args>)|let b:dbext_buffer_defaulted = 1
   endif
   let ext = expand("%:e")
-  Decho ext
   if ext =~ s:viewspattern()
     " TODO: complete controller names with trailing slashes here
     command! -buffer -bar -bang -nargs=? -range -complete=customlist,s:controllerList Rextract :<line1>,<line2>call s:Extract(<bang>0,<f-args>)
-  elseif ext == "rb"
-    command! -buffer -bar -bang -nargs=? -range -complete=customlist,s:controllerList,s:modelList Rextract :<line1>,<line2>call s:ExtractConcern(<bang>0,<f-args>)
   endif
   if RailsFilePath() =~ '\<db/migrate/.*\.rb$'
     command! -buffer -bar                 Rinvert  :call s:Invert(<bang>0)
@@ -3297,11 +3294,6 @@ function! s:Extract(bang,...) range abort
   endif
   silent! exe '%substitute?\%(\w\|[@:"'."'".'-]\)\@<!'.var.'\>?'.name.'?g'
   1
-endfunction
-" }}}1
-
-" Extract into concern {{{1
-function! s:ExtractConcern(bang,...) range abort
 endfunction
 
 " }}}1

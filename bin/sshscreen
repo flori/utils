@@ -19,11 +19,11 @@ def usage
 Usage: #{File.basename($0)} [OPTS] [user@]remote[:port]"
 
 OPTS is one of
-  -N                  list all session names on the specified remote
-  -n NAME             name of the screen session to attach to (defaults to $USER)
-  -t [HOST[:PORT]]    host:port to tunnel if different from LOCALPORT
-  -l LOCALPORT        the localport to forward to
-  -h                  to display this help
+  -N                                list all session names on the specified remote
+  -n NAME                           name of the screen session to attach to (defaults to $USER)
+  -t [TUNNEL_HOST[:TUNNEL_PORT]]    host:port to tunnel if different from LOCALPORT
+  -l LOCALPORT                      the localport to forward to if different from TUNNEL_PORT
+  -h                                to display this help
 
 EOT
   exit 1
@@ -31,7 +31,7 @@ end
 
 arguments = ARGV.dup
 opts = go 'l:t:n:hN', arguments
-usage if opts['h'] or arguments.size != 1
+usage if opts['h'] || arguments.size != 1
 user_remote = arguments.shift
 user, remote, rport =
   case user_remote
@@ -43,15 +43,17 @@ user, remote, rport =
     usage
   end
 lport = opts['l']
-tunnel, tport = if tunnel_port = opts['t']
+tunnel, tport = nil, nil
+if tunnel_port = opts['t']
   case tunnel_port
   when /\A([^:]+)(?::(\d+))?\Z/
-    [ $1, $2 || '22' ]
+    tunnel, tport = $1, $2 || '22'
+    lport ||= tport
   else
     usage
   end
 else
-  [ 'localhost', lport ]
+  tunnel, tport = 'localhost', lport
 end
 ssh_dir = File.expand_path('~/.ssh')
 mkdir_p ssh_dir
@@ -60,10 +62,10 @@ env_user = ENV['USER'] and opts['n'] ||= env_user
 if opts['N']
   exec "ssh -p #{rport} -S #{sock_file} #{user}@#{remote} screen -ls"
 elsif lport
-  File.exist? sock_file and rm_f sock_file
+  rm_f sock_file
   exec "ssh -p #{rport} -Mt -L localhost:#{lport}:#{tunnel}:#{tport}"\
     " -S #{sock_file} #{user}@#{remote} screen -DUR #{opts['n']}"
 else
-  File.exist? sock_file and rm_f sock_file
+  rm_f sock_file
   exec "ssh -p #{rport} -Mt -S #{sock_file} #{user}@#{remote} screen -DUR #{opts['n']}"
 end
