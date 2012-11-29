@@ -6,6 +6,7 @@ require 'tins/lines_file'
 include Tins::GO
 require 'utils'
 include Utils
+require 'drb/drb'
 
 def usage
   puts <<-EOT
@@ -41,9 +42,38 @@ if i = ARGV.index('--')
 else
   args = ARGV.dup
 end
-$opt = go 't:n:h', args
-args.empty? and fail "require filename or filename:linenumber as arguments"
+$opt = go 'lcp:t:n:h', args
 $opt['h'] and usage
+
+uri = "druby://localhost:#{$opt['p'] || 6623}"
+
+if $opt['l']
+  class ProbeServer
+    def run(args)
+      fork do
+        exec $0, *args
+      end
+    end
+  end
+  puts "Starting probe server listening to #{uri.inspect}."
+  DRb.start_service(uri, ProbeServer.new)
+  begin
+    DRb.thread.join
+  rescue Interrupt
+    warn " *** Interrupted ***"
+    exit
+  end
+end
+
+args.empty? and fail "require filename or filename:linenumber as arguments"
+
+if $opt['c']
+  puts "Connecting probe server on #{uri.inspect}."
+  DRb.start_service
+  probe_server = DRbObject.new_with_uri(uri)
+  opts = $opt.subhash('n', 't').map { |k, v| v.full? { "-#{k} #{v.inspect}" } }.compact
+  probe_server.run opts + args
+end
 
 puts "Running tests in #{args.inspect}"
 
