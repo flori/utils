@@ -48,13 +48,34 @@ $opt['h'] and usage
 uri = "druby://localhost:#{$opt['p'] || 6623}"
 
 if $opt['l']
+  Thread.abort_on_exception = false
+
   class ProbeServer
-    def run(args)
+    def initialize
+      @jobs = Queue.new
+      Thread.new { loop }
+    end
+
+    def run(job)
+      @jobs << job
+    end
+
+    private
+
+    def run_job(job)
       fork do
-        exec $0, *args
+        exec $0, *job
+      end
+      Process.wait
+    end
+
+    def loop
+      while job = @jobs.pop
+        run_job job
       end
     end
   end
+
   puts "Starting probe server listening to #{uri.inspect}."
   DRb.start_service(uri, ProbeServer.new)
   begin
