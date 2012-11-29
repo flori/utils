@@ -73,6 +73,7 @@ if $opt['c']
   probe_server = DRbObject.new_with_uri(uri)
   opts = $opt.subhash('n', 't').map { |k, v| v.full? { "-#{k} #{v.inspect}" } }.compact
   probe_server.run opts + args
+  exit
 end
 
 puts "Running tests in #{args.inspect}"
