@@ -48,31 +48,44 @@ $opt['h'] and usage
 uri = "druby://localhost:#{$opt['p'] || 6623}"
 
 if $opt['l']
-  Thread.abort_on_exception = false
+  Thread.abort_on_exception = $DEBUG
 
   class ProbeServer
     def initialize
       @jobs = Queue.new
-      Thread.new { loop }
+      Thread.new { work_loop }
     end
 
-    def run(job)
-      @jobs << job
+    def enqueue(job)
+      output_message "Job #{cmd(job).inspect} enqueued."
+      @jobs.push job
     end
+    alias run enqueue
 
     private
 
+    def output_message(msg)
+      STDOUT.puts msg
+      STDOUT.flush
+    end
+
     def run_job(job)
+      output_message "Job #{cmd(job)} about to run now."
       fork do
-        exec $0, *job
+        exec *cmd(job)
       end
       Process.wait
     end
 
-    def loop
-      while job = @jobs.pop
+    def work_loop
+      loop do
+        job = @jobs.shift
         run_job job
       end
+    end
+
+    def cmd(job)
+      [ $0, *job ]
     end
   end
 
@@ -93,7 +106,7 @@ if $opt['c']
   DRb.start_service
   probe_server = DRbObject.new_with_uri(uri)
   opts = $opt.subhash('n', 't').map { |k, v| v.full? { "-#{k} #{v.inspect}" } }.compact
-  probe_server.run opts + args
+  probe_server.enqueue opts + args
   exit
 end
 
