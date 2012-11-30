@@ -6,7 +6,7 @@ require 'tins/lines_file'
 include Tins::GO
 require 'utils'
 include Utils
-require 'drb/drb'
+require 'drb'
 
 def usage
   puts <<-EOT
