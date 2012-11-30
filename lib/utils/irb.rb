@@ -495,7 +495,7 @@ module IRB
 end
 IRB.conf[:SAVE_HISTORY] = 1000
 
-if defined?(ActiveRecord::Relation)
+if defined?(ActiveRecord::Relation) && !ActiveRecord::Relation.method_defined?(:examine)
   class ActiveRecord::Relation
     include Utils::IRB::Relation
   end
