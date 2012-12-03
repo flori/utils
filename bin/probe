@@ -57,7 +57,7 @@ if $opt['l']
     end
 
     def enqueue(job)
-      output_message "Job #{cmd(job).inspect} enqueued."
+      output_message "Job #{job.inspect} enqueued."
       @jobs.push job
     end
     alias run enqueue
@@ -70,11 +70,12 @@ if $opt['l']
     end
 
     def run_job(job)
-      output_message "Job #{cmd(job)} about to run now."
+      output_message "Job #{job.inspect} about to run now."
       fork do
-        exec *cmd(job)
+        exec(*cmd(job))
       end
       Process.wait
+      output_message "Job #{job.inspect} was just run."
     end
 
     def work_loop
