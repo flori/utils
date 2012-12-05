@@ -479,7 +479,7 @@ module Utils
           unless filename.start_with?('/')
             filename = File.expand_path filename
           end
-          @irb.irb_load filename
+          @irb.load filename
         end
       end
 
