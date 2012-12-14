@@ -1,5 +1,6 @@
 require 'tins/xt/full'
 require 'tins/deep_const_get'
+require 'fileutils'
 
 module Utils
   class Editor
@@ -57,6 +58,8 @@ module Utils
     attr_accessor :wait
 
     attr_accessor :servername
+
+    attr_accessor :mkdir
 
     alias wait? wait
 
@@ -123,7 +126,17 @@ module Utils
       end
     end
 
+    def make_dirs(*filenames)
+      if mkdir
+        for filename in filenames
+          FileUtils.mkdir File.dirname(filename)
+        end
+      end
+    end
+    private :make_dirs
+
     def edit_file(*filenames)
+      make_dirs *filenames
       if gui
         edit_remote_file(*filenames)
       else
@@ -132,6 +145,7 @@ module Utils
     end
 
     def edit_file_linenumber(filename, linenumber)
+      make_dirs filename
       if wait?
         edit_remote(filename)
         sleep pause_duration
