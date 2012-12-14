@@ -1,6 +1,6 @@
 module Utils
   # Utils version
-  VERSION         = '0.0.67'
+  VERSION         = '0.0.68'
   VERSION_ARRAY   = VERSION.split(/\./).map { |x| x.to_i } # :nodoc:
   VERSION_MAJOR   = VERSION_ARRAY[0] # :nodoc:
   VERSION_MINOR   = VERSION_ARRAY[1] # :nodoc:
