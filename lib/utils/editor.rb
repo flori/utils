@@ -129,7 +129,7 @@ module Utils
     def make_dirs(*filenames)
       if mkdir
         for filename in filenames
-          FileUtils.mkdir File.dirname(filename)
+          FileUtils.mkdir_p File.dirname(filename)
         end
       end
     end
