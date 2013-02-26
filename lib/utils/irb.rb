@@ -7,6 +7,8 @@ if Readline.respond_to?(:point) && Readline.respond_to?(:line_buffer)
   require 'pry-editline'
 end
 require 'utils'
+require 'drb'
+
 $editor = Utils::Editor.new
 $pager = ENV['PAGER'] || 'less -r'
 
@@ -39,6 +41,16 @@ module Utils
       # Restart this irb.
       def irb_restart
         exec $0
+      end
+
+      # Start an irb server.
+      def irb_server(hostname = nil, port = nil)
+        Utils::IRB::Service.start(hostname, port) {}
+      end
+
+      # Conenct to an irb server.
+      def irb_connect(hostname = nil, port = nil)
+        Utils::IRB::Service.connect(hostname, port)
       end
 
       # Return all instance methods of obj's class.
@@ -425,6 +437,53 @@ module Utils
         connection.select_all("EXPLAIN #{to_sql}")
       end
     end
+
+    module Service
+      class << self
+        attr_accessor :hostname
+
+        attr_accessor :port
+
+        def start(hostname = nil, port = nil, &block)
+          hostname ||= self.hostname
+          port     ||= self.port
+          block    ||= proc {}
+          uri = "druby://#{hostname}:#{port}"
+          puts "Starting IRB server listening to #{uri.inspect}."
+          DRb.start_service(uri, eval('irb_current_working_binding', block.binding))
+        end
+
+        def connect(hostname = nil, port = nil)
+          hostname ||= self.hostname
+          port     ||= self.port
+          uri = "druby://#{hostname}:#{port}"
+          irb = DRbObject.new_with_uri(uri)
+          Proxy.new(irb)
+        end
+      end
+
+      self.hostname = 'localhost'
+
+      self.port = 6642
+
+      class Proxy
+        def initialize(irb)
+          @irb = irb
+        end
+
+        def eval(code)
+          @irb.conf.workspace.evaluate nil, code
+        end
+
+        def load(filename)
+          unless filename.start_with?('/')
+            filename = File.expand_path filename
+          end
+          @irb.load filename
+        end
+      end
+
+    end
   end
 end
 
@@ -495,7 +554,7 @@ module IRB
 end
 IRB.conf[:SAVE_HISTORY] = 1000
 
-if defined?(ActiveRecord::Relation)
+if defined?(ActiveRecord::Relation) && !ActiveRecord::Relation.method_defined?(:examine)
   class ActiveRecord::Relation
     include Utils::IRB::Relation
   end

@@ -61,15 +61,17 @@ user, remote, rport =
     usage
   end
 lport = opts['l']
-tunnel, tport = if tunnel_port = opts['t']
+tunnel, tport = nil, nil
+if tunnel_port = opts['t']
   case tunnel_port
   when /\A([^:]+)(?::(\d+))?\Z/
-    [ $1, $2 || '22' ]
+    tunnel, tport = $1, $2 || '22'
+    lport ||= tport
   else
     usage
   end
 else
-  [ 'localhost', lport ]
+  tunnel, tport = 'localhost', lport
 end
 
 ssh_dir = File.expand_path('~/.ssh')
@@ -79,7 +81,7 @@ env_user = ENV['USER'] and opts['n'] ||= env_user
 if opts['N']
   exec "ssh -p #{rport} -S #{sock_file} #{user}@#{remote} #{config.ssh_tunnel.multiplexer_list}"
 elsif lport
-  File.exist? sock_file and rm_f sock_file
+  rm_f sock_file
   exec "ssh -p #{rport} -Mt -L localhost:#{lport}:#{tunnel}:#{tport}"\
     " -S #{sock_file} #{user}@#{remote} #{config.ssh_tunnel.multiplexer_attach} #{opts['n']}"
 else

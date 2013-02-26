@@ -16,6 +16,7 @@ Options are
 
   -w          open a buffer in vim and wait until it is deleted
   -s          read files and files:linenumbers from stdin and open them
+  -m          make intermediate non existing directories to file
   -p DURATION pause for this many seconds to wait for vim's reaction
   -S SERVER   specify the server for this edit command
   -h          display this help
@@ -25,13 +26,14 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-$opt = go 'p:S:wsh'
+$opt = go 'p:S:wsmh'
 $opt['h'] and usage
 
 editor = Editor.new do |config|
   config.wait           = $opt['w']
   config.pause_duration = ($opt['p'] || 1).to_i
   s = $opt['S'] and config.servername = s
+  config.mkdir = $opt['m']
 end
 
 if $opt['s']

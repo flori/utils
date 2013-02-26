@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+
+require 'tins/xt'
+include Tins::GO
+require 'utils/irb'
+require 'drb'
+
+def usage
+  puts <<-EOT
+Usage: #{File.basename($0)} [OPTS]
+
+Options are
+
+  -e CODE       CODE is execute on the remote irb
+  -l PATH       load file PATH into remote irb context
+  -r HOSTNAME   name of the remote host (defaults to #{Utils::IRB::Service.hostname})
+  -p PORTNUMBER number of the remote port (defaults to #{Utils::IRB::Service.port})
+  -h            display this help
+
+Version is #{File.basename($0)} #{Utils::VERSION}.
+  EOT
+  exit 1
+end
+
+
+$opt = go 'e:r:p:l:h'
+$opt['h'] and usage
+
+proxy = Utils::IRB::Service.connect($opt['r'], $opt['p'])
+case
+when load_path = $opt['l']
+  proxy.load(load_path)
+when code = $opt['e']
+  p proxy.eval(code)
+else
+  puts proxy.eval(STDIN.read)
+end
