@@ -20,12 +20,12 @@ def usage
 Usage: #{File.basename($0)} [OPTS] [user@]remote[:port]"
 
 OPTS is one of
-  -N                   list all session names on the specified remote
-  -n NAME              name of the multplexer session to attach to (defaults to $USER)
-  -t [HOST[:PORT]]     host:port to tunnel if different from LOCALPORT
-  -l LOCALPORT         the localport to forward to
-  -C ssh|rc-default|rc output ssh or rc config file
-  -h                   to display this help
+  -N                     list all session names on the specified remote
+  -n NAME                name of the multplexer session to attach to (defaults to $USER)
+  -t [HOST[:PORT]]       host:port to tunnel if different from LOCALPORT
+  -l LOCALPORT           the localport to forward to
+  -C (ssh|rc)-default|rc output ssh or rc config file
+  -h                     to display this help
 
 EOT
   exit 1
@@ -37,7 +37,7 @@ arguments = ARGV
 opts = go 'l:t:n:C:hN', arguments
 
 case opts['C']
-when 'ssh'
+when 'ssh-default'
   puts SSH_CONFIG; exit
 when 'rc-default'
   puts config.to_ruby; exit
