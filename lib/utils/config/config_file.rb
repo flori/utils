@@ -148,9 +148,39 @@ class Utils::Config::ConfigFile
     @strip_spaces ||= StripSpaces.new
   end
 
+  class SshTunnel < BlockConfig
+    config :terminal_multiplexer, 'sshscreen'
+
+    def initialize
+      super
+      @multiplexer =
+        case terminal_multiplexer.to_s
+        when 'sshscreen'
+          @multiplexer_list   = 'screen -ls'
+          @multiplexer_attach = 'screen -DUR'
+        when 'tmux'
+          @multiplexer_list   = 'tmux ls'
+          @multiplexer_attach = 'tmux attach'
+        else
+          fail "invalid terminal_multiplexer #{terminal_multiplexer.inspect} was configured"
+        end
+    end
+
+    attr_reader :multiplexer_list
+
+    attr_reader :multiplexer_attach
+  end
+
+  def ssh_tunnel(&block)
+    if block
+      @ssh_tunnel = SshTunnel.new(&block)
+    end
+    @ssh_tunnel ||= SshTunnel.new
+  end
+
   def to_ruby
     result = "# vim: set ft=ruby:\n"
-    for bc in %w[search discover strip_spaces probe]
+    for bc in %w[search discover strip_spaces probe ssh_tunnel]
       result << "\n" << __send__(bc).to_ruby
     end
     result
