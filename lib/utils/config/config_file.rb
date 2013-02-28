@@ -172,7 +172,7 @@ class Utils::Config::ConfigFile
       when 'sshscreen'
         'false'
       when 'tmux'
-        'tmux new -s "%s"' % session
+        'tmux -u new -s "%s"' % session
       end
     end
 
@@ -181,7 +181,7 @@ class Utils::Config::ConfigFile
       when 'sshscreen'
         'screen -DUR "%s"' % session
       when 'tmux'
-        'tmux attach -t "%s"' % session
+        'tmux -u attach -t "%s"' % session
       end
     end
   end
