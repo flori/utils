@@ -153,22 +153,37 @@ class Utils::Config::ConfigFile
 
     def initialize
       super
-      @multiplexer =
-        case terminal_multiplexer.to_s
-        when 'sshscreen'
-          @multiplexer_list   = 'screen -ls'
-          @multiplexer_attach = 'screen -DUR'
-        when 'tmux'
-          @multiplexer_list   = 'tmux ls'
-          @multiplexer_attach = 'tmux attach'
-        else
-          fail "invalid terminal_multiplexer #{terminal_multiplexer.inspect} was configured"
-        end
+      @multiplexer = terminal_multiplexer.to_s
+      @multiplexer =~ /\A(sshscreen|tmux)\z/ or
+        fail "invalid terminal_multiplexer #{terminal_multiplexer.inspect} was configured"
     end
 
-    attr_reader :multiplexer_list
+    def multiplexer_list
+      case @multiplexer
+      when 'sshscreen'
+        'screen -ls'
+      when 'tmux'
+        'tmux ls'
+      end
+    end
 
-    attr_reader :multiplexer_attach
+    def multiplexer_new(session)
+      case @multiplexer
+      when 'sshscreen'
+        'false'
+      when 'tmux'
+        'tmux new -s "%s"' % session
+      end
+    end
+
+    def multiplexer_attach(session)
+      case @multiplexer
+      when 'sshscreen'
+        'screen -DUR "%s"' % session
+      when 'tmux'
+        'tmux attach -t "%s"' % session
+      end
+    end
   end
 
   def ssh_tunnel(&block)

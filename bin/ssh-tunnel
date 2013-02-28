@@ -77,7 +77,11 @@ end
 ssh_dir = File.expand_path('~/.ssh')
 mkdir_p ssh_dir
 sock_file = "#{ssh_dir}/#{user}@#{remote}:#{rport}.sock"
-env_user = ENV['USER'] and opts['n'] ||= env_user
+if env_user = ENV['USER']
+  opts['n'] ||= env_user
+else
+  opts['n'] ||= 'session'
+end
 if opts['N']
   exec "ssh -p #{rport} -S #{sock_file} #{user}@#{remote} #{config.ssh_tunnel.multiplexer_list}"
 elsif lport
@@ -86,5 +90,7 @@ elsif lport
     " -S #{sock_file} #{user}@#{remote} #{config.ssh_tunnel.multiplexer_attach} #{opts['n']}"
 else
   File.exist? sock_file and rm_f sock_file
-  exec "ssh -p #{rport} -Mt -S #{sock_file} #{user}@#{remote} #{config.ssh_tunnel.multiplexer_attach} #{opts['n']}"
+  exec "ssh -p #{rport} -Mt -S #{sock_file} #{user}@#{remote} "\
+    "'#{config.ssh_tunnel.multiplexer_new(opts['n'])} || "\
+    "#{config.ssh_tunnel.multiplexer_attach(opts['n'])}'"
 end
