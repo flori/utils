@@ -86,8 +86,10 @@ if opts['N']
   exec "ssh -p #{rport} -S #{sock_file} #{user}@#{remote} #{config.ssh_tunnel.multiplexer_list}"
 elsif lport
   rm_f sock_file
-  exec "ssh -p #{rport} -Mt -L localhost:#{lport}:#{tunnel}:#{tport}"\
-    " -S #{sock_file} #{user}@#{remote} #{config.ssh_tunnel.multiplexer_attach} #{opts['n']}"
+  exec "ssh -p #{rport} -Mt -L localhost:#{lport}:#{tunnel}:#{tport} "\
+    "-S #{sock_file} #{user}@#{remote} "\
+      "'#{config.ssh_tunnel.multiplexer_new(opts['n'])} || "\
+      "#{config.ssh_tunnel.multiplexer_attach(opts['n'])}'"
 else
   File.exist? sock_file and rm_f sock_file
   exec "ssh -p #{rport} -Mt -S #{sock_file} #{user}@#{remote} "\
