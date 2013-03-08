@@ -21,8 +21,9 @@ Usage: #{File.basename($0)} [OPTS] [user@]remote[:port]"
 
 OPTS is one of
   -N                     list all session names on the specified remote
-  -n NAME                name of the multplexer session to attach to (defaults to $USER)
+  -n NAME                name of the multiplexer session to attach to (defaults to $USER)
   -t [HOST[:PORT]]       host:port to tunnel if different from LOCALPORT
+  -m screen|tmux         use sshscreen or tmux as a terminal multiplexer
   -l LOCALPORT           the localport to forward to
   -C (ssh|rc)-default|rc output ssh or rc config file
   -h                     to display this help
@@ -34,7 +35,7 @@ end
 config = Utils::Config::ConfigFile.new
 
 arguments = ARGV
-opts = go 'l:t:n:C:hN', arguments
+opts = go 'l:t:n:C:m:hN', arguments
 
 case opts['C']
 when 'ssh-default'
@@ -49,6 +50,10 @@ end
 config.configure_from_paths
 
 usage if opts['h'] or arguments.size != 1
+
+if multiplexer = opts['m']
+  config.ssh_tunnel.terminal_multiplexer = multiplexer
+end
 
 user_remote = arguments.shift
 user, remote, rport =
@@ -84,15 +89,22 @@ else
 end
 if opts['N']
   exec "ssh -p #{rport} -S #{sock_file} #{user}@#{remote} #{config.ssh_tunnel.multiplexer_list}"
-elsif lport
-  rm_f sock_file
-  exec "ssh -p #{rport} -Mt -L localhost:#{lport}:#{tunnel}:#{tport} "\
-    "-S #{sock_file} #{user}@#{remote} "\
-      "'#{config.ssh_tunnel.multiplexer_new(opts['n'])} || "\
-      "#{config.ssh_tunnel.multiplexer_attach(opts['n'])}'"
 else
+  env = []
   File.exist? sock_file and rm_f sock_file
-  exec "ssh -p #{rport} -Mt -S #{sock_file} #{user}@#{remote} "\
-    "'#{config.ssh_tunnel.multiplexer_new(opts['n'])} || "\
-    "#{config.ssh_tunnel.multiplexer_attach(opts['n'])}'"
+  r = config.ssh_tunnel.copy_paste.full? do |t|
+    env << "COPY_REMOTE_HOST_PORT='#{t.bind_address}:#{t.port}'"
+    " -R #{t}"
+  end
+  env *= ' '
+  if lport
+    exec "ssh -p #{rport} -Mt -L localhost:#{lport}:#{tunnel}:#{tport}#{r} "\
+      "-S #{sock_file} #{user}@#{remote} "\
+        "'env #{env} #{config.ssh_tunnel.multiplexer_new(opts['n'])} || "\
+        "#{config.ssh_tunnel.multiplexer_attach(opts['n'])}'"
+  else
+    exec "ssh -p #{rport} -Mt -S #{sock_file} #{user}@#{remote}#{r} "\
+      "'env #{env} #{config.ssh_tunnel.multiplexer_new(opts['n'])} || "\
+      "#{config.ssh_tunnel.multiplexer_attach(opts['n'])}'"
+  end
 end

@@ -49,26 +49,31 @@ class Utils::Config::ConfigFile
       end
 
       def config(name, *r, &block)
-        self.dsl_attributes ||= []
-        dsl_attributes << name.to_sym
+        self.config_settings ||= []
+        config_settings << name.to_sym
         dsl_accessor name, *r, &block
         self
       end
 
-      attr_accessor :dsl_attributes
+      attr_accessor :config_settings
     end
 
     def initialize(&block)
       block and instance_eval(&block)
     end
 
-    def to_ruby
+    def to_ruby(depth = 0)
       result = ''
-      result << "#{self.class.name[/::([^:]+)\z/, 1].underscore} do\n"
-      for da in self.class.dsl_attributes
-        result << "  #{da} #{Array(__send__(da)).map(&:inspect) * ', '}\n"
+      result << ' ' * 2 * depth << "#{self.class.name[/::([^:]+)\z/, 1].underscore} do\n"
+      for name in self.class.config_settings
+        value = __send__(name)
+        if value.respond_to?(:to_ruby)
+          result << ' ' * 2 * (depth + 1) << value.to_ruby(depth + 1)
+        else
+          result << ' ' * 2 * (depth + 1) << "#{name} #{Array(value).map(&:inspect) * ', '}\n"
+        end
       end
-      result << "end\n"
+      result << ' ' * 2 * depth << "end\n"
     end
   end
 
@@ -149,18 +154,22 @@ class Utils::Config::ConfigFile
   end
 
   class SshTunnel < BlockConfig
-    config :terminal_multiplexer, 'sshscreen'
+    config :terminal_multiplexer, 'screen'
 
     def initialize
       super
+      self.terminal_multiplexer = terminal_multiplexer
+    end
+
+    def terminal_multiplexer=(terminal_multiplexer)
       @multiplexer = terminal_multiplexer.to_s
-      @multiplexer =~ /\A(sshscreen|tmux)\z/ or
+      @multiplexer =~ /\A(screen|tmux)\z/ or
         fail "invalid terminal_multiplexer #{terminal_multiplexer.inspect} was configured"
     end
 
     def multiplexer_list
       case @multiplexer
-      when 'sshscreen'
+      when 'screen'
         'screen -ls'
       when 'tmux'
         'tmux ls'
@@ -169,7 +178,7 @@ class Utils::Config::ConfigFile
 
     def multiplexer_new(session)
       case @multiplexer
-      when 'sshscreen'
+      when 'screen'
         'false'
       when 'tmux'
         'tmux -u new -s "%s"' % session
@@ -178,12 +187,39 @@ class Utils::Config::ConfigFile
 
     def multiplexer_attach(session)
       case @multiplexer
-      when 'sshscreen'
+      when 'screen'
         'screen -DUR "%s"' % session
       when 'tmux'
         'tmux -u attach -t "%s"' % session
       end
     end
+
+    class CopyPaste < BlockConfig
+      config :bind_address, 'localhost'
+
+      config :port, 6166
+
+      config :host, 'localhost'
+
+      config :host_port, 6166
+
+      def to_s
+        [ bind_address, port, host, host_port ] * ':'
+      end
+    end
+
+    def copy_paste(enable = false, &block)
+      if @copy_paste
+        @copy_paste
+      else
+        if block
+          @copy_paste = CopyPaste.new(&block)
+        elsif enable
+          @copy_paste = CopyPaste.new {}
+        end
+      end
+    end
+    self.config_settings << :copy_paste
   end
 
   def ssh_tunnel(&block)
