@@ -29,11 +29,14 @@ end
 $opt = go 'p:S:wsmh'
 $opt['h'] and usage
 
-editor = Editor.new do |config|
-  config.wait           = $opt['w']
-  config.pause_duration = ($opt['p'] || 1).to_i
-  s = $opt['S'] and config.servername = s
-  config.mkdir = $opt['m']
+config = Utils::Config::ConfigFile.new
+config.configure_from_paths
+
+editor = Editor.new do |c|
+  c.wait           = $opt['w']
+  c.pause_duration = ($opt['p'] || 1).to_i
+  s = $opt['S'] and c.servername = s
+  c.mkdir = $opt['m']
 end
 
 if $opt['s']
@@ -49,7 +52,7 @@ if $opt['s']
 else
   argv = ARGV.dup
   if argv.empty?
-    if !STDIN.tty?
+    unless STDIN.tty?
       file = File.new(File.join(Dir.tmpdir, "edit_tmp.#$$"), 'w')
       until STDIN.eof?
         buffer = STDIN.read(8192)
@@ -57,8 +60,6 @@ else
       end
       file.close
       argv << file.path
-    else
-      editor.ensure_running
     end
   end
   unless argv.empty?

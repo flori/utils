@@ -229,6 +229,19 @@ class Utils::Config::ConfigFile
     @ssh_tunnel ||= SshTunnel.new
   end
 
+  class Edit < BlockConfig
+    config :vim_path do `which vim`.chomp end
+
+    config :vim_default_args, nil
+  end
+
+  def edit(&block)
+    if block
+      @edit = Edit.new(&block)
+    end
+    @edit ||= Edit.new
+  end
+
   def to_ruby
     result = "# vim: set ft=ruby:\n"
     for bc in %w[search discover strip_spaces probe ssh_tunnel]

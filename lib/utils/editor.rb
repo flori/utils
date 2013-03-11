@@ -50,6 +50,9 @@ module Utils
       self.wait           = false
       self.pause_duration = 1
       self.servername     = ENV['VIM_SERVER'] || "G#{ENV['USER'].upcase}"
+      config = Utils::Config::ConfigFile.new
+      config.configure_from_paths
+      self.config = config.edit
       yield self if block_given?
     end
 
@@ -61,23 +64,12 @@ module Utils
 
     attr_accessor :mkdir
 
+    attr_accessor :config
+
     alias wait? wait
 
     def vim
-      vim_in_path = [`which gvim`, `which vim`].map(&:chomp).find(&:full?)
-      @vim ||=
-        case `uname -s`
-        when /\Adarwin/i
-          if File.directory?(path = File.expand_path('~/Applications/MacVim.app')) or
-            File.directory?(path = File.expand_path('/Applications/MacVim.app'))
-          then
-            File.join(path, 'Contents/MacOS/Vim')
-          else
-            vim_in_path
-          end
-        else
-          vim_in_path
-        end
+      ([ config.vim_path ] + Array(config.vim_default_args))
     end
 
     def cmd(*parts)
@@ -96,7 +88,7 @@ module Utils
     end
 
     def fullscreen=(enabled)
-      started? or start
+      start
       sleep pause_duration
       if enabled
         edit_remote_send '<ESC>:set fullscreen<CR>'
@@ -118,8 +110,7 @@ module Utils
       if filenames.size == 1 and
         source_location = filenames.first.source_location
       then
-        edit_source_location(source_location) ||
-          edit_file(expand_globs(source_location[0, 1]))
+        edit_source_location(source_location) # || edit_file(expand_globs(source_location[0, 1]))
       elsif source_locations = filenames.map(&:source_location).compact.full?
         filenames = expand_globs(source_locations.map(&:first))
         edit_file(*filenames)
@@ -136,25 +127,16 @@ module Utils
     private :make_dirs
 
     def edit_file(*filenames)
-      make_dirs *filenames
-      if gui
-        edit_remote_file(*filenames)
-      else
-        cmd(vim, *filenames)
-      end
+      make_dirs(*filenames)
+      edit_remote_file(*filenames)
     end
 
     def edit_file_linenumber(filename, linenumber)
       make_dirs filename
       if wait?
-        edit_remote(filename)
-        sleep pause_duration
-        edit_remote_send("<ESC>:#{linenumber}<CR>")
-        edit_remote_wait(filename)
+        edit_remote_wait("+#{linenumber}", filename)
       else
-        edit_remote(filename)
-        sleep pause_duration
-        edit_remote_send("<ESC>:#{linenumber}<CR>")
+        edit_remote("+#{linenumber}", filename)
       end
     end
 
@@ -167,12 +149,8 @@ module Utils
       self
     end
 
-    def gui
-      ENV['TERM'] =~ /xterm/ ? '-g' : nil
-    end
-
     def start
-      cmd(vim, gui, '--servername', servername)
+      started? or cmd(*vim, '--servername', servername)
     end
 
     def stop
@@ -180,13 +158,17 @@ module Utils
     end
 
     def activate
-      edit_remote("stupid_trick#{rand}")
-      sleep pause_duration
-      edit_remote_send('<ESC>:bw<CR>')
+      if Array(config.vim_default_args).include?('-g')
+        edit_remote("stupid_trick#{rand}")
+        sleep pause_duration
+        edit_remote_send('<ESC>:bw<CR>')
+      else
+        # TODO use tmux to switch to editor pane?
+      end
     end
 
     def serverlist
-      @serverlist ||= `#{vim} #{gui} --serverlist`.split
+      @serverlist ||= `#{vim.map(&:inspect) * ' '} --serverlist`.split
     end
 
     def started?(name = servername)
@@ -194,19 +176,19 @@ module Utils
     end
 
     def edit_remote(*args)
-      gui and cmd(vim, gui, '--servername', servername, '--remote', *args)
+      cmd(*vim, '--servername', servername, '--remote', *args)
     end
 
     def edit_remote_wait(*args)
-      gui and cmd(vim, gui, '--servername', servername, '--remote-wait', *args)
+      cmd(*vim, '--servername', servername, '--remote-wait', *args)
     end
 
     def edit_remote_send(*args)
-      gui and cmd(vim, gui, '--servername', servername, '--remote-send', *args)
+      cmd(*vim, '--servername', servername, '--remote-send', *args)
     end
 
     def edit_remote_file(*filenames)
-      if gui && wait?
+      if wait?
         edit_remote_wait(*filenames)
       else
         edit_remote(*filenames)
