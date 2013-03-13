@@ -190,7 +190,7 @@ class Utils::Config::ConfigFile
       when 'screen'
         'screen -DUR "%s"' % session
       when 'tmux'
-        'tmux -u attach -t "%s"' % session
+        'tmux -u attach -d -t "%s"' % session
       end
     end
 
