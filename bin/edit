@@ -62,7 +62,9 @@ else
       argv << file.path
     end
   end
-  unless argv.empty?
+  if argv.empty?
+    editor.start
+  else
     if editor.file_linenumber?(argv.first)
       editor.wait = argv.size > 1
       for current_file in argv
