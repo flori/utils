@@ -1,6 +1,7 @@
 require 'tins/xt/full'
 require 'tins/deep_const_get'
 require 'fileutils'
+require 'rbconfig'
 
 module Utils
   class Editor
@@ -49,12 +50,19 @@ module Utils
     def initialize
       self.wait           = false
       self.pause_duration = 1
-      self.servername     = ENV['VIM_SERVER'] || "G#{ENV['USER'].upcase}"
-      config = Utils::Config::ConfigFile.new
+      self.servername     = derive_server_name
+      config              = Utils::Config::ConfigFile.new
       config.configure_from_paths
       self.config = config.edit
       yield self if block_given?
     end
+
+    def derive_server_name
+      name = ENV['VIM_SERVER'] || File.dirname(Dir.pwd)
+      RbConfig::CONFIG['host_os'] =~ /mswin|mingw/ and name = "G_#{name}"
+      name.upcase
+    end
+    private :derive_server_name
 
     attr_accessor :pause_duration
 
