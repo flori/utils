@@ -58,7 +58,7 @@ module Utils
     end
 
     def derive_server_name
-      name = ENV['VIM_SERVER'] || File.dirname(Dir.pwd)
+      name = ENV['VIM_SERVER'] || Dir.pwd
       RbConfig::CONFIG['host_os'] =~ /mswin|mingw/ and name = "G_#{name}"
       name.upcase
     end
