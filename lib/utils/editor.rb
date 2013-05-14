@@ -172,7 +172,7 @@ module Utils
           `tmux list-panes -F '\#{pane_pid} \#{pane_index}'`.lines.find { |l|
             pid, index = l.split(' ')
             pid.to_i == $$ and next
-            if `ps -eo ppid,command|grep ^#{pid}` =~ %r(/edit )
+            if `ps -eo ppid,command|grep ^#{pid}` =~ %r(/edit( |$))
               break index.to_i
             end
           }
