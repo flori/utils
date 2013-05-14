@@ -115,7 +115,6 @@ module Utils
     end
 
     def edit(*filenames)
-      ensure_running
       if filenames.size == 1 and
         source_location = filenames.first.source_location
       then
@@ -123,6 +122,8 @@ module Utils
       elsif source_locations = filenames.map(&:source_location).compact.full?
         filenames = expand_globs(source_locations.map(&:first))
         edit_file(*filenames)
+      end.tap do
+        activate
       end
     end
 
@@ -151,11 +152,6 @@ module Utils
 
     def edit_source_location(source_location)
       edit_file_linenumber(source_location[0], source_location[1])
-    end
-
-    def ensure_running
-      started? ? activate : start
-      self
     end
 
     def start
