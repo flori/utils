@@ -115,6 +115,7 @@ module Utils
     end
 
     def edit(*filenames)
+      ensure_running
       if filenames.size == 1 and
         source_location = filenames.first.source_location
       then
@@ -171,7 +172,14 @@ module Utils
         sleep pause_duration
         edit_remote_send('<ESC>:bw<CR>')
       else
-        # TODO use tmux to switch to editor pane?
+        switch_to_index =
+          `tmux list-panes -F '\#{pane_pid} \#{pane_index}'`.lines.find { |l|
+            pid, index = l.split(' ')
+            if `ps -eo ppid,command|grep ^#{pid}` =~ %r(/edit )
+              break index.to_i
+            end
+          }
+        switch_to_index and system "tmux select-pane -t #{switch_to_index}"
       end
     end
 
