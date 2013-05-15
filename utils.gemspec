@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = "utils"
-  s.version = "0.0.81"
+  s.version = "0.0.82"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Florian Frank"]
-  s.date = "2013-05-14"
+  s.date = "2013-05-15"
   s.description = "This ruby gem provides some useful command line utilities"
   s.email = "flori@ping.de"
   s.executables = ["chroot-exec", "chroot-libs", "classify", "create_tags", "discover", "edit", "edit_wait", "enum", "errf", "git-empty", "irb_connect", "myex", "number_files", "on_change", "path", "probe", "remote_copy", "same_files", "search", "sedit", "ssh-tunnel", "strip_spaces", "unquarantine_apps", "untest", "utils-install-config", "utils-utilsrc", "vacuum_firefox_sqlite", "xmp"]
@@ -26,12 +26,14 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<tins>, ["~> 0.6"])
       s.add_runtime_dependency(%q<term-ansicolor>, ["~> 1.0"])
       s.add_runtime_dependency(%q<dslkit>, ["~> 0.2.10"])
+      s.add_runtime_dependency(%q<pstree>, [">= 0"])
       s.add_runtime_dependency(%q<pry-editline>, [">= 0"])
     else
       s.add_dependency(%q<gem_hadar>, ["~> 0.1.8"])
       s.add_dependency(%q<tins>, ["~> 0.6"])
       s.add_dependency(%q<term-ansicolor>, ["~> 1.0"])
       s.add_dependency(%q<dslkit>, ["~> 0.2.10"])
+      s.add_dependency(%q<pstree>, [">= 0"])
       s.add_dependency(%q<pry-editline>, [">= 0"])
     end
   else
@@ -39,6 +41,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<tins>, ["~> 0.6"])
     s.add_dependency(%q<term-ansicolor>, ["~> 1.0"])
     s.add_dependency(%q<dslkit>, ["~> 0.2.10"])
+    s.add_dependency(%q<pstree>, [">= 0"])
     s.add_dependency(%q<pry-editline>, [">= 0"])
   end
 end

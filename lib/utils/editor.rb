@@ -2,6 +2,7 @@ require 'tins/xt/full'
 require 'tins/deep_const_get'
 require 'fileutils'
 require 'rbconfig'
+require 'pstree'
 
 module Utils
   class Editor
@@ -168,11 +169,12 @@ module Utils
         sleep pause_duration
         edit_remote_send('<ESC>:bw<CR>')
       else
+        pstree = PSTree.new
         switch_to_index =
           `tmux list-panes -F '\#{pane_pid} \#{pane_index}'`.lines.find { |l|
             pid, index = l.split(' ')
-            pid.to_i == $$ and next
-            if `ps -eo ppid,command|grep -v ' grep'|grep ^#{pid}` =~ %r(/edit( |$))
+            pid = pid.to_i
+            if pstree.find { |ps| ps.pid != $$ && ps.ppid == pid && ps.cmd =~ %r(/edit( |$)) }
               break index.to_i
             end
           }
