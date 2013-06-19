@@ -133,7 +133,7 @@ when :rspec
 when :'test-unit'
   testrb = find_cmd('testrb')
   if testname = $opt['n']
-    cmd 'ruby', '-I', $config.probe.include_dirs_argument, '-S', testrb,
+    cmd 'ruby', '-I', $config.probe.include_dirs_argument, testrb,
       '-n', testname, *(args + testrunner_args)
   else
     for filename in args
@@ -147,9 +147,25 @@ when :'test-unit'
           warn "no test found before line #{sl.linenumber}"
         end
       else
-        cmd 'ruby', '-I', $config.probe.include_dirs_argument, '-S', testrb,
+        cmd 'ruby', '-I', $config.probe.include_dirs_argument, testrb,
           sl.filename, *testrunner_args
       end
     end
+  end
+when :cucumber
+  cucumber = find_cmd('cucumber')
+  if linenumber = $opt['n']
+    cmd 'ruby', cucumber, '-r', $config.probe.include_dirs_argument, '-l',
+      linenumber, *(args + testrunner_args)
+  else
+    args = args.map do |a|
+      if Utils::Editor::FILE_LINENUMBER_REGEXP =~ a
+        $~.captures * ':'
+      else
+        a
+      end
+    end
+    cmd 'ruby', cucumber, '-r', $config.probe.include_dirs_argument,
+      *(args + testrunner_args)
   end
 end
