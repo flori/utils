@@ -106,7 +106,7 @@ if $opt['c']
   puts "Connecting probe server on #{uri.inspect}."
   DRb.start_service
   probe_server = DRbObject.new_with_uri(uri)
-  opts = $opt.subhash('n', 't').map { |k, v| v.full? { "-#{k} #{v.inspect}" } }.compact
+  opts = $opt.subhash('n', 't').map { |k, v| v.full? { %W[-#{k} #{v}] } }.compact.flatten
   probe_server.enqueue opts + args
   exit
 end
