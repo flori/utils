@@ -29,7 +29,7 @@ end
 
 def cmd(*args)
   puts args * ' '
-  system(*args)
+  system(*args) or exit $?.exitstatus
 end
 
 def find_cmd(*cmds)
@@ -74,12 +74,22 @@ if $opt['l']
     end
 
     def run_job(job)
-      output_message "Job #{job.inspect} about to run now:".black.on_yellow
+      message = "Job #{job.inspect} about to run now:".black
+      message = message.ask_and_send(:on_color, 166) || message.on_yellow
+      output_message message
       fork do
         exec(*cmd(job))
       end
       Process.wait
-      output_message "Job #{job.inspect} was just run.".black.on_red
+      message = "Job #{job.inspect} was just run"
+      if $?.success?
+        message << " successfully."
+        message = message.black.on_green
+      else
+        message << " and failed with exit status #{$?.exitstatus}!"
+        message = message.white.on_red.blink
+      end
+      output_message message
     end
 
     def work_loop
