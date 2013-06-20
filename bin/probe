@@ -2,6 +2,10 @@
 # encoding: UTF-8
 
 require 'tins/xt'
+require 'term/ansicolor'
+class String
+  include Term::ANSIColor
+end
 require 'tins/lines_file'
 include Tins::GO
 require 'utils'
@@ -57,7 +61,7 @@ if $opt['l']
     end
 
     def enqueue(job)
-      output_message "Job #{job.inspect} enqueued."
+      output_message "Job #{job.inspect} enqueued.".black.on_green
       @jobs.push job
     end
     alias run enqueue
@@ -70,12 +74,12 @@ if $opt['l']
     end
 
     def run_job(job)
-      output_message "Job #{job.inspect} about to run now."
+      output_message "Job #{job.inspect} about to run now:".black.on_yellow
       fork do
         exec(*cmd(job))
       end
       Process.wait
-      output_message "Job #{job.inspect} was just run."
+      output_message "Job #{job.inspect} was just run.".black.on_red
     end
 
     def work_loop
