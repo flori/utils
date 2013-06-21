@@ -2,10 +2,6 @@
 # encoding: UTF-8
 
 require 'tins/xt'
-require 'term/ansicolor'
-class String
-  include Term::ANSIColor
-end
 require 'tins/lines_file'
 include Tins::GO
 require 'utils'
@@ -54,54 +50,10 @@ uri = "druby://localhost:#{$opt['p'] || 6623}"
 if $opt['l']
   Thread.abort_on_exception = $DEBUG
 
-  class ProbeServer
-    def initialize
-      @jobs = Queue.new
-      Thread.new { work_loop }
-    end
-
-    def enqueue(job)
-      output_message "Job #{job.inspect} enqueued.".black.on_green
-      @jobs.push job
-    end
-    alias run enqueue
-
-    private
-
-    def output_message(msg)
-      STDOUT.puts msg
-      STDOUT.flush
-    end
-
-    def run_job(job)
-      message = "Job #{job.inspect} about to run now:".black
-      message = message.ask_and_send(:on_color, 166) || message.on_yellow
-      output_message message
-      fork do
-        exec(*cmd(job))
-      end
-      Process.wait
-      message = "Job #{job.inspect} was just run"
-      if $?.success?
-        message << " successfully."
-        message = message.black.on_green
-      else
-        message << " and failed with exit status #{$?.exitstatus}!"
-        message = message.white.on_red.blink
-      end
-      output_message message
-    end
-
-    def work_loop
-      loop do
-        job = @jobs.shift
-        run_job job
-      end
-    end
-
-    def cmd(job)
-      [ $0, *job ]
-    end
+  begin
+    DRb.start_service
+    DRbObject.new_with_uri(uri).shutdown
+  rescue DRb::DRbConnError
   end
 
   puts "Starting probe server listening to #{uri.inspect}."
