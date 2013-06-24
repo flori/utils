@@ -16,6 +16,9 @@ Options are
 
   -n TESTNAME   run the test TESTNAME in file FILENAME
   -t FRAMEWORK  use test framework FRAMEWORK (rspec or test-unit)
+  -c            start probe as a client
+  -l            start probe as a server
+  -p PORT       listen on/connect to local port PORT
   -h            display this help
 
 Version is #{File.basename($0)} #{Utils::VERSION}.
@@ -66,17 +69,18 @@ if $opt['l']
   end
 end
 
-args.empty? and fail "require filename or filename:linenumber as arguments"
-
 if $opt['c']
   puts "Connecting probe server on #{uri.inspect}."
   DRb.start_service
   probe_server = DRbObject.new_with_uri(uri)
-  opts = $opt.subhash('n', 't').map { |k, v| v.full? { %W[-#{k} #{v}] } }.compact.flatten
-  probe_server.enqueue opts + args
+  unless args.empty?
+    opts = $opt.subhash('n', 't').map { |k, v| v.full? { %W[-#{k} #{v}] } }.compact.flatten
+    probe_server.enqueue opts + args
+  end
   exit
 end
 
+args.empty? and fail "require filename or filename:linenumber as arguments"
 puts "Running tests in #{args.inspect}"
 
 case ($opt['t'] || $config.probe.test_framework).to_sym
