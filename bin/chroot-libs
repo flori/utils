@@ -17,6 +17,10 @@ libs.concat ARGV
 cd dir do
   cp executable, File.basename(executable)
   for l in libs
-    cp l, File.basename(l)
+    begin
+      cp l, File.basename(l)
+    rescue Errno::ENOENT => e
+      warn "Caught #{e.class}: #{e}"
+    end
   end
 end
