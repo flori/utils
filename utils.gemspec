@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Florian Frank"]
-  s.date = "2013-06-21"
+  s.date = "2013-07-17"
   s.description = "This ruby gem provides some useful command line utilities"
   s.email = "flori@ping.de"
   s.executables = ["chroot-exec", "chroot-libs", "classify", "create_tags", "discover", "edit", "edit_wait", "enum", "errf", "git-empty", "irb_connect", "myex", "number_files", "on_change", "path", "probe", "remote_copy", "same_files", "search", "sedit", "ssh-tunnel", "strip_spaces", "unquarantine_apps", "untest", "utils-install-config", "utils-utilsrc", "vacuum_firefox_sqlite", "xmp"]
@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/flori/utils"
   s.rdoc_options = ["--title", "Utils - Some useful command line utilities", "--main", "README.rdoc"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "2.0.3"
+  s.rubygems_version = "2.0.4"
   s.summary = "Some useful command line utilities"
 
   if s.respond_to? :specification_version then
@@ -23,14 +23,14 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_development_dependency(%q<gem_hadar>, ["~> 0.1.8"])
-      s.add_runtime_dependency(%q<tins>, ["~> 0.6"])
+      s.add_runtime_dependency(%q<tins>, [">= 0.8.3", "~> 0.8"])
       s.add_runtime_dependency(%q<term-ansicolor>, ["~> 1.0"])
       s.add_runtime_dependency(%q<dslkit>, ["~> 0.2.10"])
       s.add_runtime_dependency(%q<pstree>, [">= 0"])
       s.add_runtime_dependency(%q<pry-editline>, [">= 0"])
     else
       s.add_dependency(%q<gem_hadar>, ["~> 0.1.8"])
-      s.add_dependency(%q<tins>, ["~> 0.6"])
+      s.add_dependency(%q<tins>, [">= 0.8.3", "~> 0.8"])
       s.add_dependency(%q<term-ansicolor>, ["~> 1.0"])
       s.add_dependency(%q<dslkit>, ["~> 0.2.10"])
       s.add_dependency(%q<pstree>, [">= 0"])
@@ -38,7 +38,7 @@ Gem::Specification.new do |s|
     end
   else
     s.add_dependency(%q<gem_hadar>, ["~> 0.1.8"])
-    s.add_dependency(%q<tins>, ["~> 0.6"])
+    s.add_dependency(%q<tins>, [">= 0.8.3", "~> 0.8"])
     s.add_dependency(%q<term-ansicolor>, ["~> 1.0"])
     s.add_dependency(%q<dslkit>, ["~> 0.2.10"])
     s.add_dependency(%q<pstree>, [">= 0"])
