@@ -11,6 +11,8 @@ if opt['c']
   system *%w'bundle exec brakeman -q -o .brakeman.json' or fail "calling brakeman failed"
 end
 results = JSON File.read('.brakeman.json'), object_class: JSON::GenericObject
+puts "Found #{results.errors.size} errors and #{results.warnings.size} warnings.",
+  "_" * 80
 for error in results.errors
   puts error.location, "Error #{error.error.inspect}"
 end
