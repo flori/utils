@@ -8,7 +8,7 @@ include Tins::GO
 opt = go 'c'
 if opt['c']
   brakeman = `bundle exec which brakeman`.full? or fail "cannot find brakeman in path"
-  system *%w'bundle exec brakeman -q -o .brakeman.json' or fail "calling brakeman failed"
+  system *%w'bundle exec brakeman -q -o -s brakeman_ignore --separate-models .brakeman.json' or fail "calling brakeman failed"
 end
 results = JSON File.read('.brakeman.json'), object_class: JSON::GenericObject
 puts "Found #{results.errors.size} errors and #{results.warnings.size} warnings.",
@@ -18,6 +18,6 @@ for error in results.errors
 end
 for warning in results.warnings
   puts "#{warning.file}:#{warning.line}",
-  "#{warning.warning_type} (#{warning.confidence}) #{warning.message.inspect}",
-    warning.code
+    "#{warning.warning_type} (#{warning.confidence}) #{warning.message.inspect}",
+    warning.code, "See: #{warning.link}"
 end
