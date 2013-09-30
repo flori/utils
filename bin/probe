@@ -50,7 +50,7 @@ $opt['h'] and usage
 
 uri = "druby://localhost:#{$opt['p'] || 6623}"
 
-if $opt['l']
+def start_server
   Thread.abort_on_exception = $DEBUG
 
   begin
@@ -69,7 +69,7 @@ if $opt['l']
   end
 end
 
-if $opt['c']
+def connect_server
   puts "Connecting probe server on #{uri.inspect}."
   DRb.start_service
   probe_server = DRbObject.new_with_uri(uri)
@@ -78,6 +78,13 @@ if $opt['c']
     probe_server.enqueue opts + args
   end
   exit
+end
+
+case
+when $opt['l']
+  start_service
+when $opt['c']
+  connect_server
 end
 
 args.empty? and fail "require filename or filename:linenumber as arguments"
