@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 require 'tins/xt'
 require 'term/ansicolor'
 class String
@@ -8,51 +6,107 @@ end
 
 module Utils
   class ProbeServer
+    class Job
+      def initialize(probe_server, args)
+        @id           = probe_server.next_job_id
+        @args         = args
+      end
+
+      attr_reader :id
+
+      attr_reader :args
+
+      def inspect
+        "#<#{self.class}: id=#{id} args=#{args.inspect}>"
+      end
+    end
+
     def initialize
-      @jobs    = Queue.new
+      @jobs_queue = Queue.new
+      @current_job_id = 0
       Thread.new { work_loop }
     end
 
-    def enqueue(job)
-      output_message "Job #{job.inspect} enqueued.".black.on_yellow
-      @jobs.push job
+    def next_job_id
+      @current_job_id += 1
+    end
+
+    def enqueue(job_args)
+      job = Job.new(self, job_args)
+      output_message "#{job.inspect} enqueued."
+      @jobs_queue.push job
     end
     alias run enqueue
 
+    def stop
+      @pid and Process.kill :STOP, @pid
+    end
+
+    def continue
+      @pid and Process.kill :CONT, @pid
+    end
+
     def shutdown
-      output_message "Server was shutdown down – HARD!".white.on_red.blink
+      output_message "Server was shutdown down – HARD!", :type => :warn
       exit! 23
+    end
+
+    def list_jobs
+      @jobs_queue.instance_variable_get(:@que)
+    end
+
+    def clear_jobs
+      queue_synchronize do
+        unless @jobs_queue.empty?
+          @jobs_queue.clear
+          output_message "Cleared all queued jobs.", :type => :warn
+          true
+        else
+          false
+        end
+      end
     end
 
     private
 
-    def output_message(msg)
+    def queue_synchronize(&block)
+      @jobs_queue.instance_variable_get(:@mutex).synchronize(&block)
+    end
+
+    def output_message(msg, opts = { :type => :info })
+      msg =
+        case opts[:type]
+        when :success
+          msg.on_green.black
+        when :info, nil
+          msg.on_color(118).black
+        when :warn
+          msg.on_color(166).black
+        when :failure
+          msg.on_red.blink.white
+        end
       STDOUT.puts msg
       STDOUT.flush
     end
 
     def run_job(job)
-      message = "Job #{job.inspect} about to run now:".black
-      message = message.ask_and_send(:on_color, 166) || message.on_yellow
-      output_message message
-      fork do
-        exec(*cmd(job))
-      end
-      Process.wait
-      message = "Job #{job.inspect} was just run"
+      output_message "#{job.inspect} about to run now.", :type => :info
+      @pid = fork { exec(*cmd(job.args)) }
+      output_message "#{job.inspect} now running with pid #@pid.", :type => :info
+      Process.wait @pid
+      message = "#{job.inspect} was just run"
       if $?.success?
         message << " successfully."
-        message = message.black.on_green
+        output_message message, :type => :success
       else
         message << " and failed with exit status #{$?.exitstatus}!"
-        message = message.white.on_red.blink
+        output_message message, :type => :failure
       end
-      output_message message
     end
 
     def work_loop
       loop do
-        job = @jobs.shift
+        job = @jobs_queue.shift
         run_job job
       end
     end
