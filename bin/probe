@@ -71,6 +71,7 @@ def start_server
 end
 
 def connect_server
+  Utils::ProbeServer::Job.colorize = true
   puts "Connecting probe server on #{$uri.inspect}."
   DRb.start_service
   probe_server = DRbObject.new_with_uri($uri)

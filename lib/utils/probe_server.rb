@@ -7,6 +7,16 @@ end
 module Utils
   class ProbeServer
     class Job
+
+      class << self
+        attr_writer :colorize
+
+        def colorize?
+          !!@colorize
+        end
+      end
+      self.colorize = false
+
       def initialize(probe_server, args)
         @id           = probe_server.next_job_id
         @args         = args
@@ -16,46 +26,91 @@ module Utils
 
       attr_reader :args
 
-      def inspect
-        "#<#{self.class}: id=#{id} args=#{args.inspect}>"
+      attr_writer :ok
+
+      def ok
+        case @ok
+        when false then 'n'
+        when true  then 'y'
+        else            '-'
+        end
       end
+
+      def ok_colorize(string)
+        return string unless self.class.colorize?
+        case @ok
+        when false then string.white.on_red
+        when true  then string.black.on_green
+        else            string.black.on_yellow
+        end
+      end
+
+      def inspect
+        ok_colorize(
+          "#<#{self.class}: id=#{id} args=#{args.inspect} ok=#{ok}>"
+        )
+      end
+
+      alias to_s inspect
     end
 
     def initialize
+      @history    = [].freeze
       @jobs_queue = Queue.new
       @current_job_id = 0
       Thread.new { work_loop }
+    end
+
+    annotate :doc
+
+    def docs
+      annotations = self.class.doc_annotations.sort_by(&:first)
+      max_size = annotations.map { |a| a.first.size }.max
+      annotations.map { |n, v| "#{n.to_s.ljust(max_size + 1)}#{v}" }
+    end
+
+    doc 'Return the currently running job.'
+    def job
+      queue_synchronize do
+        @job
+      end
     end
 
     def next_job_id
       @current_job_id += 1
     end
 
-    def enqueue(job_args)
+    doc 'Enqueue a new job with the argument array <job_args>.'
+    def job_enqueue(job_args)
       job = Job.new(self, job_args)
       output_message "#{job.inspect} enqueued."
       @jobs_queue.push job
     end
-    alias run enqueue
+    alias enqueue job_enqueue
 
-    def stop
+    doc 'Stop the process that is working on the current job, if any.'
+    def job_stop
       @pid and Process.kill :STOP, @pid
     end
 
-    def continue
+    doc 'Continue the process that is working on the current job, if any.'
+    def job_continue
       @pid and Process.kill :CONT, @pid
     end
 
-    def shutdown
+    doc 'Shutdown the server.'
+    def server_shutdown
       output_message "Server was shutdown down – HARD!", :type => :warn
       exit! 23
     end
 
-    def list_jobs
-      @jobs_queue.instance_variable_get(:@que)
+    doc 'List the currently pending jobs waiting to be run.'
+    def jobs_list
+      @jobs_queue.instance_variable_get(:@que).dup
     end
 
-    def clear_jobs
+    doc 'Clear all pending jobs.'
+    def jobs_clear
       queue_synchronize do
         unless @jobs_queue.empty?
           @jobs_queue.clear
@@ -67,6 +122,28 @@ module Utils
       end
     end
 
+    doc 'Repeat the job with <job_id>, it will be assigned a new id, though.'
+    def job_repeat(job_id)
+      if old_job = @history.find { |job| job.id == job_id }
+        job_enqueue old_job.args
+        true
+      else
+        false
+      end
+    end
+
+    doc 'List the history of run jobs.'
+    def history_list
+      @history.dup
+    end
+
+    doc 'Clear the history of run jobs.'
+    def history_clear
+      @history = []
+      true
+    end
+
+    doc "The environment of the server process, use env['a'] = 'b' and env['a']."
     def env
       ENV
     end
@@ -100,18 +177,23 @@ module Utils
       Process.wait @pid
       message = "#{job.inspect} was just run"
       if $?.success?
+        job.ok = true
         message << " successfully."
         output_message message, :type => :success
       else
+        job.ok = false
         message << " and failed with exit status #{$?.exitstatus}!"
         output_message message, :type => :failure
       end
+      @history += [ @job.freeze ]
+      @history.freeze
+      @job = nil
     end
 
     def work_loop
       loop do
-        job = @jobs_queue.shift
-        run_job job
+        @job = @jobs_queue.shift
+        run_job @job
       end
     end
 
