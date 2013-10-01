@@ -67,6 +67,10 @@ module Utils
       end
     end
 
+    def env
+      ENV
+    end
+
     private
 
     def queue_synchronize(&block)
