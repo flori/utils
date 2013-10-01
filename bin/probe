@@ -75,9 +75,9 @@ def connect_server
   DRb.start_service
   probe_server = DRbObject.new_with_uri($uri)
   if $opt['c']
-    opts = $opt.subhash('n', 't').map { |k, v|
-      v.full? { "-#{k} #{v.inspect}" }
-    }.compact
+    opts = $opt.subhash('n', 't').each_with_object([]) { |(k, v), a|
+      v.full? and a.concat [ "-#{k}", v ]
+    }
     probe_server.enqueue opts + $args
     exit
   elsif $opt['C']
@@ -90,7 +90,7 @@ end
 case
 when $opt['l']
   start_server
-else
+when $opt['c'], $opt['C']
   connect_server
 end
 

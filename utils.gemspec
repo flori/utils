@@ -1,13 +1,13 @@
 # -*- encoding: utf-8 -*-
-# stub: utils 0.0.95 ruby lib
+# stub: utils 0.0.96 ruby lib
 
 Gem::Specification.new do |s|
   s.name = "utils"
-  s.version = "0.0.95"
+  s.version = "0.0.96"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Florian Frank"]
-  s.date = "2013-09-30"
+  s.date = "2013-10-01"
   s.description = "This ruby gem provides some useful command line utilities"
   s.email = "flori@ping.de"
   s.executables = ["brakeman2err", "chroot-exec", "chroot-libs", "classify", "create_tags", "discover", "edit", "edit_wait", "enum", "errf", "git-empty", "irb_connect", "myex", "number_files", "on_change", "path", "probe", "remote_copy", "same_files", "search", "sedit", "ssh-tunnel", "strip_spaces", "unquarantine_apps", "untest", "utils-install-config", "utils-utilsrc", "vacuum_firefox_sqlite", "xmp"]
@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/flori/utils"
   s.rdoc_options = ["--title", "Utils - Some useful command line utilities", "--main", "README.rdoc"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "2.1.4"
+  s.rubygems_version = "2.1.5"
   s.summary = "Some useful command line utilities"
 
   if s.respond_to? :specification_version then

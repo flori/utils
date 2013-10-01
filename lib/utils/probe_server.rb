@@ -112,7 +112,13 @@ module Utils
     end
 
     def cmd(job)
-      [ $0, *job ]
+      call = []
+      if ENV.key?('BUNDLE_GEMFILE') and bundle = `which bundle`.full?(:chomp)
+        call << bundle << 'exec'
+      end
+      call.push($0, *job)
+      output_message "Executing #{call.inspect} now.", :type => :info
+      call
     end
   end
 end
