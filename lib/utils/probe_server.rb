@@ -124,6 +124,7 @@ module Utils
 
     doc 'Repeat the job with <job_id>, it will be assigned a new id, though.'
     def job_repeat(job_id)
+      Job === job_id and job_id = job.id
       if old_job = @history.find { |job| job.id == job_id }
         job_enqueue old_job.args
         true
