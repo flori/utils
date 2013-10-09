@@ -32,33 +32,41 @@ end
 args = go 'I:h'
 args['h'] and usage
 
-paths = ARGV.empty? ?  %w[.] : ARGV
-paths = paths.map { |p| File.expand_path(p) }
+unless ARGV.empty?
+  paths = ARGV.map { |p| File.expand_path(p) }
+end
 
 suffix = args['I'].ask_and_send(:split, /[\s,]+/).to_a
 
 config = Utils::Config::ConfigFile.new
 config.configure_from_paths
 
-find(*(paths + [ { :suffix => suffix} ])) do |filename|
-  bn, s = File.basename(filename), File.stat(filename)
-  s.symlink? and next
-  if s.directory?
-    config.strip_spaces.prune?(bn) and prune
-    next
-  end
-  s.file? or next
-  config.strip_spaces.skip?(bn) and next
-  File.ascii?(filename) or next
-  STDOUT.puts "Stripping spaces from #{filename.inspect}."
-  secure_write(filename) do |output|
-    File.open(filename) do |file|
-      old_mode = file.stat.mode
-      file.each do |line|
-        line.gsub!(/[ \t\v]+$/, '')
-        output.write line
-      end
-      File.chmod old_mode, output.path
+if paths
+  find(*(paths + [ { :suffix => suffix} ])) do |filename|
+    bn, s = File.basename(filename), File.stat(filename)
+    s.symlink? and next
+    if s.directory?
+      config.strip_spaces.prune?(bn) and prune
+      next
     end
+    s.file? or next
+    config.strip_spaces.skip?(bn) and next
+    File.ascii?(filename) or next
+    STDOUT.puts "Stripping spaces from #{filename.inspect}."
+    secure_write(filename) do |output|
+      File.open(filename) do |file|
+        old_mode = file.stat.mode
+        file.each do |line|
+          line.gsub!(/[ \t\v]+$/, '')
+          output.write line
+        end
+        File.chmod old_mode, output.path
+      end
+    end
+  end
+else
+  for line in STDIN
+    line.gsub!(/[ \t\v]+$/, '')
+    STDOUT.write line
   end
 end
