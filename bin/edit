@@ -17,6 +17,8 @@ Options are
   -w          open a buffer in vim and wait until it is deleted
   -s          read files and files:linenumbers from stdin and open them
   -m          make intermediate non existing directories to file
+  -c COMMAND  send ex command to the current running editor
+  -C COMMAND  send visual command to the current running editor
   -p DURATION pause for this many seconds to wait for vim's reaction
   -S SERVER   specify the server for this edit command
   -h          display this help
@@ -26,7 +28,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-$opt = go 'p:S:wsmh'
+$opt = go 'p:S:c:wsmh'
 $opt['h'] and usage
 
 config = Utils::Config::ConfigFile.new
@@ -49,31 +51,36 @@ if $opt['s']
   rescue Interrupt
     exit 1
   end
-else
-  argv = ARGV.dup
-  if argv.empty?
-    unless STDIN.tty?
-      file = File.new(File.join(Dir.tmpdir, "edit_tmp.#$$"), 'w')
-      until STDIN.eof?
-        buffer = STDIN.read(8192)
-        file.write buffer
-      end
-      file.close
-      argv << file.path
+  exit 0
+elsif command = $opt['c']
+  editor.edit_remote_send "\e:#{command}\n"
+elsif command = $opt['C']
+  editor.edit_remote_send command
+end
+
+argv = ARGV.dup
+if argv.empty?
+  unless STDIN.tty?
+    file = File.new(File.join(Dir.tmpdir, "edit_tmp.#$$"), 'w')
+    until STDIN.eof?
+      buffer = STDIN.read(8192)
+      file.write buffer
     end
+    file.close
+    argv << file.path
   end
-  if argv.empty?
-    editor.start
-  else
-    if editor.file_linenumber?(argv.first)
-      editor.wait = argv.size > 1
-      for current_file in argv
-        STDOUT.puts "Edit #{current_file}"
-        editor.edit current_file
-      end
-    else
-      editor.edit(*argv)
+end
+if argv.empty?
+  editor.start
+else
+  if editor.file_linenumber?(argv.first)
+    editor.wait = argv.size > 1
+    for current_file in argv
+      STDOUT.puts "Edit #{current_file}"
+      editor.edit current_file
     end
+  else
+    editor.edit(*argv)
   end
 end
 exit 0

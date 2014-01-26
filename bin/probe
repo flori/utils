@@ -15,8 +15,9 @@ Usage: #{File.basename($0)} [OPTS] FILENAME[:LINENO] [FILENAME]
 Options are
 
   -n TESTNAME   run the test TESTNAME in file FILENAME
-  -t FRAMEWORK  use test framework FRAMEWORK (rspec or test-unit)
+  -t FRAMEWORK  use test framework FRAMEWORK (rspec, test-unit or cucumber)
   -c            start probe as a client
+  -C            start probe as a client console
   -l            start probe as a server
   -p PORT       listen on/connect to local port PORT
   -h            display this help
@@ -41,26 +42,26 @@ $config.configure_from_paths
 testrunner_args = []
 if i = ARGV.index('--')
   testrunner_args.concat ARGV[(i + 1)..-1]
-  args = ARGV[0...i]
+  $args = ARGV[0...i]
 else
-  args = ARGV.dup
+  $args = ARGV.dup
 end
-$opt = go 'lcp:t:n:h', args
+$opt = go 'lcCp:t:n:h', $args
 $opt['h'] and usage
 
-uri = "druby://localhost:#{$opt['p'] || 6623}"
+$uri = "druby://localhost:#{$opt['p'] || 6623}"
 
-if $opt['l']
+def start_server
   Thread.abort_on_exception = $DEBUG
 
   begin
     DRb.start_service
-    DRbObject.new_with_uri(uri).shutdown
+    DRbObject.new_with_uri($uri).shutdown
   rescue DRb::DRbConnError
   end
 
-  puts "Starting probe server listening to #{uri.inspect}."
-  DRb.start_service(uri, ProbeServer.new)
+  puts "Starting probe server listening to #{$uri.inspect}."
+  DRb.start_service($uri, Utils::ProbeServer.new)
   begin
     DRb.thread.join
   rescue Interrupt
@@ -69,28 +70,42 @@ if $opt['l']
   end
 end
 
-if $opt['c']
-  puts "Connecting probe server on #{uri.inspect}."
+def connect_server
+  Utils::ProbeServer::Job.colorize = true
+  puts "Connecting probe server on #{$uri.inspect}."
   DRb.start_service
-  probe_server = DRbObject.new_with_uri(uri)
-  unless args.empty?
-    opts = $opt.subhash('n', 't').map { |k, v| v.full? { %W[-#{k} #{v}] } }.compact.flatten
-    probe_server.enqueue opts + args
+  probe_server = DRbObject.new_with_uri($uri)
+  if $opt['c']
+    opts = $opt.subhash('n', 't').each_with_object([]) { |(k, v), a|
+      v.full? and a.concat [ "-#{k}", v ]
+    }
+    probe_server.enqueue opts + $args
+    exit
+  elsif $opt['C']
+    ARGV.clear
+    Tins::IRB.examine probe_server
+    exit
   end
-  exit
 end
 
-args.empty? and fail "require filename or filename:linenumber as arguments"
-puts "Running tests in #{args.inspect}"
+case
+when $opt['l']
+  start_server
+when $opt['c'], $opt['C']
+  connect_server
+end
+
+$args.empty? and fail "require filename or filename:linenumber as arguments"
+puts "Running tests in #{$args.inspect}"
 
 case ($opt['t'] || $config.probe.test_framework).to_sym
 when :rspec
   rspec = find_cmd('rspec', 'spec')
   if linenumber = $opt['n']
     cmd 'ruby', '-I', $config.probe.include_dirs_argument, rspec, '-l',
-      linenumber, *(args + testrunner_args)
+      linenumber, *($args + testrunner_args)
   else
-    args = args.map do |a|
+    $args = $args.map do |a|
       if Utils::Editor::FILE_LINENUMBER_REGEXP =~ a
         $~.captures * ':'
       else
@@ -98,15 +113,15 @@ when :rspec
       end
     end
     cmd 'ruby', '-I', $config.probe.include_dirs_argument, rspec,
-      *(args + testrunner_args)
+      *($args + testrunner_args)
   end
 when :'test-unit'
   testrb = find_cmd('testrb')
   if testname = $opt['n']
     cmd 'ruby', '-I', $config.probe.include_dirs_argument, testrb,
-      '-n', testname, *(args + testrunner_args)
+      '-n', testname, *($args + testrunner_args)
   else
-    for filename in args
+    for filename in $args
       sl = filename.source_location
       if sl.linenumber
         lf = Tins::LinesFile.for_filename(*sl)
@@ -126,9 +141,9 @@ when :cucumber
   cucumber = find_cmd('cucumber')
   if linenumber = $opt['n']
     cmd 'ruby', cucumber, '-r', $config.probe.include_dirs_argument, '-l',
-      linenumber, *(args + testrunner_args)
+      linenumber, *($args + testrunner_args)
   else
-    args = args.map do |a|
+    $args = $args.map do |a|
       if Utils::Editor::FILE_LINENUMBER_REGEXP =~ a
         $~.captures * ':'
       else
@@ -136,6 +151,6 @@ when :cucumber
       end
     end
     cmd 'ruby', cucumber, '-r', $config.probe.include_dirs_argument,
-      *(args + testrunner_args)
+      *($args + testrunner_args)
   end
 end

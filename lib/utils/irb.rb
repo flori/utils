@@ -48,10 +48,12 @@ module Utils
         Utils::IRB::Service.start(hostname, port) {}
       end
 
-      # Conenct to an irb server.
+      # Connect to an irb server.
       def irb_connect(hostname = nil, port = nil)
         Utils::IRB::Service.connect(hostname, port)
       end
+
+      # TODO: change the API of this stuff
 
       # Return all instance methods of obj's class.
       def irb_all_class_instance_methods(obj)
