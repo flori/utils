@@ -9,4 +9,5 @@ module Utils
   require 'utils/finder'
   require 'utils/grepper'
   require 'utils/probe_server'
+  require 'utils/ssh_tunnel_specification'
 end

@@ -12,7 +12,7 @@ GemHadar do
   bindir      'bin'
   executables Dir['bin/*'].map(&File.method(:basename))
   test_dir    'tests'
-  ignore      '.*.sw[pon]', 'pkg', 'Gemfile.lock', '.rvmrc', '.AppleDouble', 'tags'
+  ignore      '.*.sw[pon]', 'pkg', 'Gemfile.lock', '.rvmrc', '.AppleDouble', 'tags', '.bundle'
   readme      'README.rdoc'
 
   dependency  'tins',           '~>0.8', '>=0.8.3'

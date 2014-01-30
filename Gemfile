@@ -5,5 +5,5 @@ source 'https://rubygems.org'
 gemspec
 
 group :developer do
-  gem 'debugger', :platform => :ruby_19
+  gem 'byebug', :platform => :ruby
 end
