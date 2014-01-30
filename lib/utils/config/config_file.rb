@@ -156,6 +156,8 @@ class Utils::Config::ConfigFile
   class SshTunnel < BlockConfig
     config :terminal_multiplexer, 'screen'
 
+    config :env, {}
+
     def initialize
       super
       self.terminal_multiplexer = terminal_multiplexer

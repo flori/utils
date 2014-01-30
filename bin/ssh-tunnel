@@ -27,6 +27,7 @@ OPTS is one of
   -N                                  list all session names on the specified remote
   -n NAME                             name of the multiplexer session (default: $USER)
   -T                                  list current tunnels
+  -e VARIABLE=VALUE [...]             set variables to values
   -t [LHOST:][LPORT:][HOST:PORT|PORT] host:port to tunnel if different from LOCALPORT
   -m screen|tmux                      use sshscreen or tmux as a terminal multiplexer
   -C (ssh|rc)-default|rc              output ssh or rc config file
@@ -45,7 +46,7 @@ end
 config = Utils::Config::ConfigFile.new
 
 arguments = ARGV
-opts = go 't:n:C:m:hNTd', arguments
+opts = go 't:n:C:m:e:hNTd', arguments
 
 $DEBUG = opts['d']
 
@@ -113,6 +114,13 @@ else
     else
       usage
     end
+  end
+  config.ssh_tunnel.env.each do |var, val|
+    ENV[var.to_s] = val.to_s
+  end
+  opts['e'].to_a.each do |setting|
+    var, val = setting.split('=', 2)
+    ENV[var] = val
   end
   cmd "ssh -p #{rport} -Mt  "\
     "-S #{sock_file} #{user}@#{remote} #{tunnels * ' '} "\
