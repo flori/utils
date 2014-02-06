@@ -34,6 +34,7 @@ OPTS is one of
   -d                                  enable debugging
   -h                                  to display this help
 
+Version is #{File.basename($0)} #{Utils::VERSION}.
 EOT
   exit 1
 end
