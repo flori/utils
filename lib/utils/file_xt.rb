@@ -1,4 +1,4 @@
-require 'dslkit/polite'
+require 'tins/dslkit/polite'
 
 module Utils
   module FileXt
