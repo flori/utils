@@ -1,4 +1,4 @@
-require 'tins/dslkit/polite'
+require 'tins'
 require 'tins/xt/string'
 
 class Utils::Config::ConfigFile
