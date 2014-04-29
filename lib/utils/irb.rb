@@ -107,6 +107,13 @@ module Utils
         end.compact.sort!
       end
 
+      def irb_clipboard
+        case RUBY_PLATFORM
+        when /darwin/
+          'reattach-to-user-namespace pbcopy'
+        end
+      end
+
       class WrapperBase
         include Comparable
 
