@@ -35,5 +35,6 @@ GemHadar do
         install(file, bindir, :mode => 0755)
       end
     end
+    sh 'gem install tins term-ansicolor pstree pry-editline'
   end
 end
