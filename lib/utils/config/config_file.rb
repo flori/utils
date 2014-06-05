@@ -82,6 +82,8 @@ class Utils::Config::ConfigFile
 
     config :include_dirs, %w[lib test tests ext spec]
 
+    config :zeus, false
+
     def include_dirs_argument
       Array(include_dirs) * ':'
     end
