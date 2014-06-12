@@ -17,7 +17,6 @@ Options are
   -n TESTNAME   run the test TESTNAME in file FILENAME
   -t FRAMEWORK  use test framework FRAMEWORK (rspec, test-unit or cucumber)
   -c            start probe as a client
-  -C            start probe as a client console
   -l            start probe as a server
   -p PORT       listen on/connect to local port PORT
   -z            use zeus
