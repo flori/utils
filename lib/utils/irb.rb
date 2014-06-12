@@ -12,17 +12,6 @@ require 'drb'
 $editor = Utils::Editor.new
 $pager = ENV['PAGER'] || 'less -r'
 
-if IRB.conf[:PROMPT]
-  IRB.conf[:PROMPT][:CUSTOM] = {
-    :PROMPT_I =>  ">> ",
-    :PROMPT_N =>  ">> ",
-    :PROMPT_S =>  "%l> ",
-    :PROMPT_C =>  "+> ",
-    :RETURN   =>  " # => %s\n"
-  }
-  IRB.conf[:PROMPT_MODE] = :CUSTOM
-end
-
 module Utils
   module IRB
 
@@ -493,8 +482,25 @@ module Utils
       end
 
     end
+
+    def self.configure
+      ::IRB.conf[:SAVE_HISTORY] = 1000
+      if ::IRB.conf[:PROMPT]
+        ::IRB.conf[:PROMPT][:CUSTOM] = {
+          :PROMPT_I =>  ">> ",
+          :PROMPT_N =>  ">> ",
+          :PROMPT_S =>  "%l> ",
+          :PROMPT_C =>  "+> ",
+          :RETURN   =>  " # => %s\n"
+        }
+        ::IRB.conf[:PROMPT_MODE] = :CUSTOM
+      end
+    end
   end
 end
+
+Utils::IRB.configure
+
 
 module IRB
   class Context
@@ -561,7 +567,6 @@ module IRB
     end
   end
 end
-IRB.conf[:SAVE_HISTORY] = 1000
 
 if defined?(ActiveRecord::Relation) && !ActiveRecord::Relation.method_defined?(:examine)
   class ActiveRecord::Relation

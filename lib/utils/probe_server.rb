@@ -32,7 +32,7 @@ module Utils
         case @ok
         when false then 'n'
         when true  then 'y'
-        else            '-'
+        else            '…'
         end
       end
 
@@ -47,26 +47,55 @@ module Utils
 
       def inspect
         ok_colorize(
-          "#<#{self.class}: id=#{id} args=#{args.inspect} ok=#{ok}>"
+          "#<Job id=#{id} args=#{args.inspect} ok=#{ok}>"
         )
       end
 
       alias to_s inspect
     end
 
-    def initialize
+    def initialize(uri)
+      @uri        = uri
       @history    = [].freeze
       @jobs_queue = Queue.new
       @current_job_id = 0
       Thread.new { work_loop }
     end
 
+    def start
+      output_message "Starting probe server listening to #{@uri.inspect}.", type: :info
+      DRb.start_service(@uri, self)
+      begin
+        DRb.thread.join
+      rescue Interrupt
+        ARGV.clear << '-f'
+        puts
+        begin
+          old, $VERBOSE = $VERBOSE, nil
+          examine(self)
+        ensure
+          $VERBOSE = old
+        end
+        output_message "Continue listening to #{@uri.inspect}.", type: :info
+        retry
+      end
+    end
+
+    def inspect
+      "#<Probe job=#@current_job_id #queue=#{@jobs_queue.size}>"
+    end
+    alias to_s inspect
+
     annotate :doc
 
     def docs
       annotations = self.class.doc_annotations.sort_by(&:first)
       max_size = annotations.map { |a| a.first.size }.max
-      annotations.map { |n, v| "#{n.to_s.ljust(max_size + 1)}#{v}" }
+      output_message annotations.map { |n, v| "#{n.to_s.ljust(max_size + 1)}#{v}" }
+    end
+
+    doc 'Pause processing of the job queue.'
+    def pause
     end
 
     doc 'Return the currently running job.'
@@ -104,14 +133,14 @@ module Utils
     end
 
     doc 'Shutdown the server.'
-    def server_shutdown
-      output_message "Server was shutdown down – HARD!", :type => :warn
+    def shutdown
+      output_message "Server was shutdown down – HARD!", type: :warn
       exit! 23
     end
 
     doc 'List the currently pending jobs waiting to be run.'
     def jobs_list
-      @jobs_queue.instance_variable_get(:@que).dup
+      output_message @jobs_queue.instance_variable_get(:@que)
     end
 
     doc 'Clear all pending jobs.'
@@ -119,7 +148,7 @@ module Utils
       queue_synchronize do
         unless @jobs_queue.empty?
           @jobs_queue.clear
-          output_message "Cleared all queued jobs.", :type => :warn
+          output_message "Cleared all queued jobs.", type: :warn
           true
         else
           false
@@ -140,7 +169,7 @@ module Utils
 
     doc 'List the history of run jobs.'
     def history_list
-      @history.dup
+      output_message @history
     end
 
     doc 'Clear the history of run jobs.'
@@ -160,36 +189,40 @@ module Utils
       @jobs_queue.instance_variable_get(:@mutex).synchronize(&block)
     end
 
-    def output_message(msg, opts = { :type => :info })
+    def output_message(msg, type: nil)
+      msg.respond_to?(:to_a) and msg = msg.to_a * "\n"
       msg =
-        case opts[:type]
+        case type
         when :success
           msg.on_green.black
-        when :info, nil
+        when :info
           msg.on_color(118).black
         when :warn
           msg.on_color(166).black
         when :failure
           msg.on_red.blink.white
+        else
+          msg
         end
       STDOUT.puts msg
       STDOUT.flush
+      self
     end
 
     def run_job(job)
-      output_message "#{job.inspect} about to run now.", :type => :info
+      output_message "#{job.inspect} about to run now."
       @pid = fork { exec(*cmd(job.args)) }
-      output_message "#{job.inspect} now running with pid #@pid.", :type => :info
+      output_message "#{job.inspect} now running with pid #@pid.", type: :info
       Process.wait @pid
       message = "#{job.inspect} was just run"
       if $?.success?
         job.ok = true
         message << " successfully."
-        output_message message, :type => :success
+        output_message message, type: :success
       else
         job.ok = false
         message << " and failed with exit status #{$?.exitstatus}!"
-        output_message message, :type => :failure
+        output_message message, type: :failure
       end
       @history += [ @job.freeze ]
       @history.freeze
@@ -209,7 +242,7 @@ module Utils
         call << bundle << 'exec'
       end
       call.push($0, *job)
-      output_message "Executing #{call.inspect} now.", :type => :info
+      output_message "Executing #{call.inspect} now.", type: :info
       call
     end
   end

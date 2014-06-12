@@ -39,7 +39,7 @@ def find_cmd(*cmds)
 end
 
 def zeus?
-  $config.probe.zeus && !`which zeus`.empty?
+  $config.probe.zeus && !`which zeus`.empty? && test(?S, '.zeus.sock')
 end
 
 def start_server
@@ -51,14 +51,7 @@ def start_server
   rescue DRb::DRbConnError
   end
 
-  puts "Starting probe server listening to #{$uri.inspect}."
-  DRb.start_service($uri, Utils::ProbeServer.new)
-  begin
-    DRb.thread.join
-  rescue Interrupt
-    warn " *** Interrupted ***"
-    exit
-  end
+  Utils::ProbeServer.new($uri).start
 end
 
 def connect_server
@@ -72,10 +65,6 @@ def connect_server
     }
     probe_server.enqueue opts + $args
     exit
-  elsif $opt['C']
-    ARGV.clear
-    Tins::IRB.examine probe_server
-    exit
   end
 end
 
@@ -88,11 +77,11 @@ if i = ARGV.index('--')
 else
   $args = ARGV.dup
 end
-$opt = go 'zlcCp:t:n:h', $args
+$opt = go 'zlcp:t:n:h', $args
 $opt['h'] and usage
 $opt['z'] ||= $config.probe.zeus
 if $opt['z'] && !zeus?
-  warn "Zeus support was enabled, but is not installed!"
+  warn Term::ANSIColor.red("Zeus support was enabled, but is not installed or running!")
 end
 
 $uri = "druby://localhost:#{$opt['p'] || 6623}"
@@ -100,7 +89,8 @@ $uri = "druby://localhost:#{$opt['p'] || 6623}"
 case
 when $opt['l']
   start_server
-when $opt['c'], $opt['C']
+  exit
+when $opt['c']
   connect_server
 end
 
