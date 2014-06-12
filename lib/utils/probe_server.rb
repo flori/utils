@@ -69,7 +69,7 @@ module Utils
         DRb.thread.join
       rescue Interrupt
         ARGV.clear << '-f'
-        puts
+        output_message %{\nType "commands" to get help for the commands.}, type: :info
         begin
           old, $VERBOSE = $VERBOSE, nil
           examine(self)
@@ -88,7 +88,7 @@ module Utils
 
     annotate :doc
 
-    def docs
+    def commands
       annotations = self.class.doc_annotations.sort_by(&:first)
       max_size = annotations.map { |a| a.first.size }.max
       output_message annotations.map { |n, v| "#{n.to_s.ljust(max_size + 1)}#{v}" }
@@ -96,6 +96,18 @@ module Utils
 
     doc 'Pause processing of the job queue.'
     def pause
+      mutex.lock
+      true
+    rescue ThreadError
+      false
+    end
+
+    doc 'Continue processing of the job queue.'
+    def continue
+      mutex.unlock
+      true
+    rescue ThreadError
+      false
     end
 
     doc 'Return the currently running job.'
@@ -112,7 +124,7 @@ module Utils
     doc 'Enqueue a new job with the argument array <job_args>.'
     def job_enqueue(job_args)
       job = Job.new(self, job_args)
-      output_message "#{job.inspect} enqueued."
+      output_message " → #{job.inspect} enqueued.", type: :info
       @jobs_queue.push job
     end
     alias enqueue job_enqueue
@@ -185,8 +197,12 @@ module Utils
 
     private
 
+    def mutex
+      @jobs_queue.instance_variable_get(:@mutex)
+    end
+
     def queue_synchronize(&block)
-      @jobs_queue.instance_variable_get(:@mutex).synchronize(&block)
+      mutex.synchronize(&block)
     end
 
     def output_message(msg, type: nil)
@@ -194,13 +210,13 @@ module Utils
       msg =
         case type
         when :success
-          msg.on_green.black
+          msg.on_color(22).white
         when :info
-          msg.on_color(118).black
+          msg.on_color(20).white
         when :warn
-          msg.on_color(166).black
+          msg.on_color(40).white
         when :failure
-          msg.on_red.blink.white
+          msg.on_color(124).blink.white
         else
           msg
         end
@@ -210,11 +226,10 @@ module Utils
     end
 
     def run_job(job)
-      output_message "#{job.inspect} about to run now."
       @pid = fork { exec(*cmd(job.args)) }
-      output_message "#{job.inspect} now running with pid #@pid.", type: :info
+      output_message " → #{job.inspect} now running with pid #@pid.", type: :info
       Process.wait @pid
-      message = "#{job.inspect} was just run"
+      message = " → #{job.inspect} was just run"
       if $?.success?
         job.ok = true
         message << " successfully."
@@ -242,7 +257,7 @@ module Utils
         call << bundle << 'exec'
       end
       call.push($0, *job)
-      output_message "Executing #{call.inspect} now.", type: :info
+      #output_message "Executing #{call.inspect} now.", type: :info
       call
     end
   end
