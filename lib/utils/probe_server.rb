@@ -69,20 +69,20 @@ module Utils
         DRb.thread.join
       rescue Interrupt
         ARGV.clear << '-f'
-        output_message %{\nType "commands" to get help for the commands.}, type: :info
+        output_message %{\nEntering interactive mode: Type "commands" to get help for the commands.}, type: :info
         begin
           old, $VERBOSE = $VERBOSE, nil
           examine(self)
         ensure
           $VERBOSE = old
         end
-        output_message "Continue listening to #{@uri.inspect}.", type: :info
+        output_message "Quitting interactive mode, but still listening to #{@uri.inspect}.", type: :info
         retry
       end
     end
 
     def inspect
-      "#<Probe job=#@current_job_id #queue=#{@jobs_queue.size}>"
+      "#<Probe #queue=#{@jobs_queue.size}>"
     end
     alias to_s inspect
 
