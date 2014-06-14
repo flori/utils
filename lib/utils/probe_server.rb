@@ -130,18 +130,8 @@ module Utils
     alias enqueue job_enqueue
 
     doc 'Send the <signal> to the process that is working on the current job, if any.'
-    def job_kill(signal)
+    def job_kill(signal = :TERM)
       @pid and Process.kill signal, @pid
-    end
-
-    doc 'Stop the process that is working on the current job, if any.'
-    def job_stop
-      job_kill :STOP
-    end
-
-    doc 'Continue the process that is working on the current job, if any.'
-    def job_continue
-      job_kill :CONT
     end
 
     doc 'Shutdown the server.'
