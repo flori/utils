@@ -32,6 +32,8 @@ GemHadar do
     bindir = CONFIG["bindir"]
     cd 'bin' do
       for file in executables
+        found_first_in_path = `which #{file}`.chomp
+        found_first_in_path.empty? or rm found_first_in_path
         install(file, bindir, :mode => 0755)
       end
     end
