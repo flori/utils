@@ -7,7 +7,7 @@ require 'pstree'
 module Utils
   class Editor
     FILE_LINENUMBER_REGEXP = /\A\s*([^:]+):(\d+)/
-    CLASS_METHOD_REGEXP    = /\A([A-Z][\w:]+)([#.])(\S+)/
+    CLASS_METHOD_REGEXP    = /\A([A-Z][\w:]+)([#.])([\w!?]+)/
 
     module SourceLocationExtension
       include Tins::DeepConstGet
