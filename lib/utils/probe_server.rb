@@ -168,9 +168,9 @@ module Utils
       end
     end
 
-    doc 'Repeat the job with <job_id>, it will be assigned a new id, though.'
-    def job_repeat(job_id)
-      Job === job_id and job_id = job.id
+    doc 'Repeat the job with <job_id> or the last, it will be assigned a new id, though.'
+    def job_repeat(job_id = @history.last)
+      Job === job_id and job_id = job_id.id
       if old_job = @history.find { |job| job.id == job_id }
         job_enqueue old_job.args
         true
