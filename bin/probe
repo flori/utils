@@ -19,7 +19,6 @@ Options are
   -c            start probe as a client
   -l            start probe as a server
   -p PORT       listen on/connect to local port PORT
-  -z            use zeus
   -h            display this help
 
 Version is #{File.basename($0)} #{Utils::VERSION}.
@@ -38,11 +37,16 @@ def find_cmd(*cmds)
 end
 
 def zeus?
-  $config.probe.zeus && !`which zeus`.empty? && test(?S, '.zeus.sock')
+  !`which zeus`.empty? && test(?S, '.zeus.sock')
+end
+singleton_class.class_eval do
+  memoize_function :zeus?
 end
 
 def start_server
   Thread.abort_on_exception = $DEBUG
+  zeus? and
+    puts "Found a zeus socket file, I'll try to use it for running tests."
 
   begin
     DRb.start_service
@@ -76,12 +80,8 @@ if i = ARGV.index('--')
 else
   $args = ARGV.dup
 end
-$opt = go 'zlcp:t:n:h', $args
+$opt = go 'lcp:t:n:h', $args
 $opt['h'] and usage
-$opt['z'] ||= $config.probe.zeus
-if $opt['z'] && !zeus?
-  warn Term::ANSIColor.red("Zeus support was enabled, but is not installed or running!")
-end
 
 $uri = "druby://localhost:#{$opt['p'] || 6623}"
 
