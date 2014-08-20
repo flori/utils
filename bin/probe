@@ -101,7 +101,7 @@ when :rspec
   if zeus?
     rspec = %w[-S zeus rspec -f Utils::LineFormatter ]
   else
-    rspec = find_cmd('rspec', 'spec')
+    rspec = [ find_cmd('rspec', 'spec') ] << '-f' << 'Utils::LineFormatter'
   end
   if linenumber = $opt['n']
     cmd 'ruby', '-I', $config.probe.include_dirs_argument, *rspec, '-l',
