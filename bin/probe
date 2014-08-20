@@ -99,7 +99,7 @@ puts "Running tests in #{$args.inspect}"
 case ($opt['t'] || $config.probe.test_framework).to_sym
 when :rspec
   if zeus?
-    rspec = %w[-S zeus rspec]
+    rspec = %w[-S zeus rspec -f Utils::LineFormatter ]
   else
     rspec = find_cmd('rspec', 'spec')
   end

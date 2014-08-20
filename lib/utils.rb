@@ -10,4 +10,5 @@ module Utils
   require 'utils/grepper'
   require 'utils/probe_server'
   require 'utils/ssh_tunnel_specification'
+  require 'utils/line_formatter'
 end
