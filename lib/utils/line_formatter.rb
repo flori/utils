@@ -1,12 +1,16 @@
 require 'tins/terminal'
 require 'term/ansicolor'
 begin
-  require 'rpsec'
+  require 'rspec'
+rescue LoadError
+end
+
+begin
   require 'rspec/core/formatters/base_text_formatter'
 rescue LoadError
 end
 
-if defined? RSpec
+if defined? RSpec && defined? RSpec::Core::Formatters::BaseTextFormatter
   module Utils
     class LineFormatter < RSpec::Core::Formatters::BaseTextFormatter
       def start(example_count)
