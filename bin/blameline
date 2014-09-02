@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+require 'utils'
+require 'term/ansicolor'
+
+for line in ARGF
+  (file, line = line.source_location) or next
+  blame = `git blame -L #{line},+1 "#{file}"`
+  blame.sub!(/^[0-9a-f]+/) { Term::ANSIColor.yellow($&) }
+  blame.sub!(/\(([^)]+)\)/) { "(#{Term::ANSIColor.red($1)})" }
+  puts blame
+end

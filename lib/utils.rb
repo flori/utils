@@ -11,4 +11,9 @@ module Utils
   require 'utils/probe_server'
   require 'utils/ssh_tunnel_specification'
   require 'utils/line_formatter'
+
+  require 'utils/xt/source_location_extension'
+  class ::Object
+    include Utils::Xt::SourceLocationExtension
+  end
 end
