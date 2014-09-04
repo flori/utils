@@ -1,9 +1,26 @@
 #!/usr/bin/env ruby
 
+require 'tins/go'
+include Tins::GO
 require 'utils'
 require 'term/ansicolor'
 
-for line in ARGF
+$opts = go 'sh'
+
+if $opts[?h]
+  puts <<USAGE
+#{File.basename($0)} [OPTIONS] [LINES|FILES]
+USAGE
+  exit
+end
+
+if $opts[?s]
+  lines = ARGF
+else
+  lines = ARGV
+end
+
+for line in lines
   (file, line = line.source_location) or next
   blame = `git blame -L #{line},+1 "#{file}"`
   blame.sub!(/^[0-9a-f]+/) { Term::ANSIColor.yellow($&) }
