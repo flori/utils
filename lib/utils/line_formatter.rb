@@ -5,12 +5,13 @@ begin
 rescue LoadError
 end
 
+
 begin
   require 'rspec/core/formatters/base_text_formatter'
 rescue LoadError
 end
 
-if defined? RSpec && defined? RSpec::Core::Formatters::BaseTextFormatter
+if defined?(RSpec) && defined?(RSpec::Core::Formatters::BaseTextFormatter)
   module Utils
     class LineFormatter < RSpec::Core::Formatters::BaseTextFormatter
       def start(example_count)
