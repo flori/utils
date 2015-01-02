@@ -3,7 +3,3 @@
 source 'https://rubygems.org'
 
 gemspec
-
-group :developer do
-  gem 'byebug', :platform => :ruby
-end
