@@ -2,7 +2,10 @@ require 'tins/terminal'
 require 'term/ansicolor'
 
 begin
-  require 'rspec'
+  begin
+    require 'rspec'
+  rescue LoadError
+  end
   require 'rspec/core/formatters/base_text_formatter'
 rescue LoadError
 end
