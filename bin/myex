@@ -62,6 +62,7 @@ when 'create'
     warn "Created table #{table}."
   end
 when 'truncate'
+  puts "SET FOREIGN_KEY_CHECKS = 0;"
   STDIN.grep(/^CREATE TABLE `([^`]+)` \(/) do |stmt|
     table = $1
     next unless ARGV.empty? or ARGV.member?(table)
@@ -70,6 +71,7 @@ when 'truncate'
   end
 when 'insert'
   truncated = {}
+  puts "SET FOREIGN_KEY_CHECKS = 0;"
   STDIN.grep(/^INSERT (?:IGNORE )?INTO `(#{ARGV.empty? ? '[^`]+' : ARGV * '|'})`/) do |stmt|
     table = $1
     stmt.sub!(/(^INSERT) (INTO)/, '\1 IGNORE \2') if opts['i']
