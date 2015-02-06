@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+require 'tins/go'
+include Tins::GO
+require 'utils'
+require 'term/ansicolor'
+
+$opts = go 'm:h'
+
+if $opts[?h]
+  puts <<USAGE
+#{File.basename($0)} [OPTIONS] [FILES]
+USAGE
+  exit
+end
+max = ($opts[?m] || 80).to_i
+
+files = ARGV
+
+for file in files
+  File.open(file) do |f|
+    for line  in f
+      size = line.size
+      if size > max
+        lineno = f.lineno + 1
+        blamer = Utils::LineBlamer.new(file, lineno) or next
+        blame = blamer.perform
+        author = blame[/\((.*?)\d{4}/, 1]
+        puts [ author, size, "#{file}:#{lineno}" ] * ?\t
+      end
+    end
+  end
+end
