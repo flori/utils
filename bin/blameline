@@ -21,8 +21,8 @@ else
 end
 
 for line in lines
-  (file, line = line.source_location) or next
-  blame = `git blame -L #{line},+1 "#{file}"`
+  blamer = Utils::LineBlamer.for_line(line) or next
+  blame = blamer.perform
   blame.sub!(/^[0-9a-f]+/) { Term::ANSIColor.yellow($&) }
   blame.sub!(/\(([^)]+)\)/) { "(#{Term::ANSIColor.red($1)})" }
   puts blame
