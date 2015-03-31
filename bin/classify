@@ -4,23 +4,35 @@ require 'tins/go'
 include Tins::GO
 require 'tins/xt/string'
 
-$opts = go 'bdts'
+$opts = go 'bdtsn:'
 
 string  = ARGV.shift or fail "need a class/filepath/filename"
 
+def path_shifter(string, separator: ?/, n: 0)
+  n or return string
+  n, path = n.to_i, string.split(separator)
+  if n < 0
+    path = path.slice(n..-1)
+  else
+    path.slice!(0...n)
+  end
+  path * separator
+end
+
 def underscore(string)
-  string = string.sub(/.*::/, '') if $opts['b']
+  string = path_shifter(string, n: $opts['n'], separator: '::')
   string = string.underscore
   $opts['s'] and string << '.rb'
   print string
 end
 
 def camelize(string)
-  string = File.basename(string) if $opts['b']
+  string = path_shifter(string, n: $opts['n'])
   string = string.gsub(/#{Regexp.quote(File.extname(string))}\Z/, '')
   print string.camelize
 end
 
+$opts['b'] and $opts['n'] = '-1'
 case
 when $opts['t']
   if string[0, 1] =~ /[A-Z]/
