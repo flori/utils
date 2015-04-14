@@ -99,9 +99,10 @@ puts "Running tests in #{$args.inspect}"
 case ($opt['t'] || $config.probe.test_framework).to_sym
 when :rspec
   if zeus?
-    rspec = %w[-S zeus rspec -f Utils::LineFormatter ]
+    rspec = %w[-S zeus rspec -rutils -f Utils::LineFormatter ]
   else
-    rspec = [ find_cmd('rspec', 'spec') ] << '-f' << 'Utils::LineFormatter'
+    rspec = [ find_cmd('rspec', 'spec') ] << '-rutils' << '-f' <<
+      'Utils::LineFormatter'
   end
   if linenumber = $opt['n']
     cmd 'ruby', '-I', $config.probe.include_dirs_argument, *rspec, '-l',
