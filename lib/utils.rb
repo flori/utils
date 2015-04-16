@@ -10,8 +10,11 @@ module Utils
   require 'utils/grepper'
   require 'utils/probe_server'
   require 'utils/ssh_tunnel_specification'
-  require 'utils/line_formatter'
   require 'utils/line_blamer'
+  begin
+    require 'utils/line_formatter'
+  rescue LoadError
+  end
 
   require 'utils/xt/source_location_extension'
   class ::Object
