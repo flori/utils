@@ -105,7 +105,6 @@ else
         end
       end
     end
-  rescue => e
-    warn "Caught #{e.class}: #{e.message.inspect}"
+  rescue NameError
   end
 end
