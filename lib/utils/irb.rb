@@ -147,7 +147,7 @@ module Utils
         def initialize(obj, name, modul)
           super(name)
           @method = modul ? obj.instance_method(name) : obj.method(name)
-          @description = "#{owner}##@name(#{arity})"
+          @description = @method.description(style: :namespace)
         end
 
         attr_reader :method
