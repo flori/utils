@@ -23,6 +23,7 @@ else
 
         def start(_ignore)
           output.puts "Storing error list in #{@errors_lst.path.inspect}: "
+          output.puts ?- * Tins::Terminal.columns
         end
 
         def close(_ignore)
@@ -30,10 +31,9 @@ else
         end
 
         def dump_summary(summary)
-          @errors_lst.puts "\n#{?= * 75}\nFinished in %s\n" %
-            format_duration(summary.duration)
-          @errors_lst.puts line = summary_line(summary)
-          output.puts line
+          line = summary_line(summary)
+          @errors_lst.puts ?= * 80, line
+          output.puts ?= * Tins::Terminal.columns, line
         end
 
         def example_passed(example)
@@ -51,18 +51,19 @@ else
 
         private
 
-        def summary_line(example)
-          "%u of %u (%.2f %%) failed, %u pending (%.2f %%)" % [
-            example.failure_count,
-            example.example_count,
-            100 * example.failure_count.to_f / example.example_count,
-            example.pending_count,
-            100 * example.pending_count.to_f / example.example_count,
+        def summary_line(summary)
+          failure_percentage = 100 * summary.failure_count.to_f / summary.example_count
+          failure_percentage.nan? and failure_percentage = 0.0
+          pending_percentage = 100 * summary.pending_count.to_f / summary.example_count
+          pending_percentage.nan? and pending_percentage = 0.0
+          "%u of %u (%.2f %%) failed, %u pending (%.2f %%) in %.3f seconds" % [
+            summary.failure_count,
+            summary.example_count,
+            failure_percentage,
+            summary.pending_count,
+            pending_percentage,
+            summary.duration,
           ]
-        end
-
-        def format_duration(duration)
-          "%0.3f seconds" % duration
         end
 
         def read_failed_line(example)
