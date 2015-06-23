@@ -14,6 +14,7 @@ else
 
         def initialize(output)
           @output = output
+          @output.sync = true
           filename = 'errors.lst'
           @errors_lst = File.new(filename, 'w')
           @errors_lst.sync = true
@@ -47,6 +48,7 @@ else
         def example_failed(example)
           dump_failure_to_error_file(example)
           output.puts format_line(example)
+          dump_failure(example)
         end
 
         private
@@ -66,11 +68,18 @@ else
           ]
         end
 
+        def dump_failure(example)
+          output.puts(
+            description(example, full: true),
+            dump_failure_for_example(example)
+          )
+        end
+
         def read_failed_line(example)
           ''.strip
         end
 
-        def dump_failure_for_error_file(example)
+        def dump_failure_for_example(example)
           result = ''
           exception = execution_result(example).exception
           exception_class_name = exception.class.name
@@ -82,13 +91,17 @@ else
           result
         end
 
-        def format_backtrace(example)
+        def format_backtrace(example, folding: false, limit: nil)
           backtrace = execution_result(example).exception.backtrace
-          result = %w[ {{{ ]
+          if limit
+            backtrace = backtrace[0, limit]
+          end
+          result = []
+          folding and result << '{{{'
           for line in backtrace
             result << RSpec::Core::Metadata::relative_path(line)
           end
-          result += %w[ }}} ]
+          folding and result << '}}}'
           result * ?\n
         end
 
@@ -96,7 +109,7 @@ else
           @errors_lst.flock File::LOCK_EX
           @errors_lst.puts "%s\n%3.3fs %s\n%s\n%s" % [
             location(example), run_time(example), description(example, full: true),
-            dump_failure_for_error_file(example), format_backtrace(example)
+            dump_failure_for_example(example), format_backtrace(example, folding: true)
           ]
         ensure
           @errors_lst.flock File::LOCK_UN
