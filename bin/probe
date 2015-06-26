@@ -18,7 +18,7 @@ Options are
   -t FRAMEWORK  use test framework FRAMEWORK (rspec, test-unit or cucumber)
   -c            start probe as a client
   -l            start probe as a server
-  -p PORT       listen on/connect to local port PORT
+  -u URI        use this DRb URI communication
   -h            display this help
 
 Version is #{File.basename($0)} #{Utils::VERSION}.
@@ -80,10 +80,10 @@ if i = ARGV.index('--')
 else
   $args = ARGV.dup
 end
-$opt = go 'lcp:t:n:h', $args
+$opt = go 'lct:n:u:h', $args
 $opt['h'] and usage
 
-$uri = "druby://localhost:#{$opt['p'] || 6623}"
+$uri = $opt['u'] || 'drbunix:probe.socket'
 
 case
 when $opt['l']
