@@ -7,13 +7,13 @@ if Readline.respond_to?(:point) && Readline.respond_to?(:line_buffer)
   require 'pry-editline'
 end
 require 'utils'
-require 'drb'
 
 $editor = Utils::Editor.new
 $pager = ENV['PAGER'] || 'less -r'
 
 module Utils
   module IRB
+    require 'utils/irb/service'
 
     module Shell
       require 'fileutils'
@@ -24,7 +24,7 @@ module Utils
       # pattern.class.name as argument.
       def ri(*patterns)
         patterns.map! { |p| p.respond_to?(:to_str) ? p.to_str : p.class.name }
-        system "ri #{patterns.map { |p| "'#{p}'" } * ' '} | #{$pager}"
+        system "ri #{patterns.map { |p| "'#{p}'" } * ' ' } | #{$pager}"
       end
 
       # Restart this irb.
@@ -33,52 +33,52 @@ module Utils
       end
 
       # Start an irb server.
-      def irb_server(hostname = nil, port = nil)
-        Utils::IRB::Service.start(hostname, port) {}
+      def irb_server(uri = nil)
+        Utils::IRB::Service.start(uri) {}
       end
 
       # Connect to an irb server.
-      def irb_connect(hostname = nil, port = nil)
-        Utils::IRB::Service.connect(hostname, port)
+      def irb_connect(uri = nil)
+        Utils::IRB::Service.connect(uri)
       end
 
       # TODO: change the API of this stuff
 
       # Return all instance methods of obj's class.
-      def irb_all_class_instance_methods(obj)
+      def irb_all_class_instance_methods(obj = self)
         methods = obj.class.instance_methods
         irb_wrap_methods obj, methods
       end
 
       # Return instance methods of obj's class without the inherited/mixed in
       # methods.
-      def irb_class_instance_methods(obj)
+      def irb_class_instance_methods(obj = self)
         methods = obj.class.instance_methods(false)
         irb_wrap_methods obj, methods
       end
 
       # Return all instance methods defined in module modul.
-      def irb_all_instance_methods(modul)
+      def irb_all_instance_methods(modul = self)
         methods = modul.instance_methods
         irb_wrap_methods modul, methods, true
       end
 
       # Return instance methods defined in module modul without the inherited/mixed
       # in methods.
-      def irb_instance_methods(modul)
+      def irb_instance_methods(modul = self)
         methods = modul.instance_methods(false)
         irb_wrap_methods modul, methods, true
       end
 
       # Return all methods of obj (including obj's eigenmethods.)
-      def irb_all_methods(obj)
+      def irb_all_methods(obj = self)
         methods = obj.methods
         irb_wrap_methods obj, methods
       end
 
       # Return instance methods of obj's class without the inherited/mixed in
       # methods, but including obj's eigenmethods.
-      def irb_methods(obj)
+      def irb_methods(obj = self)
         methods = obj.class.ancestors[1..-1].inject(obj.methods) do |all, a|
           all -= a.instance_methods
         end
@@ -86,21 +86,14 @@ module Utils
       end
 
       # Return all eigen methods of obj.
-      def irb_eigen_methods(obj)
+      def irb_eigen_methods(obj = self)
         irb_wrap_methods obj, obj.methods(false)
       end
 
-      def irb_wrap_methods(obj, methods, modul = false)
+      def irb_wrap_methods(obj = self, methods = methods(), modul = false)
         methods.map do |name|
           MethodWrapper.new(obj, name, modul) rescue nil
         end.compact.sort!
-      end
-
-      def irb_clipboard
-        case RUBY_PLATFORM
-        when /darwin/
-          'reattach-to-user-namespace pbcopy'
-        end
       end
 
       class WrapperBase
@@ -180,12 +173,12 @@ module Utils
       end
 
       # Return all the constants defined in +modul+.
-      def irb_constants(modul)
+      def irb_constants(modul = self)
         modul.constants.map { |c| ConstantWrapper.new(modul.const_get(c), c) }.sort
       end
 
       # Return all the subclasses of +klass+. TODO implement subclasses w/out rails
-      def irb_subclasses(klass)
+      def irb_subclasses(klass = self)
         klass.subclasses.map { |c| ConstantWrapper.new(eval(c), c) }.sort
       end
 
@@ -193,76 +186,7 @@ module Utils
         Infinity = 1.0 / 0 # I like to define the infinite.
       end
 
-      # Output all kinds of information about +obj+. If detailed is given output
-      # details about the methods (+ arity) in inheritance chain of +obj+ as well.
-      # * detailed as 0 output instance methods only of part 0 (the first) of the
-      #   chain.
-      # * detailed as 1..2 output instance methods of +obj+ inherited from parts 1
-      #   and 2 of the the chain.
-      def irb_info(obj, detailed = nil)
-        if Module === obj
-          modul = obj
-          klassp = Class === modul
-          if klassp
-            begin
-              allocated = modul.allocate
-            rescue TypeError
-            else
-              obj = allocated
-            end
-          end
-        else
-          modul = obj.class
-        end
-        inspected = obj.inspect
-        puts "obj = #{inspected.size > 40 ? inspected[0, 40] + '...' : inspected} is of class #{obj.class}."
-        am = irb_all_methods(obj).size
-        ms = irb_methods(obj).size
-        ems = irb_eigen_methods(obj).size
-        puts "obj: #{am} methods, #{ms} only local#{ems > 0 ? " (#{ems} eigenmethods),": ','} #{am - ms} inherited/mixed in."
-        acim = irb_all_class_instance_methods(obj).size
-        cim = irb_class_instance_methods(obj).size
-        puts "obj: #{acim} instance methods, #{cim} local, #{acim - cim} only inherited/mixed in."
-        if klassp
-          s = modul.superclass
-          puts "Superclass of #{modul}: #{s}"
-        end
-        a = []
-        ec = true
-        begin
-          a << (class << obj; self; end)
-        rescue TypeError
-          ec = false
-        end
-        a.concat modul.ancestors
-        if ec
-          puts "Ancestors of #{modul}: (#{a[0]},) #{a[1..-1].map { |k| "#{k}#{k == s ? '*' : ''}" } * ', '}"
-        else
-          puts "Ancestors of #{modul}: #{a[0..-1].map { |k| "#{k}#{k == s ? '*' : ''}" } * ', '}"
-        end
-        if Class === modul and detailed
-          if detailed.respond_to? :to_int
-            detailed = detailed..detailed
-          end
-          detailed.each do |i|
-            break if i >= a.size
-            k = a[i]
-            puts "#{k}:"
-            puts irb_wrap_methods(obj, k.instance_methods(false)).sort
-          end
-        end
-        nil
-      end
-
-      # Output *all* the irb_info about +obj+. You may need to buy a bigger screen for
-      # this or use:
-      #  less { irb_fullinfo object }
-      def irb_fullinfo(obj)
-        irb_info obj, 0..Infinity
-      end
-
       def capture_output(with_stderr = false)
-        return "missing block" unless block_given?
         require 'tempfile'
         begin
           old_stdout, $stdout = $stdout, Tempfile.new('irb')
@@ -430,59 +354,6 @@ module Utils
       end
     end
 
-    module Relation
-      def explain
-        connection.select_all("EXPLAIN #{to_sql}")
-      end
-    end
-
-    module Service
-      class << self
-        attr_accessor :hostname
-
-        attr_accessor :port
-
-        def start(hostname = nil, port = nil, &block)
-          hostname ||= self.hostname
-          port     ||= self.port
-          block    ||= proc {}
-          uri = "druby://#{hostname}:#{port}"
-          puts "Starting IRB server listening to #{uri.inspect}."
-          DRb.start_service(uri, eval('irb_current_working_binding', block.binding))
-        end
-
-        def connect(hostname = nil, port = nil)
-          hostname ||= self.hostname
-          port     ||= self.port
-          uri = "druby://#{hostname}:#{port}"
-          irb = DRbObject.new_with_uri(uri)
-          Proxy.new(irb)
-        end
-      end
-
-      self.hostname = 'localhost'
-
-      self.port = 6642
-
-      class Proxy
-        def initialize(irb)
-          @irb = irb
-        end
-
-        def eval(code)
-          @irb.conf.workspace.evaluate nil, code
-        end
-
-        def load(filename)
-          unless filename.start_with?('/')
-            filename = File.expand_path filename
-          end
-          @irb.load filename
-        end
-      end
-
-    end
-
     def self.configure
       ::IRB.conf[:SAVE_HISTORY] = 1000
       if ::IRB.conf[:PROMPT]
@@ -501,12 +372,11 @@ end
 
 Utils::IRB.configure
 
-
 module IRB
   class Context
     def init_save_history
-      unless (class<<@io;self;end).include?(HistorySavingAbility)
-        @io.extend(HistorySavingAbility)
+      unless @io.singleton_class < HistorySavingAbility
+        @io.extend HistorySavingAbility
       end
     end
 
@@ -565,12 +435,6 @@ module IRB
         end
       end
     end
-  end
-end
-
-if defined?(ActiveRecord::Relation) && !ActiveRecord::Relation.method_defined?(:examine)
-  class ActiveRecord::Relation
-    include Utils::IRB::Relation
   end
 end
 
