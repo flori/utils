@@ -1,6 +1,7 @@
 require 'tins/xt'
 require 'irb/completion'
 require 'enumerator'
+require 'tempfile'
 require 'pp'
 require_maybe 'ap'
 if Readline.respond_to?(:point) && Readline.respond_to?(:line_buffer)
@@ -30,6 +31,18 @@ module Utils
       # Restart this irb.
       def irb_restart
         exec $0
+      end
+
+      def irb_open(url = nil, &block)
+        if url
+          system 'open', url
+        else
+          Tempfile.open('wb') do |t|
+            t.write capture_output(&block)
+            t.rewind
+            system 'open', t.path
+          end
+        end
       end
 
       # Start an irb server.
@@ -243,8 +256,12 @@ module Utils
         end
       end
 
-      def irb_write(filename, text = nil)
-        File.secure_write filename, text, 'wb'
+      def irb_write(filename, text = nil, &block)
+        if text.nil? && block
+          File.secure_write filename, nil, 'wb', &block
+        else
+          File.secure_write filename, text, 'wb'
+        end
       end
 
       def irb_read(filename, chunk_size = 8_192)
@@ -289,6 +306,10 @@ module Utils
 
       def irb_edit(*files)
         $editor.full?(:edit, *files)
+      end
+
+      def edit
+        $editor.full?(:edit, self)
       end
 
       # List contents of directory
