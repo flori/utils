@@ -3,7 +3,7 @@
 
 require 'utils'
 include Utils
-require 'tins/go'
+require 'tins/xt'
 include Tins::GO
 
 def convert_ruby_to_vim_regexp(pattern)
@@ -13,14 +13,20 @@ def convert_ruby_to_vim_regexp(pattern)
   regexp
 end
 
-def edit_files(pattern, paths)
-  editor = Utils::Editor.new do |config|
-    config.wait = true
-  end
+def edit_files(pattern, paths, pick: false)
+  editor = Utils::Editor.new
   editor.edit_remote_send("<ESC>/#{convert_ruby_to_vim_regexp(pattern)}<CR>")
-  for path in paths
-    STDERR.puts "Edit #{path}"
-    editor.edit(path)
+  if pick
+    path = complete(prompt: 'Pick? ') do |p|
+      paths.grep /#{p}/
+    end
+    editor.edit(path.strip)
+  else
+    editor.wait = true
+    for path in paths
+      STDERR.puts "Edit #{path}"
+      editor.edit(path)
+    end
   end
 end
 
@@ -48,6 +54,7 @@ Options are
   -i          use case insensitive matches
   -I SUFFIX   only include files with suffix SUFFIX in search
   -e          open the matching files with edit command
+  -E          pick one file to edit
   -a CSET     use only character set CSET from PATTERN
   -v          be verbose
   -h          display this help
@@ -57,7 +64,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'I:A:B:C:s:S:n:N:a:RciflLevh'
+args = go 'I:A:B:C:s:S:n:N:a:RciflLeEvh'
 args['h'] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }
@@ -73,6 +80,7 @@ grepper = Grepper.new(
   :config  => config
 ).search
 case
+when args['E'] then edit_files grepper.pattern, grepper.paths, pick: true
 when args['e'] then edit_files grepper.pattern, grepper.paths
 when args['l'] then puts grepper.paths
 end

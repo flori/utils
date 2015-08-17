@@ -99,7 +99,7 @@ class Utils::Finder
     end
     paths.compact!
     @paths, @output = paths.sort.transpose.values_at(-2, -1)
-    if !@args['e'] && @output && !@output.empty?
+    if !@args['e'] && !@args['E'] && @output && !@output.empty?
       yield @output if block_given?
     end
     self

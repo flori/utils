@@ -94,7 +94,7 @@ class Utils::Grepper
     end
     unless @output.empty?
       case
-      when @args['l'], @args['e']
+      when @args['l'], @args['e'], @args['E']
         @output.uniq!
         @paths.concat @output
       else
@@ -115,7 +115,7 @@ class Utils::Grepper
           @output << @filename
         elsif @args['L']
           @output << "#{@filename}:#{file.lineno}"
-        elsif @args['e']
+        elsif @args['e'] || @args['E']
           @output << "#{@filename}:#{file.lineno}"
           break
         else
@@ -149,7 +149,7 @@ class Utils::Grepper
     find(*(@roots + [ { :suffix => suffixes } ])) do |filename|
       match(filename)
     end
-    if @args['L'] or @args['e']
+    if @args['L'] || @args['e'] || @args['E']
       @paths = @paths.sort_by do |path|
         pair = path.split(':')
         pair[1] = pair[1].to_i

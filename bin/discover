@@ -2,14 +2,20 @@
 
 require 'utils'
 include Utils
-require 'tins/go'
+require 'tins/xt'
 include Tins::GO
 
-def edit_files(paths)
-  editor = Utils::Editor.new do |config|
-    config.wait = true
+def edit_files(paths, pick: false)
+  editor = Utils::Editor
+  if pick
+    path = complete(prompt: 'Pick? ') do |p|
+      paths.grep /#{p}/
+    end
+    editor.edit(path.strip)
+  else
+    editor.wait = true
+    editor.edit(*paths)
   end
-  editor.edit(*paths)
 end
 
 def usage
@@ -27,6 +33,7 @@ Options are
   -c          disable color output
   -i          use case insensitive matches
   -e          open the matching files with edit command
+  -E          pick one file to edit
   -a CSET     use only character set CSET from PATTERN
   -I SUFFIX   only include files with suffix SUFFIX during finding
   -b          match also binary files
@@ -38,7 +45,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'I:a:rdDciebvh'
+args = go 'I:a:rdDcieEbvh'
 args['h'] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }
@@ -56,6 +63,7 @@ finder = Finder.new(
 ).search do |output|
   puts output
 end
-if args['e']
-  edit_files finder.paths
+case
+when args['E'] then edit_files finder.paths, pick: true
+when args['e'] then edit_files finder.paths
 end
