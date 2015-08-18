@@ -17,8 +17,12 @@ def edit_files(pattern, paths, pick: false)
   editor = Utils::Editor.new
   editor.edit_remote_send("<ESC>/#{convert_ruby_to_vim_regexp(pattern)}<CR>")
   if pick
-    path = complete(prompt: 'Pick? ') do |p|
-      paths.grep /#{p}/
+    if paths.size > 1
+      path = complete(prompt: 'Pick? ') do |p|
+        paths.grep /#{p}/
+      end
+    else
+      path = paths.first
     end
     editor.edit(path.strip)
   else

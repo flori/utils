@@ -8,8 +8,12 @@ include Tins::GO
 def edit_files(paths, pick: false)
   editor = Utils::Editor
   if pick
-    path = complete(prompt: 'Pick? ') do |p|
-      paths.grep /#{p}/
+    if paths.size > 1
+      path = complete(prompt: 'Pick? ') do |p|
+        paths.grep /#{p}/
+      end
+    else
+      path = paths.first
     end
     editor.edit(path.strip)
   else
