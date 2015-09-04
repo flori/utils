@@ -60,7 +60,9 @@ end
 
 argv = ARGV.dup
 if argv.empty?
-  unless STDIN.tty?
+  if STDIN.tty?
+    argv = `git ls-files -m`.lines.map(&:chomp) rescue []
+  else
     file = File.new(File.join(Dir.tmpdir, "edit_tmp.#$$"), 'w')
     until STDIN.eof?
       buffer = STDIN.read(8192)
