@@ -6,7 +6,7 @@ require 'tins/xt'
 include Tins::GO
 
 def edit_files(paths, pick: false)
-  editor = Utils::Editor
+  editor = Utils::Editor.new
   if pick
     if paths.size > 1
       path = complete(prompt: 'Pick? ') do |p|
