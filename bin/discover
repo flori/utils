@@ -64,10 +64,13 @@ finder = Finder.new(
   :args    => args,
   :roots   => roots,
   :config  => config
-).search do |output|
-  puts output
-end
+).search
+
 case
-when args['E'] then edit_files finder.paths, pick: true
-when args['e'] then edit_files finder.paths
+when args['E']
+  edit_files finder.paths, pick: true
+when args['e']
+  edit_files finder.paths
+else
+  puts finder.paths
 end
