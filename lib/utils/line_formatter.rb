@@ -93,6 +93,7 @@ else
 
         def format_backtrace(example, folding: false, limit: nil)
           backtrace = execution_result(example).exception.backtrace
+          backtrace.nil? and return ''
           if limit
             backtrace = backtrace[0, limit]
           end
