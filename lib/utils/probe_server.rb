@@ -7,19 +7,9 @@ end
 module Utils
   class ProbeServer
     class Job
-
-      class << self
-        attr_writer :colorize
-
-        def colorize?
-          !!@colorize
-        end
-      end
-      self.colorize = false
-
       def initialize(probe_server, args)
         @id           = probe_server.next_job_id
-        @args         = args
+        @args         = Array(args)
       end
 
       attr_reader :id
@@ -37,18 +27,15 @@ module Utils
       end
 
       def ok_colorize(string)
-        return string unless self.class.colorize?
         case @ok
         when false then string.white.on_red
         when true  then string.black.on_green
-        else            string.black.on_yellow
+        else            string
         end
       end
 
       def inspect
-        ok_colorize(
-          "#<Job id=#{id} args=#{args.inspect} ok=#{ok}>"
-        )
+        ok_colorize("Job##{id} #{args.map { |a| a.include?(' ') ? a.inspect : a } * ' '}")
       end
 
       alias to_s inspect
@@ -62,6 +49,12 @@ module Utils
       Thread.new { work_loop }
     end
 
+    def print(*msg)
+      if msg.first !~ /^irb: warn: can't alias / # shut your god d*mn wh*re mouth
+        super
+      end
+    end
+
     def start
       output_message "Starting probe server listening to #{@uri.inspect}.", type: :info
       DRb.start_service(@uri, self)
@@ -69,7 +62,8 @@ module Utils
         DRb.thread.join
       rescue Interrupt
         ARGV.clear << '-f'
-        output_message %{\nEntering interactive mode: Type "commands" to get help for the commands.}, type: :info
+        output_message %{\nEntering interactive mode.}, type: :info
+        help
         begin
           old, $VERBOSE = $VERBOSE, nil
           examine(self)
@@ -88,40 +82,24 @@ module Utils
 
     annotate :doc
 
-    def commands
-      annotations = self.class.doc_annotations.sort_by(&:first)
-      max_size = annotations.map { |a| a.first.size }.max
-      output_message annotations.map { |n, v| "#{n.to_s.ljust(max_size + 1)}#{v}" }
-    end
+    annotate :shortcut
 
-    doc 'Pause processing of the job queue.'
-    def pause
-      mutex.lock
-      true
-    rescue ThreadError
-      false
-    end
-
-    doc 'Continue processing of the job queue.'
-    def continue
-      mutex.unlock
-      true
-    rescue ThreadError
-      false
-    end
-
-    doc 'Return the currently running job.'
-    def job
-      queue_synchronize do
-        @job
-      end
-    end
-
-    def next_job_id
-      @current_job_id += 1
+    doc 'Display this help.'
+    shortcut :h
+    def help
+      docs      = doc_annotations.sort_by(&:first)
+      docs_size = docs.map { |a| a.first.size }.max
+      format = '%-20s %-3s %s'
+      output_message [
+          (format % %w[ command sho description ]).on_color(20).white
+        ] << docs.map { |cmd, doc|
+          shortcut = shortcut_of(cmd) and shortcut = "(#{shortcut})"
+          format % [ cmd, shortcut, doc ]
+        }
     end
 
     doc 'Enqueue a new job with the argument array <job_args>.'
+    shortcut :e
     def job_enqueue(job_args)
       job = Job.new(self, job_args)
       output_message " → #{job.inspect} enqueued.", type: :info
@@ -130,35 +108,15 @@ module Utils
     alias enqueue job_enqueue
 
     doc 'Send the <signal> to the process that is working on the current job, if any.'
-    def job_kill(signal = :TERM)
-      @pid and Process.kill signal, @pid
-    end
-
-    doc 'Shutdown the server.'
+    doc 'Quit the server.'
+    shortcut :q
     def shutdown
       output_message "Server was shutdown down – HARD!", type: :warn
-      exit! 23
-    end
-
-    doc 'List the currently pending jobs waiting to be run.'
-    def jobs_list
-      output_message @jobs_queue.instance_variable_get(:@que)
-    end
-
-    doc 'Clear all pending jobs.'
-    def jobs_clear
-      queue_synchronize do
-        unless @jobs_queue.empty?
-          @jobs_queue.clear
-          output_message "Cleared all queued jobs.", type: :warn
-          true
-        else
-          false
-        end
-      end
+      exit 23
     end
 
     doc 'Repeat the job with <job_id> or the last, it will be assigned a new id, though.'
+    shortcut :r
     def job_repeat(job_id = @history.last)
       Job === job_id and job_id = job_id.id
       if old_job = @history.find { |job| job.id == job_id }
@@ -170,6 +128,7 @@ module Utils
     end
 
     doc 'List the history of run jobs.'
+    shortcut :l
     def history_list
       output_message @history
     end
@@ -185,15 +144,21 @@ module Utils
       ENV
     end
 
+    doc "Clear the terminal screen"
+    shortcut :c
+    def clear
+      system "clear"
+    end
+
+    for (method_name, shortcut) in shortcut_annotations
+      alias_method shortcut, method_name
+    end
+
+    def next_job_id
+      @current_job_id += 1
+    end
+
     private
-
-    def mutex
-      @jobs_queue.instance_variable_get(:@mutex)
-    end
-
-    def queue_synchronize(&block)
-      mutex.synchronize(&block)
-    end
 
     def output_message(msg, type: nil)
       msg.respond_to?(:to_a) and msg = msg.to_a * "\n"
@@ -204,7 +169,7 @@ module Utils
         when :info
           msg.on_color(20).white
         when :warn
-          msg.on_color(40).white
+          msg.on_color(94).white
         when :failure
           msg.on_color(124).blink.white
         else
@@ -216,9 +181,8 @@ module Utils
     end
 
     def run_job(job)
-      @pid = fork { exec(*cmd(job.args)) }
-      output_message " → #{job.inspect} now running with pid #@pid.", type: :info
-      Process.wait @pid
+      output_message " → #{job.inspect} now running.", type: :info
+      system *cmd(job.args)
       message = " → #{job.inspect} was just run"
       if $?.success?
         job.ok = true
