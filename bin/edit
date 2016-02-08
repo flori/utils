@@ -14,21 +14,22 @@ PATHS are the directory and file paths that are opened in the vim.
 
 Options are
 
-  -w          open a buffer in vim and wait until it is deleted
-  -s          read files and files:linenumbers from stdin and open them
-  -m          make intermediate non existing directories to file
-  -c COMMAND  send ex command to the current running editor
-  -C COMMAND  send visual command to the current running editor
-  -p DURATION pause for this many seconds to wait for vim's reaction
-  -S SERVER   specify the server for this edit command
-  -h          display this help
+  -w           open a buffer in vim and wait until it is deleted
+  -s           read files and files:linenumbers from stdin and open them
+  -m           make intermediate non existing directories to file
+  -g [m|c|d|o] open modified/cached/deleted/other files
+  -c COMMAND   send ex command to the current running editor
+  -C COMMAND   send visual command to the current running editor
+  -p DURATION  pause for this many seconds to wait for vim's reaction
+  -S SERVER    specify the server for this edit command
+  -h           display this help
 
 Version is #{File.basename($0)} #{Utils::VERSION}.
   EOT
   exit 1
 end
 
-$opt = go 'p:S:c:wsmh'
+$opt = go 'p:S:c:g:wsmh'
 $opt['h'] and usage
 
 config = Utils::Config::ConfigFile.new
@@ -60,9 +61,7 @@ end
 
 argv = ARGV.dup
 if argv.empty?
-  if STDIN.tty?
-    argv = `git ls-files -m`.lines.map(&:chomp) rescue []
-  else
+  unless STDIN.tty?
     file = File.new(File.join(Dir.tmpdir, "edit_tmp.#$$"), 'w')
     until STDIN.eof?
       buffer = STDIN.read(8192)
@@ -71,6 +70,9 @@ if argv.empty?
     file.close
     argv << file.path
   end
+end
+if git_files_arg = $opt['g']
+  argv.concat `git ls-files -#{git_files_arg}`.lines.map(&:chomp).uniq
 end
 if argv.empty?
   editor.start
