@@ -43,8 +43,18 @@ singleton_class.class_eval do
   memoize_function :zeus?
 end
 
+def spring?
+  `./bin/spring status`.lines.first =~ /^Spring is running:/
+end
+singleton_class.class_eval do
+  memoize_function :spring?
+end
+
 def start_server
   Thread.abort_on_exception = $DEBUG
+  spring? and
+    puts "Found spring running, I'll try to use it for running tests."
+
   zeus? and
     puts "Found a zeus socket file, I'll try to use it for running tests."
 
@@ -97,7 +107,10 @@ puts "Running tests in #{$args.inspect}"
 
 case ($opt['t'] || $config.probe.test_framework).to_sym
 when :rspec
-  if zeus?
+  case
+  when spring?
+    rspec = %w[bin/rspec -rutils -f Utils::LineFormatter ]
+  when zeus?
     rspec = %w[-S zeus rspec -rutils -f Utils::LineFormatter ]
   else
     rspec = [ find_cmd('rspec', 'spec') ] << '-rutils' << '-f' <<
