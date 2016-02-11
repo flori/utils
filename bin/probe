@@ -45,7 +45,7 @@ singleton_class.class_eval do
 end
 
 def spring?
-  `./bin/spring status`.lines.first =~ /^Spring is running:/
+  `bin/spring status`.lines.first =~ /^Spring is running:/
 end
 singleton_class.class_eval do
   memoize_function :spring?
@@ -119,7 +119,7 @@ case ($opt['t'] || $config.probe.test_framework).to_sym
 when :rspec
   case
   when spring?
-    rspec = %w[bin/rspec -rutils -f Utils::LineFormatter ]
+    rspec = %w[bin/spring rspec -rutils -f Utils::LineFormatter ]
   when zeus?
     rspec = %w[-S zeus rspec -rutils -f Utils::LineFormatter ]
   else

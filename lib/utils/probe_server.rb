@@ -139,9 +139,25 @@ module Utils
       true
     end
 
+    class LogWrapper < BasicObject
+      def initialize(server, object)
+        @server, @object = server, object
+      end
+
+      def []=(name, value)
+        name, value = name.to_s, value.to_s
+        @server.output_message("Setting #{name}=#{value.inspect}.", type: :info)
+        @object[name] = value
+      end
+
+      def method_missing(*a, &b)
+        @object.__send__(*a, &b)
+      end
+    end
+
     doc "The environment of the server process, use env['a'] = 'b' and env['a']."
-    def env
-      ENV
+    memoize_method def env
+      LogWrapper.new(self, ENV)
     end
 
     doc "Clear the terminal screen"
@@ -157,8 +173,6 @@ module Utils
     def next_job_id
       @current_job_id += 1
     end
-
-    private
 
     def output_message(msg, type: nil)
       msg.respond_to?(:to_a) and msg = msg.to_a * "\n"
@@ -179,6 +193,8 @@ module Utils
       STDOUT.flush
       self
     end
+
+    private
 
     def run_job(job)
       output_message " → #{job.inspect} now running.", type: :info
