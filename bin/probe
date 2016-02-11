@@ -10,13 +10,14 @@ require 'drb'
 
 def usage
   puts <<-EOT
-Usage: #{File.basename($0)} [OPTS] FILENAME[:LINENO] [FILENAME]
+Usage: #{File.basename($0)} [OPTS] [FILENAME[:LINENO]]
 
 Options are
 
   -n TESTNAME   run the test TESTNAME in file FILENAME
   -t FRAMEWORK  use test framework FRAMEWORK (rspec, test-unit or cucumber)
   -c            start probe as a client
+  -C FOO=BAR    set env variable on probe server
   -l            start probe as a server
   -u URI        use this DRb URI communication
   -h            display this help
@@ -71,6 +72,10 @@ def connect_server
   puts "Connecting probe server on #{$uri.inspect}."
   DRb.start_service
   probe_server = DRbObject.new_with_uri($uri)
+  if setting = $opt['C']
+    name, value = setting.split(?=, 2)
+    probe_server.env[name] = value
+  end
   if $opt['c']
     opts = $opt.subhash('n', 't').each_with_object([]) { |(k, v), a|
       v.full? and a.concat [ "-#{k}", v ]
@@ -89,7 +94,7 @@ if i = ARGV.index('--')
 else
   $args = ARGV.dup
 end
-$opt = go 'lct:n:u:h', $args
+$opt = go 'lct:n:u:C:h', $args
 $opt['h'] and usage
 
 $uri = $opt['u'] || 'drbunix:probe.socket'
@@ -98,11 +103,11 @@ case
 when $opt['l']
   start_server
   exit
-when $opt['c']
+when $opt['c'], $opt['C']
   connect_server
 end
 
-$args.empty? and fail "require filename or filename:linenumber as arguments"
+$args.empty? and exit
 puts "Running tests in #{$args.inspect}"
 
 case ($opt['t'] || $config.probe.test_framework).to_sym
