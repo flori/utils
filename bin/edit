@@ -74,7 +74,7 @@ end
 case git_files_arg = $opt['g']
 when ?g
   argv.concat `git diff HEAD --name-only`.lines.map(&:chomp).uniq
-else
+when /\A[mcdo]\z/
   argv.concat `git ls-files -#{git_files_arg}`.lines.map(&:chomp).uniq
 end
 if argv.empty?
