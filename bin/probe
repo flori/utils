@@ -17,7 +17,7 @@ Options are
   -n TESTNAME   run the test TESTNAME in file FILENAME
   -t FRAMEWORK  use test framework FRAMEWORK (rspec, test-unit or cucumber)
   -c            start probe as a client
-  -C FOO=BAR    set env variable on probe server
+  -C FOO[=BAR]  set/get env variable on probe server
   -l            start probe as a server
   -u URI        use this DRb URI communication
   -h            display this help
@@ -69,12 +69,17 @@ def start_server
 end
 
 def connect_server
-  puts "Connecting probe server on #{$uri.inspect}."
   DRb.start_service
   probe_server = DRbObject.new_with_uri($uri)
   if setting = $opt['C']
-    name, value = setting.split(?=, 2)
-    probe_server.env[name] = value
+    case setting
+    when /\A([^=]+)=([^=]+)\z/
+      probe_server.env[$1] = $2
+    when /\A([^=]+)\z/
+      puts probe_server.env[$1]
+    else
+      usage
+    end
   end
   if $opt['c']
     opts = $opt.subhash('n', 't').each_with_object([]) { |(k, v), a|
