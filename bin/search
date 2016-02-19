@@ -5,6 +5,8 @@ require 'utils'
 include Utils
 require 'tins/xt'
 include Tins::GO
+require 'term/ansicolor'
+include Term::ANSIColor
 
 def convert_ruby_to_vim_regexp(pattern)
   regexp = pattern.source.dup
@@ -13,10 +15,73 @@ def convert_ruby_to_vim_regexp(pattern)
   regexp
 end
 
-def edit_files(pattern, paths, pick: false)
+def read_line(path)
+  filename, lineno = path.source_location
+  line = File.open(filename) do |file|
+    file.lazy.each_with_index.select { |l, n| n + 1 == lineno }.first&.first 
+  end
+end
+
+def replace_line(path, new_line)
+  filename, lineno = path.source_location
+  File.secure_write filename do |output|
+    File.open(filename) do |file|
+      file.each_with_index do |line, n|
+        if n + 1 == lineno
+          output.write new_line
+        else
+          output.write line
+        end
+      end
+    end
+  end
+end
+
+def replace_ask(editor, path, pattern, replace, all)
+  line = read_line path
+  display_new_line = line.gsub(
+    pattern.matcher,
+    "#{on_red(line[pattern.matcher])}#{on_green(replace)}"
+  )
+  loop do
+    puts red(path)
+    puts display_new_line
+    if all
+      new_line = line.gsub(pattern.matcher, replace)
+      replace_line path, new_line
+      break true
+    else
+      print "Replace? (#{bold(?y)}/n/e/a) "
+      case answer = STDIN.gets.chomp
+      when ?y, '', ?a
+        new_line = line.gsub(pattern.matcher, replace)
+        replace_line path, new_line
+        break answer == ?a
+      when ?n
+        break false
+      when ?e
+        editor.edit(path.strip)
+        break false
+      when ?a
+        break true
+      else
+        next
+      end
+    end
+  end
+end
+
+def edit_files(pattern, paths, pick: false, replace: nil)
   editor = Utils::Editor.new
   editor.edit_remote_send("<ESC>/#{convert_ruby_to_vim_regexp(pattern)}<CR>")
-  if pick
+  case
+  when replace
+    editor.wait = true
+    all = false
+    for path in paths
+      all |= replace_ask editor, path, pattern, replace, all
+    end
+  when pick
     if paths.size > 1
       path = complete(prompt: 'Pick? ') do |p|
         paths.grep /#{p}/
@@ -59,6 +124,7 @@ Options are
   -I SUFFIX   only include files with suffix SUFFIX in search
   -e          open the matching files with edit command
   -E          pick one file to edit
+  -r REPLACE  replace the searched match with REPLACE
   -a CSET     use only character set CSET from PATTERN
   -v          be verbose
   -h          display this help
@@ -68,7 +134,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'I:A:B:C:s:S:n:N:a:RciflLeEvh'
+args = go 'r:I:A:B:C:s:S:n:N:a:RciflLeEvh'
 args['h'] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }
@@ -84,6 +150,7 @@ grepper = Grepper.new(
   :config  => config
 ).search
 case
+when args['r'] then edit_files grepper.pattern, grepper.paths, replace: args['r']
 when args['E'] then edit_files grepper.pattern, grepper.paths, pick: true
 when args['e'] then edit_files grepper.pattern, grepper.paths
 when args['l'] then puts grepper.paths

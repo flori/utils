@@ -9,6 +9,8 @@ module Utils
         @pattern = @pattern.gsub(/[^#{@cset}]/, '') if @cset
       end
 
+      attr_reader :matcher
+
       def method_missing(*a, &b)
         @matcher.__send__(*a, &b)
       end
