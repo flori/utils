@@ -46,6 +46,8 @@ end
 
 def spring?
   `bin/spring status`.lines.first =~ /^Spring is running:/
+rescue Errno::ENOENT
+  false
 end
 singleton_class.class_eval do
   memoize_function :spring?
