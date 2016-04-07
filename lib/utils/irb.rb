@@ -21,11 +21,34 @@ module Utils
       include FileUtils
       include Tins::Find
 
+      def receiver_unless_main(method, &block)
+        receiver_name = method.receiver.to_s
+        if receiver_name != 'main'
+          if block
+            block.(receiver_name)
+          else
+            receiver_name
+          end
+        end
+      end
+      private :receiver_unless_main
+
       # Start _ri_ for +pattern+. If +pattern+ is not string like, call it with
       # pattern.class.name as argument.
       def ri(*patterns)
-        patterns.map! { |p| p.respond_to?(:to_str) ? p.to_str : p.class.name }
-        system "ri #{patterns.map { |p| "'#{p}'" } * ' ' } | #{$pager}"
+        patterns.empty? and
+          receiver_unless_main(method(__method__)) { |pattern| return ri(pattern) }
+        patterns.map! { |p|
+          case
+          when Module === p
+            p.name
+          when p.respond_to?(:to_str)
+            p.to_str
+          else
+            p.class.name
+          end
+        }
+        system "ri #{patterns.map { |p| "'#{p}'" } * ' ' } | #$pager"
       end
 
       # Restart this irb.
@@ -34,14 +57,19 @@ module Utils
       end
 
       def irb_open(url = nil, &block)
-        if url
+        case
+        when url
           system 'open', url
-        else
+        when block
           Tempfile.open('wb') do |t|
             t.write capture_output(&block)
             t.rewind
             system 'open', t.path
           end
+        when url = receiver_unless_main(method(__method__))
+          irb_open url
+        else
+          raise ArgumentError, 'need an url or block'
         end
       end
 
