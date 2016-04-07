@@ -35,9 +35,11 @@ module Utils
 
       # Start _ri_ for +pattern+. If +pattern+ is not string like, call it with
       # pattern.class.name as argument.
-      def ri(*patterns)
+      def ri(*patterns, doc: 'ri')
         patterns.empty? and
-          receiver_unless_main(method(__method__)) { |pattern| return ri(pattern) }
+          receiver_unless_main(method(__method__)) do |pattern|
+          return ri(pattern, doc: doc)
+        end
         patterns.map! { |p|
           case
           when Module === p
@@ -48,7 +50,11 @@ module Utils
             p.class.name
           end
         }
-        system "ri #{patterns.map { |p| "'#{p}'" } * ' ' } | #$pager"
+        system "#{doc} #{patterns.map { |p| "'#{p}'" } * ' ' } | #$pager"
+      end
+
+      def yri(*patterns)
+        ri *patterns, doc: 'yri'
       end
 
       # Restart this irb.
@@ -358,25 +364,6 @@ module Utils
             false
           end
         end
-      end
-    end
-
-    module Module
-      # Start +ri+ for +module#pattern+, trying to find a method matching +pattern+
-      # for all modules in the ancestors chain of this module.
-      def ri(pattern = nil)
-        if pattern
-          pattern = pattern.to_sym.to_s if pattern.respond_to? :to_sym
-          ancestors.each do |a|
-            if method = a.instance_methods(false).find { |m| pattern === m }
-              a = Object if a == Kernel # ri seems to be confused
-              system "ri #{a}##{method} | #{$pager}"
-            end
-          end
-        else
-          system "ri #{self} | #{$pager}"
-        end
-        return
       end
     end
 
