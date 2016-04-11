@@ -482,10 +482,6 @@ class Object
   include Utils::IRB::Shell
 end
 
-class Module
-  include Utils::IRB::Module
-end
-
 class Regexp
   include Utils::IRB::Regexp
 end
