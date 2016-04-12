@@ -31,7 +31,7 @@ class Utils::Grepper
 
   def initialize(opts = {})
     @args  = opts[:args] || {}
-    @roots = opts[:roots] || []
+    @roots = discover_roots(opts[:roots])
     @config = opts[:config] || Utils::Config::ConfigFile.new
     if n = @args.values_at(*%w[A B C]).compact.first
       if n.to_s =~ /\A\d+\Z/ and (n = n.to_i) >= 1
@@ -152,5 +152,12 @@ class Utils::Grepper
     end
     @paths = @paths.sort_by(&:source_location)
     self
+  end
+
+  private
+
+  def discover_roots(roots)
+    roots ||= []
+    roots.inject([]) { |rs, r| rs.concat Dir[r] }
   end
 end

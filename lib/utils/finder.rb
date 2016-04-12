@@ -11,8 +11,8 @@ class Utils::Finder
   include Term::ANSIColor
 
   def initialize(opts = {})
-    @args    = opts[:args] || {}
-    @roots   = opts[:roots] || []
+    @args  = opts[:args] || {}
+    @roots = discover_roots(opts[:roots])
     @config = opts[:config] || Utils::Config::ConfigFile.new
     pattern_opts = opts.subhash(:pattern) | {
       :cset  => @args['a'],
@@ -100,5 +100,12 @@ class Utils::Finder
     paths.compact!
     @paths, @output = paths.sort.transpose.values_at(-2, -1)
     self
+  end
+
+  private
+
+  def discover_roots(roots)
+    roots ||= []
+    roots.inject([]) { |rs, r| rs.concat Dir[r] }
   end
 end
