@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+
+require 'rss'
+require 'tins'
+require 'open-uri'
+require 'term/ansicolor'
+
+
+class String
+  include Term::ANSIColor
+
+  def wrap(cols: Tins::Terminal.cols)
+    split(?\n).each do |line|
+      line.size > cols and line.gsub!(/(.{1,#{cols}})(\s+|$)/, "\\1\n")
+      line.strip!
+    end * ?\n
+  end
+end
+
+IO.popen(ENV.fetch('PAGER', `which less`.chomp << ' -r'), 'w') do |pager|
+  url = ARGV.shift
+  open(url) do |rss|
+    feed = RSS::Parser.parse(rss)
+    pager.puts "Feed: #{feed.channel.title}",
+      ?– * Tins::Terminal.cols
+    feed.items.sort_by { |item| -item.date.to_f }.each do |item|
+      pager.puts(
+        "Title: #{item.title.bright_blue}",
+        "Link: #{item.link.red}",
+        "Date: #{item.date.strftime('%FT%T%z')}",
+        "",
+        item.description.wrap.chomp.white,
+        ?– * Tins::Terminal.cols
+      )
+    end
+  end
+end
