@@ -32,7 +32,7 @@ class Utils::Grepper
   def initialize(opts = {})
     @args  = opts[:args] || {}
     @roots = discover_roots(opts[:roots])
-    @config = opts[:config] || Utils::Config::ConfigFile.new
+    @config = opts[:config] || Utils::ConfigFile.new
     if n = @args.values_at(*%w[A B C]).compact.first
       if n.to_s =~ /\A\d+\Z/ and (n = n.to_i) >= 1
         @queue = Queue.new n

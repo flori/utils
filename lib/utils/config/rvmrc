@@ -1,5 +1,0 @@
-rvm_project_rvmrc=1
-rvm_project_rvmrc_default=1
-rvm_gemset_create_on_use_flag=1
-rvm_make_flags="-j 3"
-rvm_configure_flags="--enable-shared --disable-install-doc --with-readline-dir=$rvm_path/usr"

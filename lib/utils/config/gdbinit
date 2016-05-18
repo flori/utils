@@ -1,8 +1,0 @@
-define session-ruby
-  source ~/.gdb/ruby
-end
-session-ruby
-
-define session-asm
-  source ~/.gdb/asm
-end

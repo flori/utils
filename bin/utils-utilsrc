@@ -4,7 +4,7 @@ require 'tempfile'
 require 'utils'
 include Utils
 
-$config = Utils::Config::ConfigFile.new
+$config = Utils::ConfigFile.new
 $utilsrc = File.expand_path('~/.utilsrc')
 
 def create_default_utilsrc

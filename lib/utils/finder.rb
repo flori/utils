@@ -13,7 +13,7 @@ class Utils::Finder
   def initialize(opts = {})
     @args  = opts[:args] || {}
     @roots = discover_roots(opts[:roots])
-    @config = opts[:config] || Utils::Config::ConfigFile.new
+    @config = opts[:config] || Utils::ConfigFile.new
     pattern_opts = opts.subhash(:pattern) | {
       :cset  => @args['a'],
       :icase => @args['i'],

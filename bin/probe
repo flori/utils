@@ -92,7 +92,7 @@ def connect_server
   end
 end
 
-$config = Utils::Config::ConfigFile.new
+$config = Utils::ConfigFile.new
 $config.configure_from_paths
 testrunner_args = []
 if i = ARGV.index('--')

@@ -1,7 +1,7 @@
 require 'tins'
 require 'tins/xt/string'
 
-class Utils::Config::ConfigFile
+class Utils::ConfigFile
   class << self
     attr_accessor :config_file_paths
   end

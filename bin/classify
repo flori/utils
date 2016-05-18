@@ -9,7 +9,7 @@ $opts = go 'bdtsn:'
 
 string  = ARGV.shift or fail "need a class/filepath/filename"
 
-$config = Utils::Config::ConfigFile.new
+$config = Utils::ConfigFile.new
 $config.configure_from_paths
 
 $config.classify.shift_path_by_default and

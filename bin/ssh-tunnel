@@ -44,7 +44,7 @@ def cmd(string)
   exec string
 end
 
-config = Utils::Config::ConfigFile.new
+config = Utils::ConfigFile.new
 
 arguments = ARGV
 opts = go 't:n:C:m:e:hNTd', arguments

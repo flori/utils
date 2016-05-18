@@ -56,7 +56,7 @@ roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }
 
 Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args['c']
 STDOUT.sync = true
-config = Utils::Config::ConfigFile.new
+config = Utils::ConfigFile.new
 config.configure_from_paths
 args['b'] ||= config.discover.binary
 finder = Finder.new(

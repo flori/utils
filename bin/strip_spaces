@@ -38,7 +38,7 @@ end
 
 suffix = args['I'].ask_and_send(:split, /[\s,]+/).to_a
 
-config = Utils::Config::ConfigFile.new
+config = Utils::ConfigFile.new
 config.configure_from_paths
 
 if paths

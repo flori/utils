@@ -9,7 +9,7 @@ module Utils
       self.wait           = false
       self.pause_duration = 1
       self.servername     = derive_server_name
-      config              = Utils::Config::ConfigFile.new
+      config              = Utils::ConfigFile.new
       config.configure_from_paths
       self.config = config.edit
       yield self if block_given?

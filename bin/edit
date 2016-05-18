@@ -32,7 +32,7 @@ end
 $opt = go 'p:S:c:g:wsmh'
 $opt['h'] and usage
 
-config = Utils::Config::ConfigFile.new
+config = Utils::ConfigFile.new
 config.configure_from_paths
 
 editor = Editor.new do |c|
