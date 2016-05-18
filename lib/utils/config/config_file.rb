@@ -64,13 +64,15 @@ class Utils::Config::ConfigFile
 
     def to_ruby(depth = 0)
       result = ''
-      result << ' ' * 2 * depth << "#{self.class.name[/::([^:]+)\z/, 1].underscore} do\n"
+      result << ' ' * 2 * depth <<
+        "#{self.class.name[/::([^:]+)\z/, 1].underscore} do\n"
       for name in self.class.config_settings
         value = __send__(name)
         if value.respond_to?(:to_ruby)
           result << ' ' * 2 * (depth + 1) << value.to_ruby(depth + 1)
         else
-          result << ' ' * 2 * (depth + 1) << "#{name} #{Array(value).map(&:inspect) * ', '}\n"
+          result << ' ' * 2 * (depth + 1) <<
+            "#{name} #{Array(value).map(&:inspect) * ', '}\n"
         end
       end
       result << ' ' * 2 * depth << "end\n"
@@ -244,9 +246,20 @@ class Utils::Config::ConfigFile
     @edit ||= Edit.new
   end
 
+  class Classify < BlockConfig
+    config :shift_path_by_default, 0
+  end
+
+  def classify(&block)
+    if block
+      @classify = Classify.new(&block)
+    end
+    @classify ||= Classify.new
+  end
+
   def to_ruby
     result = "# vim: set ft=ruby:\n"
-    for bc in %w[search discover strip_spaces probe ssh_tunnel]
+    for bc in %w[search discover strip_spaces probe ssh_tunnel edit classify]
       result << "\n" << __send__(bc).to_ruby
     end
     result
