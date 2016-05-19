@@ -4,16 +4,7 @@ require 'utils'
 require 'tins/go'
 include Tins::GO
 require 'tins/xt/string'
-
-$opts = go 'bdtsn:'
-
-string  = ARGV.shift or fail "need a class/filepath/filename"
-
-$config = Utils::ConfigFile.new
-$config.configure_from_paths
-
-$config.classify.shift_path_by_default and
-  $opts['n'] ||= $config.classify.shift_path_by_default
+require 'term/ansicolor'
 
 def path_shifter(string, separator: ?/, n: nil)
   n or return string
@@ -28,21 +19,47 @@ end
 
 def underscore(string)
   string = path_shifter(string, n: $opts['n'], separator: '::')
-  string = string.underscore
+  string = Tins::StringUnderscore.instance_method(:underscore).bind(string).()
   $opts['s'] and string << '.rb'
-  print string
+  string
 end
 
 def camelize(string)
   string = path_shifter(string, n: $opts['n'])
   string = string.gsub(/#{Regexp.quote(File.extname(string))}\Z/, '')
-  print string.camelize
+  string.camelize
 end
 
+def camelcase?(string)
+  string[0, 1] =~ /[A-Z]/
+end
+
+def compute_shift(config, string)
+  string = underscore(string)
+  result = config.classify.shift_path_by_default
+  for prefix in config.classify.shift_path_for_prefix
+    if string.start_with? prefix
+      return prefix.count(?/) + 1
+    end
+  end
+  result
+end
+
+$opts = go 'bdtsn:'
+
+
+string = ARGV.shift or fail "need a class/filepath/filename"
+string = Term::ANSIColor.uncolor string
+
+config = Utils::ConfigFile.new
+config.configure_from_paths
+
+$opts['n'] ||= compute_shift(config, string)
+
 $opts['b'] and $opts['n'] = '-1'
-case
+print case
 when $opts['t']
-  if string[0, 1] =~ /[A-Z]/
+  if camelcase?(string)
     underscore string
   else
     camelize string

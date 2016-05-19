@@ -248,6 +248,8 @@ class Utils::ConfigFile
 
   class Classify < BlockConfig
     config :shift_path_by_default, 0
+
+    config :shift_path_for_prefix, []
   end
 
   def classify(&block)
