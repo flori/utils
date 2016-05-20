@@ -24,6 +24,10 @@ def underscore(string)
   string
 end
 
+def parameterize(string, separator)
+  underscore(string).gsub(?/, separator) # quick and dirty
+end
+
 def camelize(string)
   string = path_shifter(string, n: $opts['n'])
   string = string.gsub(/#{Regexp.quote(File.extname(string))}\Z/, '')
@@ -45,7 +49,7 @@ def compute_shift(config, string)
   result
 end
 
-$opts = go 'bdtsn:'
+$opts = go 'bdtsp:n:'
 
 
 string = ARGV.shift or fail "need a class/filepath/filename"
@@ -60,12 +64,20 @@ $opts['b'] and $opts['n'] = '-1'
 print case
 when $opts['t']
   if camelcase?(string)
-    underscore string
+    if separator = $opts['p']
+      parameterize string, separator
+    else
+      underscore string
+    end
   else
     camelize string
   end
 when $opts['d']
-  underscore string
+  if separator = $opts['p']
+    parameterize string, separator
+  else
+    underscore string
+  end
 else
   camelize string
 end
