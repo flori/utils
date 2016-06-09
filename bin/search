@@ -125,6 +125,7 @@ Options are
   -e          open the matching files with edit command
   -E          pick one file to edit
   -r REPLACE  replace the searched match with REPLACE
+  -b
   -a CSET     use only character set CSET from PATTERN
   -v          be verbose
   -h          display this help
@@ -134,7 +135,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'r:I:A:B:C:s:S:n:N:a:RciflLeEvh'
+args = go 'r:I:A:B:C:s:S:n:N:a:RciflLeEvbh'
 args['h'] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }

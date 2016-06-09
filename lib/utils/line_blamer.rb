@@ -9,7 +9,7 @@ module Utils
     end
 
     def perform(options = '')
-      `git blame #{options} -L #@lineno,+1 "#@file"`
+      `git 2>/dev/null blame #{options} -L #@lineno,+1 "#@file"`.full?
     end
   end
 end

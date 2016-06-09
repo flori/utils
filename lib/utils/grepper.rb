@@ -94,6 +94,16 @@ class Utils::Grepper
     end
     unless @output.empty?
       case
+      when @args['b']
+        @output.uniq!
+        @output.each do |l|
+          blamer = LineBlamer.for_line(l)
+          if blame = blamer.perform
+            blame.sub!(/^[0-9a-f]+/) { Term::ANSIColor.yellow($&) }
+            blame.sub!(/\(([^)]+)\)/) { "(#{Term::ANSIColor.red($1)})" }
+            puts blame
+          end
+        end
       when @args['l'], @args['e'], @args['E'], @args['r']
         @output.uniq!
         @paths.concat @output
@@ -114,7 +124,7 @@ class Utils::Grepper
         case
         when @args['l']
           @output << @filename
-        when @args['L'], @args['r']
+        when @args['L'], @args['r'], @args['b']
           @output << "#{@filename}:#{file.lineno}"
         when @args['e'], @args['E']
           @output << "#{@filename}:#{file.lineno}"
