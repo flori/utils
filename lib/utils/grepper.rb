@@ -99,9 +99,9 @@ class Utils::Grepper
         @output.each do |l|
           blamer = LineBlamer.for_line(l)
           if blame = blamer.perform
-            blame.sub!(/^[0-9a-f]+/) { Term::ANSIColor.yellow($&) }
+            blame.sub!(/^[0-9a-f^]+/) { Term::ANSIColor.yellow($&) }
             blame.sub!(/\(([^)]+)\)/) { "(#{Term::ANSIColor.red($1)})" }
-            puts blame
+            puts "#{l} #{blame}"
           end
         end
       when @args['l'], @args['e'], @args['E'], @args['r']
