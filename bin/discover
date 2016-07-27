@@ -32,10 +32,7 @@ directory and file paths that are searched.
 Options are
 
   -r          interpret PATTERN argument as regex not fuzzy
-  -d          discover directories as well
-  -D          discover only directories
   -c          disable color output
-  -i          use case insensitive matches
   -e          open the matching files with edit command
   -E          pick one file to edit
   -a CSET     use only character set CSET from PATTERN
@@ -49,7 +46,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'I:a:rdDcieEbvh'
+args = go 'I:a:rceEbvh'
 args['h'] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }

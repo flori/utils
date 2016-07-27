@@ -16,14 +16,12 @@ class Utils::Finder
     @config = opts[:config] || Utils::ConfigFile.new
     pattern_opts = opts.subhash(:pattern) | {
       :cset  => @args['a'],
-      :icase => @args['i'],
+      :icase => @args.fetch('i', true),
     }
     @binary = @args['b']
     @pattern = @args['r'] ?
       RegexpPattern.new(pattern_opts) :
       FuzzyPattern.new(pattern_opts)
-    @directory = @args['d']
-    @only_directory = @args['D']
     @paths  = []
   end
 
@@ -38,13 +36,7 @@ class Utils::Finder
   def attempt_match?(path)
     stat = path.stat
     stat.symlink? and stat = path.lstat
-    if @only_directory
-      stat.directory?
-    elsif @directory
-      stat.directory? || ascii_file?(stat, path)
-    else
-      ascii_file?(stat, path)
-    end
+    stat.directory? || ascii_file?(stat, path)
   rescue SystemCallError => e
     warn "Caught #{e.class}: #{e}"
     nil
@@ -73,7 +65,7 @@ class Utils::Finder
       if do_match = attempt_match?(path) and @args['v']
         warn "Attempt match of #{path.inspect}"
       end
-      if do_match and match = @pattern.match(file)
+      if do_match and match = @pattern.match(path)
         if FuzzyPattern === @pattern
           current = 0
           marked_file = ''
@@ -81,8 +73,8 @@ class Utils::Finder
           for i in 1...(match.size)
             match[i] or next
             b = match.begin(i)
-            marked_file << file[current...b]
-            marked_file << red(file[b, 1])
+            marked_file << path[current...b]
+            marked_file << red(path[b, 1])
             score += (b - e)
             e = match.end(i)
             current = b + 1
@@ -90,9 +82,9 @@ class Utils::Finder
           marked_file << match.post_match
           [ score, file.size, path, File.join(dir, marked_file) ]
         else
-          marked_file = file[0...match.begin(0)] <<
-            red(file[match.begin(0)...match.end(0)]) <<
-            file[match.end(0)..-1]
+          marked_file = path[0...match.begin(0)] <<
+            red(path[match.begin(0)...match.end(0)]) <<
+            path[match.end(0)..-1]
           [ 0, file.size, path, File.join(dir, marked_file) ]
         end
       end

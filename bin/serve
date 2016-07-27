@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+require 'tins/go'
+include Tins::GO
+require 'webrick'
+
+$opts = go 'p:h'
+
+if $opts[?h]
+  puts <<USAGE
+#{File.basename($0)} [OPTIONS] [DIR]
+USAGE
+  exit
+end
+
+port = ($opts[?p] || 8888).to_i
+s = WEBrick::HTTPServer.new(
+  Port:         port,
+  DocumentRoot: ARGV.shift || Dir.pwd
+)
+trap('INT') { s.shutdown }
+puts "You have been served: http://localhost:#{port}/"
+s.start
+
