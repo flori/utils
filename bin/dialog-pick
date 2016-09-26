@@ -1,0 +1,11 @@
+#!/bin/sh
+
+text=${1:-Pick}
+tags=`cat`
+lines=$(tput lines)
+columns=$(tput cols)
+
+result=$(dialog --no-items --menu "$text" $((lines - 5)) $((columns - 5)) $((lines - 10)) $tags 2>&1 1>/dev/tty)
+exitcode=$?
+echo $result
+exit $exitcode
