@@ -156,7 +156,7 @@ class Utils::ConfigFile
   end
 
   class SshTunnel < BlockConfig
-    config :terminal_multiplexer, 'screen'
+    config :terminal_multiplexer, 'tmux'
 
     config :env, {}
 
