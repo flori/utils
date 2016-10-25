@@ -21,6 +21,7 @@ stripped.
 
 Options are
 
+  -t COLUMNS  turn tabs into COLUMNS spaces
   -I SUFFIXES list of suffixes
   -h          display this help
 
@@ -29,7 +30,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'I:h'
+args = go 'I:t:h'
 args['h'] and usage
 
 unless ARGV.empty?
@@ -52,12 +53,15 @@ if paths
     s.file? or next
     config.strip_spaces.skip?(bn) and next
     File.ascii?(filename) or next
-    STDOUT.puts "Stripping spaces from #{filename.inspect}."
+    STDOUT.puts "Stripping spaces/tabs from #{filename.inspect}."
     secure_write(filename) do |output|
       File.open(filename) do |file|
         old_mode = file.stat.mode
         file.each do |line|
           line.gsub!(/[ \t\v]+$/, '')
+          if tabs = args['t']
+            line.gsub!(/\t/, ' ' * Integer(tabs))
+          end
           output.write line
         end
         File.chmod old_mode, output.path
