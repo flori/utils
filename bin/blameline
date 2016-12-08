@@ -21,9 +21,5 @@ else
 end
 
 for line in lines
-  blamer = Utils::LineBlamer.for_line(line) or next
-  blame = blamer.perform or next
-  blame.sub!(/^[0-9a-f^]+/) { Term::ANSIColor.yellow($&) }
-  blame.sub!(/\(([^)]+)\)/) { "(#{Term::ANSIColor.red($1)})" }
-  puts blame
+  Utils::LineBlamer.blame(line).full? { |l| puts l }
 end
