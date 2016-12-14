@@ -9,7 +9,7 @@ path_separator = RUBY_PLATFORM =~ /mswin32/ ? ';' : ':'
 path = (ENV['PATH'] || '').split(path_separator)
 path.map! { |part| File.expand_path(part) }
 
-$opt = go('e')
+$opts = go('e')
 
 case cmd = ARGV.shift
 when 'prefix', 'postfix'
@@ -35,4 +35,4 @@ end
 
 path.uniq!
 
-puts "#{'export ' if $opt['e']}PATH=#{path * path_separator}"
+puts "#{'export ' if $opt[?e]}PATH=#{path * path_separator}"

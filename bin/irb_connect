@@ -24,14 +24,14 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
 end
 
 
-$opt = go 'e:r:p:l:h'
-$opt['h'] and usage
+$opts = go 'e:r:p:l:h'
+$opts[?h] and usage
 
-proxy = Utils::IRB::Service.connect($opt['r'], $opt['p'])
+proxy = Utils::IRB::Service.connect($opts[?r], $opts[?p])
 case
-when load_path = $opt['l']
+when load_path = $opts[?l]
   proxy.load(load_path)
-when code = $opt['e']
+when code = $opts[?e]
   p proxy.eval(code)
 else
   puts proxy.eval(STDIN.read)

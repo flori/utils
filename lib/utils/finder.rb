@@ -15,11 +15,11 @@ class Utils::Finder
     @roots = discover_roots(opts[:roots])
     @config = opts[:config] || Utils::ConfigFile.new
     pattern_opts = opts.subhash(:pattern) | {
-      :cset  => @args['a'],
+      :cset  => @args[?a],
       :icase => @args.fetch('i', true),
     }
-    @binary = @args['b']
-    @pattern = @args['r'] ?
+    @binary = @args[?b]
+    @pattern = @args[?r] ?
       RegexpPattern.new(pattern_opts) :
       FuzzyPattern.new(pattern_opts)
     @paths  = []
@@ -44,16 +44,16 @@ class Utils::Finder
 
   def search
     paths = []
-    suffixes = @args['I'].ask_and_send(:split, /[\s,]+/).to_a
+    suffixes = @args[?I].ask_and_send(:split, /[\s,]+/).to_a
     find(*(@roots + [ { :suffix => suffixes } ])) do |filename|
       begin
         bn, s = filename.pathname.basename, filename.stat
         if !s || s.directory? && @config.discover.prune?(bn)
-          @args['v'] and warn "Pruning #{filename.inspect}."
+          @args[?v] and warn "Pruning #{filename.inspect}."
           prune
         end
         if s.file? && @config.discover.skip?(bn)
-          @args['v'] and warn "Skipping #{filename.inspect}."
+          @args[?v] and warn "Skipping #{filename.inspect}."
           next
         end
         paths << filename
@@ -62,7 +62,7 @@ class Utils::Finder
     paths.uniq!
     paths.map! { |p| a = File.split(p) ; a.unshift(p) ; a }
     paths = paths.map! do |path, dir, file|
-      if do_match = attempt_match?(path) and @args['v']
+      if do_match = attempt_match?(path) and @args[?v]
         warn "Attempt match of #{path.inspect}"
       end
       if do_match and match = @pattern.match(path)

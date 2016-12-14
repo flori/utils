@@ -42,22 +42,22 @@ class Utils::Grepper
     end
     @paths  = []
     pattern_opts = opts.subhash(:pattern) | {
-      :cset  => @args['a'],
-      :icase => @args['i'],
+      :cset  => @args[?a],
+      :icase => @args[?i],
     }
-    @pattern = @args['R'] ?
+    @pattern = @args[?R] ?
       FuzzyPattern.new(pattern_opts) :
       RegexpPattern.new(pattern_opts)
     @name_pattern =
-      if name_pattern = @args['N']
+      if name_pattern = @args[?N]
         RegexpPattern.new(:pattern => name_pattern)
-      elsif name_pattern = @args['n']
+      elsif name_pattern = @args[?n]
         FuzzyPattern.new(:pattern => name_pattern)
       end
     @skip_pattern =
-      if skip_pattern = @args['S']
+      if skip_pattern = @args[?S]
         RegexpPattern.new(:pattern => skip_pattern)
-      elsif skip_pattern = @args['s']
+      elsif skip_pattern = @args[?s]
         FuzzyPattern.new(:pattern => skip_pattern)
       end
   end
@@ -71,40 +71,40 @@ class Utils::Grepper
     @output = []
     bn, s = File.basename(filename), File.stat(filename)
     if !s || s.directory? && @config.search.prune?(bn)
-      @args['v'] and warn "Pruning #{filename.inspect}."
+      @args[?v] and warn "Pruning #{filename.inspect}."
       prune
     end
     if s.file? && !@config.search.skip?(bn) &&
       (!@name_pattern || @name_pattern.match(bn))
     then
-      File.open(filename, 'rb') do |file|
-        if file.binary? != true
-          @args['v'] and warn "Matching #{filename.inspect}."
-          if @args['f']
+      File.open(filename, 'rb', encoding: Encoding::UTF_8) do |file|
+        if @args[?b] && !@args[?g] || file.binary? != true
+          @args[?v] and warn "Matching #{filename.inspect}."
+          if @args[?f]
             @output << filename
           else
             match_lines file
           end
         else
-          @args['v'] and warn "Skipping binary file #{filename.inspect}."
+          @args[?v] and warn "Skipping binary file #{filename.inspect}."
         end
       end
     else
-      @args['v'] and warn "Skipping #{filename.inspect}."
+      @args[?v] and warn "Skipping #{filename.inspect}."
     end
     unless @output.empty?
       case
-      when @args['b']
+      when @args[?g]
         @output.uniq!
         @output.each do |l|
           blamer = LineBlamer.for_line(l)
           if blame = blamer.perform
             blame.sub!(/^[0-9a-f^]+/) { Term::ANSIColor.yellow($&) }
             blame.sub!(/\(([^)]+)\)/) { "(#{Term::ANSIColor.red($1)})" }
-            puts "#{l} #{blame}"
+            puts "#{blame.chomp} #{Term::ANSIColor.blue(l)}"
           end
         end
-      when @args['l'], @args['e'], @args['E'], @args['r']
+      when @args[?l], @args[?e], @args[?E], @args[?r]
         @output.uniq!
         @paths.concat @output
       else
@@ -122,21 +122,21 @@ class Utils::Grepper
         line[m.begin(0)...m.end(0)] = black on_white m[0]
         @queue and @queue << line
         case
-        when @args['l']
+        when @args[?l]
           @output << @filename
-        when @args['L'], @args['r'], @args['b']
+        when @args[?L], @args[?r], @args[?g]
           @output << "#{@filename}:#{file.lineno}"
-        when @args['e'], @args['E']
+        when @args[?e], @args[?E]
           @output << "#{@filename}:#{file.lineno}"
           break
         else
           @output << red("#{@filename}:#{file.lineno}")
-          if @args['B'] or @args['C']
+          if @args[?B] or @args[?C]
             @output.concat @queue.data
           else
             @output << line
           end
-          if @args['A'] or @args['C']
+          if @args[?A] or @args[?C]
             where = file.tell
             lineno = file.lineno
             @queue.max_size.times do
@@ -156,7 +156,7 @@ class Utils::Grepper
   end
 
   def search
-    suffixes = @args['I'].ask_and_send(:split, /[\s,]+/).to_a
+    suffixes = @args[?I].ask_and_send(:split, /[\s,]+/).to_a
     find(*(@roots + [ { :suffix => suffixes } ])) do |filename|
       match(filename)
     end

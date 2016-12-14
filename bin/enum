@@ -150,18 +150,18 @@ $opts = {
 }.update(go('p:e:f:h')) do |o,default,set|
   set || default
 end
-usage if $opts['h'] || ARGV.size != 1
+usage if $opts[?h] || ARGV.size != 1
 $ranges = ARGV.shift
-$limited = $opts['p'] ? Limited.new($opts['p']) : nil
+$limited = $opts[?p] ? Limited.new($opts[?p]) : nil
 ranges = parse_ranges($ranges)
 generator = Generator.new(ranges)
-$opts['f'] ||= %w[ %s ] * generator.size * ':'
+$opts[?f] ||= %w[ %s ] * generator.size * ':'
 
 generator.each do |tuple|
-  if $opts['e']
-    execute_command($opts['e'], $opts['f'], tuple)
+  if $opts[?e]
+    execute_command($opts[?e], $opts[?f], tuple)
   else
-    puts $opts['f'] % tuple
+    puts $opts[?f] % tuple
   end
 end
 exit 0

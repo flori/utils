@@ -31,13 +31,13 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
 end
 
 args = go 'I:t:h'
-args['h'] and usage
+args[?h] and usage
 
 unless ARGV.empty?
   paths = ARGV.map { |p| File.expand_path(p) }
 end
 
-suffix = args['I'].ask_and_send(:split, /[\s,]+/).to_a
+suffix = args[?I].ask_and_send(:split, /[\s,]+/).to_a
 
 config = Utils::ConfigFile.new
 config.configure_from_paths
@@ -59,7 +59,7 @@ if paths
         old_mode = file.stat.mode
         file.each do |line|
           line.gsub!(/[ \t\v]+$/, '')
-          if tabs = args['t']
+          if tabs = args[?t]
             line.gsub!(/\t/, ' ' * Integer(tabs))
           end
           output.write line

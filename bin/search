@@ -125,7 +125,8 @@ Options are
   -e          open the matching files with edit command
   -E          pick one file to edit
   -r REPLACE  replace the searched match with REPLACE
-  -b
+  -b          also search binary files
+  -g          use git to determine author of the line
   -a CSET     use only character set CSET from PATTERN
   -v          be verbose
   -h          display this help
@@ -135,12 +136,12 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'r:I:A:B:C:s:S:n:N:a:RciflLeEvbh'
-args['h'] and usage
+args = go 'r:I:A:B:C:s:S:n:N:a:RciflLeEvbgh'
+args[?h] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }
 
-Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args['c']
+Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args[?c]
 STDOUT.sync = true
 config = Utils::ConfigFile.new
 config.configure_from_paths
@@ -151,8 +152,8 @@ grepper = Grepper.new(
   :config  => config
 ).search
 case
-when args['r'] then edit_files grepper.pattern, grepper.paths, replace: args['r']
-when args['E'] then edit_files grepper.pattern, grepper.paths, pick: true
-when args['e'] then edit_files grepper.pattern, grepper.paths
-when args['l'] then puts grepper.paths
+when args[?r] then edit_files grepper.pattern, grepper.paths, replace: args[?r]
+when args[?E] then edit_files grepper.pattern, grepper.paths, pick: true
+when args[?e] then edit_files grepper.pattern, grepper.paths
+when args[?l] then puts grepper.paths
 end

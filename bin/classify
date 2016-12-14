@@ -18,9 +18,9 @@ def path_shifter(string, separator: ?/, n: nil)
 end
 
 def underscore(string)
-  string = path_shifter(string, n: $opts['n'], separator: '::')
+  string = path_shifter(string, n: $opts[?n], separator: '::')
   string = Tins::StringUnderscore.instance_method(:underscore).bind(string).()
-  $opts['s'] and string << '.rb'
+  $opts[?s] and string << '.rb'
   string
 end
 
@@ -29,7 +29,7 @@ def parameterize(string, separator)
 end
 
 def camelize(string)
-  string = path_shifter(string, n: $opts['n'])
+  string = path_shifter(string, n: $opts[?n])
   string = string.gsub(/#{Regexp.quote(File.extname(string))}\Z/, '')
   string.camelize
 end
@@ -58,13 +58,13 @@ string = Term::ANSIColor.uncolor string
 config = Utils::ConfigFile.new
 config.configure_from_paths
 
-$opts['n'] ||= compute_shift(config, string)
+$opts[?n] ||= compute_shift(config, string)
 
-$opts['b'] and $opts['n'] = '-1'
+$opts[?b] and $opts[?n] = '-1'
 print case
-when $opts['t']
+when $opts[?t]
   if camelcase?(string)
-    if separator = $opts['p']
+    if separator = $opts[?p]
       parameterize string, separator
     else
       underscore string
@@ -72,8 +72,8 @@ when $opts['t']
   else
     camelize string
   end
-when $opts['d']
-  if separator = $opts['p']
+when $opts[?d]
+  if separator = $opts[?p]
     parameterize string, separator
   else
     underscore string

@@ -47,15 +47,15 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
 end
 
 args = go 'I:a:rceEbvh'
-args['h'] and usage
+args[?h] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }
 
-Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args['c']
+Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args[?c]
 STDOUT.sync = true
 config = Utils::ConfigFile.new
 config.configure_from_paths
-args['b'] ||= config.discover.binary
+args[?b] ||= config.discover.binary
 finder = Finder.new(
   :pattern => pattern,
   :args    => args,
@@ -64,9 +64,9 @@ finder = Finder.new(
 ).search
 
 case
-when args['E']
+when args[?E]
   edit_files finder.paths, pick: true
-when args['e']
+when args[?e]
   edit_files finder.paths
 else
   puts finder.paths

@@ -73,7 +73,7 @@ end
 def connect_server
   DRb.start_service
   probe_server = DRbObject.new_with_uri($uri)
-  if setting = $opt['C']
+  if setting = $opts[?C]
     case setting
     when /\A([^=]+)=([^=]+)\z/
       probe_server.env[$1] = $2
@@ -83,8 +83,8 @@ def connect_server
       usage
     end
   end
-  if $opt['c']
-    opts = $opt.subhash('n', 't').each_with_object([]) { |(k, v), a|
+  if $opts[?c]
+    opts = $opts.subhash('n', 't').each_with_object([]) { |(k, v), a|
       v.full? and a.concat [ "-#{k}", v ]
     }
     probe_server.enqueue opts + $args
@@ -101,23 +101,23 @@ if i = ARGV.index('--')
 else
   $args = ARGV.dup
 end
-$opt = go 'lct:n:u:C:h', $args
-$opt['h'] and usage
+$opts = go 'lct:n:u:C:h', $args
+$opts[?h] and usage
 
-$uri = $opt['u'] || 'drbunix:probe.socket'
+$uri = $opts[?u] || 'drbunix:probe.socket'
 
 case
-when $opt['l']
+when $opts[?l]
   start_server
   exit
-when $opt['c'], $opt['C']
+when $opts[?c], $opts[?C]
   connect_server
 end
 
 $args.empty? and exit
 puts "Running tests in #{$args.inspect}"
 
-case ($opt['t'] || $config.probe.test_framework).to_sym
+case ($opts[?t] || $config.probe.test_framework).to_sym
 when :rspec
   case
   when spring?
@@ -128,7 +128,7 @@ when :rspec
     rspec = [ find_cmd('rspec', 'spec') ] << '-rutils' << '-f' <<
       'Utils::LineFormatter'
   end
-  if linenumber = $opt['n']
+  if linenumber = $opts[?n]
     cmd 'ruby', '-I', $config.probe.include_dirs_argument, *rspec, '-l',
       linenumber, *($args + testrunner_args)
   else
@@ -148,7 +148,7 @@ when :'test-unit'
   else
     testrb = find_cmd('testrb')
   end
-  if testname = $opt['n']
+  if testname = $opts[?n]
     cmd 'ruby', '-I', $config.probe.include_dirs_argument, *testrb,
       '-n', testname, *($args + testrunner_args)
   else
@@ -170,7 +170,7 @@ when :'test-unit'
   end
 when :cucumber
   cucumber = find_cmd('cucumber')
-  if linenumber = $opt['n']
+  if linenumber = $opts[?n]
     cmd 'ruby', cucumber, '-r', $config.probe.include_dirs_argument, '-l',
       linenumber, *($args + testrunner_args)
   else

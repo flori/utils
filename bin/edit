@@ -30,19 +30,19 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
 end
 
 $opt = go 'p:S:c:g:wsmh'
-$opt['h'] and usage
+$opt[?h] and usage
 
 config = Utils::ConfigFile.new
 config.configure_from_paths
 
 editor = Editor.new do |c|
-  c.wait           = $opt['w']
-  c.pause_duration = ($opt['p'] || 1).to_i
-  s = $opt['S'] and c.servername = s
-  c.mkdir = $opt['m']
+  c.wait           = $opt[?w]
+  c.pause_duration = ($opt[?p] || 1).to_i
+  s = $opt[?S] and c.servername = s
+  c.mkdir = $opt[?m]
 end
 
-if $opt['s']
+if $opt[?s]
   begin
     until STDIN.eof?
       line = STDIN.gets
@@ -53,9 +53,9 @@ if $opt['s']
     exit 1
   end
   exit 0
-elsif command = $opt['c']
+elsif command = $opt[?c]
   editor.edit_remote_send "\e:#{command}\n"
-elsif command = $opt['C']
+elsif command = $opt[?C]
   editor.edit_remote_send command
 end
 
@@ -71,7 +71,7 @@ if argv.empty?
     argv << file.path
   end
 end
-case git_files_arg = $opt['g']
+case git_files_arg = $opt[?g]
 when ?g
   argv.concat `git diff HEAD --name-only`.lines.map(&:chomp).uniq
 when /\A[mcdo]\z/

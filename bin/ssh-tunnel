@@ -49,9 +49,9 @@ config = Utils::ConfigFile.new
 arguments = ARGV
 opts = go 't:n:C:m:e:hNTd', arguments
 
-$DEBUG = opts['d']
+$DEBUG = opts[?d]
 
-if opts['T']
+if opts[?T]
   tunnels = PSTree.new.select { |pt| pt.user == ENV['USER'] && pt.cmd =~ /ssh.*-L/ }
   tunnels.map! do |pt|
     cmd = pt.cmd
@@ -63,7 +63,7 @@ if opts['T']
   exit 0
 end
 
-case opts['C']
+case opts[?C]
 when 'ssh-default'
   STDOUT.puts SSH_CONFIG; exit
 when 'rc-default'
@@ -75,9 +75,9 @@ end
 
 config.configure_from_paths
 
-usage if opts['h'] or arguments.size != 1
+usage if opts[?h] or arguments.size != 1
 
-if multiplexer = opts['m']
+if multiplexer = opts[?m]
   config.ssh_tunnel.terminal_multiplexer = multiplexer
 end
 
@@ -96,11 +96,11 @@ ssh_dir = File.expand_path('~/.ssh')
 mkdir_p ssh_dir
 sock_file = "#{ssh_dir}/#{user}@#{remote}:#{rport}.sock"
 if env_user = ENV['USER']
-  opts['n'] ||= env_user
+  opts[?n] ||= env_user
 else
-  opts['n'] ||= 'session'
+  opts[?n] ||= 'session'
 end
-if opts['N']
+if opts[?N]
   cmd "ssh -p #{rport} -S #{sock_file} #{user}@#{remote} #{config.ssh_tunnel.multiplexer_list}"
 else
   File.exist? sock_file and rm_f sock_file
@@ -109,7 +109,7 @@ else
     env << "COPY_REMOTE_HOST_PORT='#{t.bind_address}:#{t.port}'"
     tunnels << "-R #{t}"
   end
-  opts['t'].to_a.each do |tunnel_spec|
+  opts[?t].to_a.each do |tunnel_spec|
     if arg = Utils::SshTunnelSpecification.new(tunnel_spec).valid?
       tunnels << "-L #{arg}"
     else
@@ -119,12 +119,12 @@ else
   config.ssh_tunnel.env.each do |var, val|
     ENV[var.to_s] = val.to_s
   end
-  opts['e'].to_a.each do |setting|
+  opts[?e].to_a.each do |setting|
     var, val = setting.split('=', 2)
     ENV[var] = val
   end
   cmd "ssh -p #{rport} -Mt  "\
     "-S #{sock_file} #{user}@#{remote} #{tunnels * ' '} "\
-      "'env #{env * ' '} #{config.ssh_tunnel.multiplexer_new(opts['n'])} || "\
-      "#{config.ssh_tunnel.multiplexer_attach(opts['n'])}'"
+      "'env #{env * ' '} #{config.ssh_tunnel.multiplexer_new(opts[?n])} || "\
+      "#{config.ssh_tunnel.multiplexer_attach(opts[?n])}'"
 end
