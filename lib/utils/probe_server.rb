@@ -35,7 +35,7 @@ module Utils
       end
 
       def inspect
-        ok_colorize("Job##{id} #{args.map { |a| a.include?(' ') ? a.inspect : a } * ' '}")
+        ok_colorize("#{id} #{args.map { |a| a.include?(' ') ? a.inspect : a } * ' '}")
       end
 
       alias to_s inspect
