@@ -13,6 +13,8 @@ module Utils
 
       def method_missing(*a, &b)
         @matcher.__send__(*a, &b)
+      rescue ArgumentError => e
+        raise e unless e.message.include?('invalid byte sequence in UTF-8')
       end
     end
 
