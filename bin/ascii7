@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+
+map = Hash.new { |h, k| h[k] = k }.merge(
+  " "    => "Spc",
+  "\x7f" => "DEL"
+).merge(%w[
+  NUL SOH STX ETX EOT ENQ ACK BEL BS TAB LF VT FF CR SO SI DLE DC1 DC2
+  DC3 DC4 NAK SYN ETB CAN EM SUB ESC FS GS RS US
+].each_with_index.map { |s, i| [ i.chr, s ] }.to_h)
+prefixes = 0..0b11
+puts ([ '' ] + prefixes.map { |p| '%02b' % p }) * ?\t
+(1 << 5).times do |x|
+  puts ([ "%05b" % x ] + prefixes.map { |p| map[((p << 5) | x).chr] }) * ?\t
+end
