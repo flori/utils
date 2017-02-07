@@ -1,45 +1,45 @@
 # -*- encoding: utf-8 -*-
-# stub: utils 0.8.0 ruby lib
+# stub: utils 0.9.0 ruby lib
 
 Gem::Specification.new do |s|
-  s.name = "utils"
-  s.version = "0.8.0"
+  s.name = "utils".freeze
+  s.version = "0.9.0"
 
-  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.require_paths = ["lib"]
-  s.authors = ["Florian Frank"]
-  s.date = "2016-09-30"
-  s.description = "This ruby gem provides some useful command line utilities"
-  s.email = "flori@ping.de"
-  s.executables = ["blameline", "brakeman2err", "chroot-exec", "chroot-libs", "classify", "create_tags", "dialog-pick", "discover", "edit", "edit_wait", "enum", "errf", "git-empty", "irb_connect", "json_check", "long_lines", "myex", "number_files", "on_change", "path", "probe", "remote_copy", "rssr", "same_files", "search", "sedit", "serve", "ssh-tunnel", "strip_spaces", "unquarantine_apps", "untest", "utils-utilsrc", "vacuum_firefox_sqlite", "xmp"]
-  s.extra_rdoc_files = ["README.md", "lib/utils.rb", "lib/utils/config_file.rb", "lib/utils/editor.rb", "lib/utils/file_xt.rb", "lib/utils/finder.rb", "lib/utils/grepper.rb", "lib/utils/irb.rb", "lib/utils/irb/service.rb", "lib/utils/line_blamer.rb", "lib/utils/line_formatter.rb", "lib/utils/md5.rb", "lib/utils/patterns.rb", "lib/utils/probe_server.rb", "lib/utils/ssh_tunnel_specification.rb", "lib/utils/version.rb", "lib/utils/xt/source_location_extension.rb"]
-  s.files = [".gitignore", "COPYING", "Gemfile", "README.md", "Rakefile", "VERSION", "bin/blameline", "bin/brakeman2err", "bin/chroot-exec", "bin/chroot-libs", "bin/classify", "bin/create_tags", "bin/dialog-pick", "bin/discover", "bin/edit", "bin/edit_wait", "bin/enum", "bin/errf", "bin/git-empty", "bin/irb_connect", "bin/json_check", "bin/long_lines", "bin/myex", "bin/number_files", "bin/on_change", "bin/path", "bin/probe", "bin/remote_copy", "bin/rssr", "bin/same_files", "bin/search", "bin/sedit", "bin/serve", "bin/ssh-tunnel", "bin/strip_spaces", "bin/unquarantine_apps", "bin/untest", "bin/utils-utilsrc", "bin/vacuum_firefox_sqlite", "bin/xmp", "lib/utils.rb", "lib/utils/config_file.rb", "lib/utils/editor.rb", "lib/utils/file_xt.rb", "lib/utils/finder.rb", "lib/utils/grepper.rb", "lib/utils/irb.rb", "lib/utils/irb/service.rb", "lib/utils/line_blamer.rb", "lib/utils/line_formatter.rb", "lib/utils/md5.rb", "lib/utils/patterns.rb", "lib/utils/probe_server.rb", "lib/utils/ssh_tunnel_specification.rb", "lib/utils/version.rb", "lib/utils/xt/source_location_extension.rb", "utils.gemspec", "utils.gemspec "]
-  s.homepage = "http://github.com/flori/utils"
-  s.rdoc_options = ["--title", "Utils - Some useful command line utilities", "--main", "README.md"]
-  s.rubygems_version = "2.5.1"
-  s.summary = "Some useful command line utilities"
+  s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
+  s.require_paths = ["lib".freeze]
+  s.authors = ["Florian Frank".freeze]
+  s.date = "2017-02-07"
+  s.description = "This ruby gem provides some useful command line utilities".freeze
+  s.email = "flori@ping.de".freeze
+  s.executables = ["ascii7".freeze, "blameline".freeze, "brakeman2err".freeze, "chroot-exec".freeze, "chroot-libs".freeze, "classify".freeze, "create_tags".freeze, "dialog-pick".freeze, "discover".freeze, "edit".freeze, "edit_wait".freeze, "enum".freeze, "errf".freeze, "git-empty".freeze, "git-versions".freeze, "irb_connect".freeze, "json_check".freeze, "long_lines".freeze, "myex".freeze, "number_files".freeze, "on_change".freeze, "path".freeze, "probe".freeze, "remote_copy".freeze, "rssr".freeze, "same_files".freeze, "search".freeze, "sedit".freeze, "serve".freeze, "ssh-tunnel".freeze, "strip_spaces".freeze, "unquarantine_apps".freeze, "untest".freeze, "utils-utilsrc".freeze, "vacuum_firefox_sqlite".freeze, "xmp".freeze]
+  s.extra_rdoc_files = ["README.md".freeze, "lib/utils.rb".freeze, "lib/utils/config_file.rb".freeze, "lib/utils/editor.rb".freeze, "lib/utils/file_xt.rb".freeze, "lib/utils/finder.rb".freeze, "lib/utils/grepper.rb".freeze, "lib/utils/irb.rb".freeze, "lib/utils/irb/service.rb".freeze, "lib/utils/line_blamer.rb".freeze, "lib/utils/line_formatter.rb".freeze, "lib/utils/md5.rb".freeze, "lib/utils/patterns.rb".freeze, "lib/utils/probe_server.rb".freeze, "lib/utils/ssh_tunnel_specification.rb".freeze, "lib/utils/version.rb".freeze, "lib/utils/xt/source_location_extension.rb".freeze]
+  s.files = [".gitignore".freeze, "COPYING".freeze, "Gemfile".freeze, "README.md".freeze, "Rakefile".freeze, "VERSION".freeze, "bin/ascii7".freeze, "bin/blameline".freeze, "bin/brakeman2err".freeze, "bin/chroot-exec".freeze, "bin/chroot-libs".freeze, "bin/classify".freeze, "bin/create_tags".freeze, "bin/dialog-pick".freeze, "bin/discover".freeze, "bin/edit".freeze, "bin/edit_wait".freeze, "bin/enum".freeze, "bin/errf".freeze, "bin/git-empty".freeze, "bin/git-versions".freeze, "bin/irb_connect".freeze, "bin/json_check".freeze, "bin/long_lines".freeze, "bin/myex".freeze, "bin/number_files".freeze, "bin/on_change".freeze, "bin/path".freeze, "bin/probe".freeze, "bin/remote_copy".freeze, "bin/rssr".freeze, "bin/same_files".freeze, "bin/search".freeze, "bin/sedit".freeze, "bin/serve".freeze, "bin/ssh-tunnel".freeze, "bin/strip_spaces".freeze, "bin/unquarantine_apps".freeze, "bin/untest".freeze, "bin/utils-utilsrc".freeze, "bin/vacuum_firefox_sqlite".freeze, "bin/xmp".freeze, "lib/utils.rb".freeze, "lib/utils/config_file.rb".freeze, "lib/utils/editor.rb".freeze, "lib/utils/file_xt.rb".freeze, "lib/utils/finder.rb".freeze, "lib/utils/grepper.rb".freeze, "lib/utils/irb.rb".freeze, "lib/utils/irb/service.rb".freeze, "lib/utils/line_blamer.rb".freeze, "lib/utils/line_formatter.rb".freeze, "lib/utils/md5.rb".freeze, "lib/utils/patterns.rb".freeze, "lib/utils/probe_server.rb".freeze, "lib/utils/ssh_tunnel_specification.rb".freeze, "lib/utils/version.rb".freeze, "lib/utils/xt/source_location_extension.rb".freeze, "utils.gemspec".freeze]
+  s.homepage = "http://github.com/flori/utils".freeze
+  s.rdoc_options = ["--title".freeze, "Utils - Some useful command line utilities".freeze, "--main".freeze, "README.md".freeze]
+  s.rubygems_version = "2.6.8".freeze
+  s.summary = "Some useful command line utilities".freeze
 
   if s.respond_to? :specification_version then
     s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency(%q<gem_hadar>, ["~> 1.9.1"])
-      s.add_runtime_dependency(%q<tins>, ["~> 1.8"])
-      s.add_runtime_dependency(%q<term-ansicolor>, ["~> 1.3"])
-      s.add_runtime_dependency(%q<pstree>, ["~> 0.1"])
-      s.add_runtime_dependency(%q<pry-editline>, [">= 0"])
+      s.add_development_dependency(%q<gem_hadar>.freeze, ["~> 1.9.1"])
+      s.add_runtime_dependency(%q<tins>.freeze, ["~> 1.8"])
+      s.add_runtime_dependency(%q<term-ansicolor>.freeze, ["~> 1.3"])
+      s.add_runtime_dependency(%q<pstree>.freeze, ["~> 0.1"])
+      s.add_runtime_dependency(%q<pry-editline>.freeze, [">= 0"])
     else
-      s.add_dependency(%q<gem_hadar>, ["~> 1.9.1"])
-      s.add_dependency(%q<tins>, ["~> 1.8"])
-      s.add_dependency(%q<term-ansicolor>, ["~> 1.3"])
-      s.add_dependency(%q<pstree>, ["~> 0.1"])
-      s.add_dependency(%q<pry-editline>, [">= 0"])
+      s.add_dependency(%q<gem_hadar>.freeze, ["~> 1.9.1"])
+      s.add_dependency(%q<tins>.freeze, ["~> 1.8"])
+      s.add_dependency(%q<term-ansicolor>.freeze, ["~> 1.3"])
+      s.add_dependency(%q<pstree>.freeze, ["~> 0.1"])
+      s.add_dependency(%q<pry-editline>.freeze, [">= 0"])
     end
   else
-    s.add_dependency(%q<gem_hadar>, ["~> 1.9.1"])
-    s.add_dependency(%q<tins>, ["~> 1.8"])
-    s.add_dependency(%q<term-ansicolor>, ["~> 1.3"])
-    s.add_dependency(%q<pstree>, ["~> 0.1"])
-    s.add_dependency(%q<pry-editline>, [">= 0"])
+    s.add_dependency(%q<gem_hadar>.freeze, ["~> 1.9.1"])
+    s.add_dependency(%q<tins>.freeze, ["~> 1.8"])
+    s.add_dependency(%q<term-ansicolor>.freeze, ["~> 1.3"])
+    s.add_dependency(%q<pstree>.freeze, ["~> 0.1"])
+    s.add_dependency(%q<pry-editline>.freeze, [">= 0"])
   end
 end
