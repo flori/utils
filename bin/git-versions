@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+require 'tins/xt'
+require 'term/ansicolor'
+include Tins::GO
+
+$opts = go 'v'
+
+class String
+  include Term::ANSIColor
+end
+
+versions = `git tag`.lines.map(&:chomp).grep(/\Av(\d+\.)*\d+/).sort_by { |x|
+  x[/\A.(.+)/, 1].version
+}.reverse
+versions.each_cons(2) do |new, old|
+  puts "Version #{new}".red.bold
+  if $opts[?v]
+    puts `git log --color --stat -u #{old}..#{new}`
+  else
+    puts `git log --color --stat #{old}..#{new}`
+  end
+end

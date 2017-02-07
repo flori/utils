@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-
 map = Hash.new { |h, k| h[k] = k }.merge(
   " "    => "Spc",
   "\x7f" => "DEL"
