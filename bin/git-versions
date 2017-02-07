@@ -4,14 +4,16 @@ require 'tins/xt'
 require 'term/ansicolor'
 include Tins::GO
 
-$opts = go 'v'
+$opts = go 'r:v'
 
 class String
   include Term::ANSIColor
 end
 
-versions = `git tag`.lines.map(&:chomp).grep(/\Av(\d+\.)*\d+/).sort_by { |x|
-  x[/\A.(.+)/, 1].version
+regexp = $opts[?r] && Regexp.new($opts[?r]) || /^v((?:\d+\.)*\d+)/
+
+versions = `git tag`.lines.map(&:chomp).grep(regexp).sort_by { |x|
+  x[regexp, 1].version
 }.reverse
 versions.each_cons(2) do |new, old|
   puts "Version #{new}".red.bold
