@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Florian Frank".freeze]
-  s.date = "2017-02-07"
+  s.date = "2017-02-16"
   s.description = "This ruby gem provides some useful command line utilities".freeze
   s.email = "flori@ping.de".freeze
   s.executables = ["ascii7".freeze, "blameline".freeze, "brakeman2err".freeze, "chroot-exec".freeze, "chroot-libs".freeze, "classify".freeze, "create_tags".freeze, "dialog-pick".freeze, "discover".freeze, "edit".freeze, "edit_wait".freeze, "enum".freeze, "errf".freeze, "git-empty".freeze, "git-versions".freeze, "irb_connect".freeze, "json_check".freeze, "long_lines".freeze, "myex".freeze, "number_files".freeze, "on_change".freeze, "path".freeze, "probe".freeze, "remote_copy".freeze, "rssr".freeze, "same_files".freeze, "search".freeze, "sedit".freeze, "serve".freeze, "ssh-tunnel".freeze, "strip_spaces".freeze, "unquarantine_apps".freeze, "untest".freeze, "utils-utilsrc".freeze, "vacuum_firefox_sqlite".freeze, "xmp".freeze]
@@ -28,12 +28,14 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<term-ansicolor>.freeze, ["~> 1.3"])
       s.add_runtime_dependency(%q<pstree>.freeze, ["~> 0.1"])
       s.add_runtime_dependency(%q<pry-editline>.freeze, [">= 0"])
+      s.add_runtime_dependency(%q<infobar>.freeze, [">= 0"])
     else
       s.add_dependency(%q<gem_hadar>.freeze, ["~> 1.9.1"])
       s.add_dependency(%q<tins>.freeze, ["~> 1.8"])
       s.add_dependency(%q<term-ansicolor>.freeze, ["~> 1.3"])
       s.add_dependency(%q<pstree>.freeze, ["~> 0.1"])
       s.add_dependency(%q<pry-editline>.freeze, [">= 0"])
+      s.add_dependency(%q<infobar>.freeze, [">= 0"])
     end
   else
     s.add_dependency(%q<gem_hadar>.freeze, ["~> 1.9.1"])
@@ -41,5 +43,6 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<term-ansicolor>.freeze, ["~> 1.3"])
     s.add_dependency(%q<pstree>.freeze, ["~> 0.1"])
     s.add_dependency(%q<pry-editline>.freeze, [">= 0"])
+    s.add_dependency(%q<infobar>.freeze, [">= 0"])
   end
 end

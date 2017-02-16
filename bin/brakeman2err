@@ -1,23 +1,32 @@
 #!/usr/bin/env ruby
 
+require 'utils'
 require 'json'
 require 'tins/xt'
 require 'tins/go'
 include Tins::GO
 
-opts = go 'c'
+opts = go 'ce'
 if opts[?c]
   brakeman = `bundle exec which brakeman`.full? or fail "cannot find brakeman in path"
-  system *%w'bundle exec brakeman -q -s brakeman_ignore --url-safe-methods brakeman_ignore -o .brakeman.json' or fail "calling brakeman failed"
-end
-results = JSON File.read('.brakeman.json'), object_class: JSON::GenericObject
-puts "Found #{results.errors.size} errors and #{results.warnings.size} warnings.",
-  "_" * 80
-for error in results.errors
-  puts error.location, "Error #{error.error.inspect}"
-end
-for warning in results.warnings
-  puts "#{warning.file}:#{warning.line}",
-    "#{warning.warning_type} (#{warning.confidence}) #{warning.message.inspect}",
-    warning.code, "See: #{warning.link}"
+  Utils::Busybar.new('Computing brakeman results').spin do
+    system 'bundle exec brakeman -q -i config/brakeman.yml -o .brakeman.json 2>/dev/null' or fail "calling brakeman failed"
+  end
+else
+  results = JSON File.read('.brakeman.json'), object_class: JSON::GenericObject
+  if opts[?e]
+    puts "Found #{results.errors.size} errors and #{results.warnings.size} warnings.",
+      "_" * 80
+      for error in results.errors
+        puts error.location, "Error #{error.error.inspect}"
+      end
+  else
+    puts "Found #{results.warnings.size} warnings.", "_" * 80
+  end
+  for warning in results.warnings
+    puts "#{warning.file}:#{warning.line}",
+      "#{warning.warning_type} (#{warning.confidence}) #{warning.message.inspect}",
+      warning.code, "See: #{warning.link}"
+  end
+
 end
