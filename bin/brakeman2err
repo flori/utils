@@ -5,11 +5,12 @@ require 'json'
 require 'tins/xt'
 require 'tins/go'
 include Tins::GO
+require 'infobar'
 
 opts = go 'ce'
 if opts[?c]
   brakeman = `bundle exec which brakeman`.full? or fail "cannot find brakeman in path"
-  Utils::Busybar.new('Computing brakeman results').spin do
+  Infobar.busy(label: 'Computing brakeman results').busy do
     system 'bundle exec brakeman -q -i config/brakeman.yml -o .brakeman.json 2>/dev/null' or fail "calling brakeman failed"
   end
 else
