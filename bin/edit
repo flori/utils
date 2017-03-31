@@ -22,6 +22,7 @@ Options are
   -C COMMAND     send visual command to the current running editor
   -p DURATION    pause for this many seconds to wait for vim's reaction
   -S SERVER      specify the server for this edit command
+  -l             list current vim servers
   -h             display this help
 
 Version is #{File.basename($0)} #{Utils::VERSION}.
@@ -29,7 +30,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-$opt = go 'p:S:c:g:wsmh'
+$opt = go 'p:S:c:g:wsmlh'
 $opt[?h] and usage
 
 config = Utils::ConfigFile.new
@@ -42,7 +43,10 @@ editor = Editor.new do |c|
   c.mkdir = $opt[?m]
 end
 
-if $opt[?s]
+if $opt[?l]
+  puts editor.serverlist
+  exit 0
+elsif $opt[?s]
   begin
     until STDIN.eof?
       line = STDIN.gets
