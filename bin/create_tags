@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 
-require 'utils'
+require 'infobar'
 
 paths = %w[ . ] + `bundle list --paths`.lines.map(&:chomp)
 cmd = %w[ ctags --recurse=yes --languages=Ruby,C ] + paths
-b = Utils::Busybar.new('Creating tags').spin { system *cmd }
+b = Infobar.busy(label: 'Creating tags') { system *cmd }
 if megabytes = File.size('tags').to_f / 1024 ** 2 rescue nil
   b.puts 'Created %.3fM of tags.' % megabytes
 end
