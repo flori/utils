@@ -31,7 +31,7 @@ directory and file paths that are searched.
 
 Options are
 
-  -r          interpret PATTERN argument as regex not fuzzy
+  -pX         interpret PATTERN argument as X=r for regexp or X=f for fuzzy
   -c          disable color output
   -e          open the matching files with edit command
   -E          pick one file to edit
@@ -46,7 +46,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'I:a:rceEbvh'
+args = go 'I:a:p:ceEbvh'
 args[?h] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }

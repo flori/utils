@@ -14,14 +14,13 @@ class Utils::Finder
     @args  = opts[:args] || {}
     @roots = discover_roots(opts[:roots])
     @config = opts[:config] || Utils::ConfigFile.new
+    @binary = @args[?b]
     pattern_opts = opts.subhash(:pattern) | {
       :cset  => @args[?a],
       :icase => @args.fetch('i', true),
     }
-    @binary = @args[?b]
-    @pattern = @args[?r] ?
-      RegexpPattern.new(pattern_opts) :
-      FuzzyPattern.new(pattern_opts)
+    @pattern = choose(@args[?p], pattern_opts)
+    p @pattern
     @paths  = []
   end
 

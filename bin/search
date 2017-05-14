@@ -109,16 +109,16 @@ the files. PATHS are the directory and file paths that are searched.
 Options are
 
   -n PATTERN  only search files whose names match fuzzy PATTERN
-  -N PATTERN  only search files whose names match regex PATTERN
+  -N PATTERN  only search files whose names match regexp PATTERN
   -s PATTERN  skip lines that match fuzzy PATTERN
-  -S PATTERN  skip lines that match regex PATTERN
+  -S PATTERN  skip lines that match regexp PATTERN
   -A NUMBER   displays NUMBER lines of context after the match
   -B NUMBER   displays NUMBER lines of context before the match
   -C NUMBER   displays NUMBER lines of context around the match
   -f          just list the paths of the files that would be searched
   -l          just list the paths of the files with matches
   -L          list only the path:linenumber of the files with matches
-  -R          interpret PATTERN argument as fuzzy not regex
+  -pX         interpret PATTERN argument as X=f fuzzy or X=r for regexp
   -c          disable color output
   -i          use case insensitive matches
   -I SUFFIX   only include files with suffix SUFFIX in search
@@ -136,7 +136,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'r:I:A:B:C:s:S:n:N:a:RciflLeEvbgh'
+args = go 'p:I:A:B:C:s:S:n:N:a:RciflLeEvbgh'
 args[?h] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }

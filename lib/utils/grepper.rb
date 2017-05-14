@@ -45,9 +45,7 @@ class Utils::Grepper
       :cset  => @args[?a],
       :icase => @args[?i],
     }
-    @pattern = @args[?R] ?
-      FuzzyPattern.new(pattern_opts) :
-      RegexpPattern.new(pattern_opts)
+    @pattern = choose(@args[?p], pattern_opts, default: ?r)
     @name_pattern =
       if name_pattern = @args[?N]
         RegexpPattern.new(:pattern => name_pattern)

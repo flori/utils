@@ -36,5 +36,16 @@ module Utils
         @matcher = Regexp.new(@pattern, @icase ? Regexp::IGNORECASE : 0)
       end
     end
+
+    def choose(argument, pattern_opts, default: ?f)
+      case argument
+      when /^r/, (default == ?r ? nil : :not)
+        RegexpPattern.new(pattern_opts)
+      when /^f/, (default == ?f ? nil : :not)
+        FuzzyPattern.new(pattern_opts)
+      else
+        raise ArgumentError, 'argument -p has to be f=fuzzy or r=regexp'
+      end
+    end
   end
 end
