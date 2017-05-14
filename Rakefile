@@ -13,7 +13,7 @@ GemHadar do
   executables Dir['bin/*'].map(&File.method(:basename))
   test_dir    'tests'
   ignore      '.*.sw[pon]', 'pkg', 'Gemfile.lock', '.rvmrc', '.AppleDouble',
-    'tags', '.bundle', '.DS_Store'
+    'tags', '.bundle', '.DS_Store', '.byebug_history'
   readme      'README.md'
 
   dependency  'tins',           '~>1.8'

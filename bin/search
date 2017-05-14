@@ -120,7 +120,7 @@ Options are
   -L          list only the path:linenumber of the files with matches
   -pX         interpret PATTERN argument as X=f fuzzy or X=r for regexp
   -c          disable color output
-  -i          use case insensitive matches
+  -iX         use case insensitive matches with X=y (default) or not with X=n
   -I SUFFIX   only include files with suffix SUFFIX in search
   -e          open the matching files with edit command
   -E          pick one file to edit
@@ -136,7 +136,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'p:I:A:B:C:s:S:n:N:a:RciflLeEvbgh'
+args = go 'p:I:A:B:C:s:S:n:N:a:i:RcflLeEvbgh'
 args[?h] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }

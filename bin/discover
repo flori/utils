@@ -36,6 +36,7 @@ Options are
   -e          open the matching files with edit command
   -E          pick one file to edit
   -a CSET     use only character set CSET from PATTERN
+  -iX         use case insensitive matches with X=y (default) or not with X=n
   -I SUFFIX   only include files with suffix SUFFIX during finding
   -b          match also binary files
   -v          be verbose
@@ -46,7 +47,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'I:a:p:ceEbvh'
+args = go 'I:i:a:p:ceEbvh'
 args[?h] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }

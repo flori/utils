@@ -43,7 +43,7 @@ class Utils::Grepper
     @paths  = []
     pattern_opts = opts.subhash(:pattern) | {
       :cset  => @args[?a],
-      :icase => @args[?i],
+      :icase => @args[?i] != ?n,
     }
     @pattern = choose(@args[?p], pattern_opts, default: ?r)
     @name_pattern =

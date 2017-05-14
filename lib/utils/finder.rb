@@ -17,10 +17,9 @@ class Utils::Finder
     @binary = @args[?b]
     pattern_opts = opts.subhash(:pattern) | {
       :cset  => @args[?a],
-      :icase => @args.fetch('i', true),
+      :icase => @args[?i] != ?n,
     }
     @pattern = choose(@args[?p], pattern_opts)
-    p @pattern
     @paths  = []
   end
 

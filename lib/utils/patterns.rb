@@ -19,9 +19,9 @@ module Utils
     end
 
     class FuzzyPattern < Pattern
-      def initialize(opts ={})
+      def initialize(opts = {})
         super
-        r = @pattern.split(//).grep(/[0-9a-z]/).map { |x|
+        r = @pattern.split(//).grep(/[[:print:]]/).map { |x|
           "(#{Regexp.quote(x)})"
         } * '.*?'
         @matcher = Regexp.new(
