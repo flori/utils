@@ -131,7 +131,7 @@ class Utils::Finder
             e ||= b
             marked_path << path[current...b]
             marked_path << red(path[b, 1])
-            score += (b - e)
+            score += (b - e) * (path.size - b)
             e = match.end(i)
             current = b + 1
           end
