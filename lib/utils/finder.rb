@@ -64,6 +64,7 @@ class Utils::Finder
           @args[?v] and warn "Skipping #{filename.inspect}."
           next
         end
+        s.directory? and filename << ?/
         paths << filename
       end
     end
@@ -92,6 +93,7 @@ class Utils::Finder
   def load_paths
     lines = File.readlines(index_path)
     lines.empty? and raise Errno::ENOENT
+    @args[?d] or lines = lines.grep_v(%r{/$})
     lines.map(&:chomp!)
   rescue Errno::ENOENT
     return create_paths
