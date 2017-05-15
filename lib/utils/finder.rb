@@ -124,14 +124,14 @@ class Utils::Finder
         if FuzzyPattern === @pattern
           current = 0
           marked_path = ''
-          score, e = 0, nil
+          score, e = path.size, nil
           for i in 1...match.size
             match[i] or next
             b = match.begin(i)
             e ||= b
             marked_path << path[current...b]
             marked_path << red(path[b, 1])
-            score += (path.size - (b - e))
+            score += (b - e)
             e = match.end(i)
             current = b + 1
           end
