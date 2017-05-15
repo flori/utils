@@ -1,5 +1,8 @@
 require 'term/ansicolor'
 require 'tins/xt'
+require 'tempfile'
+require 'digest/md5'
+require 'fileutils'
 
 class ::File
   include Utils::FileXt
@@ -21,6 +24,7 @@ class Utils::Finder
     }
     @pattern = choose(@args[?p], pattern_opts)
     @paths  = []
+    @args[?r] and reset_index
   end
 
   attr_reader :paths
@@ -31,6 +35,13 @@ class Utils::Finder
     stat.file? && (@binary || stat.size == 0 || File.ascii?(path))
   end
 
+  def search_index
+    paths = load_paths
+    search_paths(paths)
+  end
+
+  alias search search_index
+
   def attempt_match?(path)
     stat = path.stat
     stat.symlink? and stat = path.lstat
@@ -40,10 +51,9 @@ class Utils::Finder
     nil
   end
 
-  def search
+  def build_paths
     paths = []
-    suffixes = @args[?I].ask_and_send(:split, /[\s,]+/).to_a
-    find(*(@roots + [ { :suffix => suffixes } ])) do |filename|
+    find(*@roots) do |filename|
       begin
         bn, s = filename.pathname.basename, filename.stat
         if !s || s.directory? && @config.discover.prune?(bn)
@@ -58,12 +68,57 @@ class Utils::Finder
       end
     end
     paths.uniq!
+    paths.select! { |path| attempt_match?(path) }
+    paths
+  end
+
+  def index_path
+    roots = @roots.map { |r| File.expand_path(r) }.uniq.sort
+    filename = "finder-paths-" +
+      Digest::MD5.new.update(roots.inspect).hexdigest
+    dirname = File.join(Dir.tmpdir, File.basename($0))
+    FileUtils.mkdir_p dirname
+    File.join(dirname, filename)
+  end
+
+  def create_paths
+    paths = build_paths
+    File.secure_write(index_path) do |output|
+      output.puts paths
+    end
+    paths
+  end
+
+  def load_paths
+    lines = File.readlines(index_path)
+    lines.empty? and raise Errno::ENOENT
+    lines.map(&:chomp!)
+  rescue Errno::ENOENT
+    return create_paths
+  end
+
+  def reset_index
+    path = index_path
+    @args[?v] and warn "Resetting index #{path.inspect}."
+    FileUtils.rm_f path
+  end
+
+  def search_index
+    search_paths load_paths
+  end
+
+  def search_directly
+    search_paths build_paths
+  end
+
+  def search_paths(paths)
+    suffixes = @args[?I].ask_and_send(:split, /[\s,]+/).to_a
+    suffixes.full? do |s|
+      paths.select! { |path| s.include?(File.extname(path)[1..-1]) }
+    end
     paths.map! { |p| a = File.split(p) ; a.unshift(p) ; a }
     paths = paths.map! do |path, dir, file|
-      if do_match = attempt_match?(path) and @args[?v]
-        warn "Attempt match of #{path.inspect}"
-      end
-      if do_match and match = @pattern.match(path)
+      if match = @pattern.match(path)
         if FuzzyPattern === @pattern
           current = 0
           marked_file = ''

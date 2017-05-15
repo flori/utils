@@ -32,6 +32,7 @@ directory and file paths that are searched.
 Options are
 
   -pX         interpret PATTERN argument as X=r for regexp or X=f for fuzzy
+  -r          reset the search index
   -c          disable color output
   -e          open the matching files with edit command
   -E          pick one file to edit
@@ -47,28 +48,37 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'I:i:a:p:ceEbvh'
+args = go 'I:i:a:p:creEbvh'
 args[?h] and usage
-pattern = ARGV.shift or usage
-roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }
 
 Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args[?c]
 STDOUT.sync = true
 config = Utils::ConfigFile.new
 config.configure_from_paths
 args[?b] ||= config.discover.binary
+
+pattern = ARGV.shift || ''
+roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }
+
 finder = Finder.new(
   :pattern => pattern,
   :args    => args,
   :roots   => roots,
   :config  => config
-).search
+)
 
 case
+when args[?r]
+  exit
+when pattern.empty?
+  usage
 when args[?E]
+  finder.search
   edit_files finder.paths, pick: true
 when args[?e]
+  finder.search
   edit_files finder.paths
 else
+  finder.search
   puts finder.paths
 end
