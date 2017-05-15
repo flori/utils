@@ -122,10 +122,11 @@ class Utils::Finder
         if FuzzyPattern === @pattern
           current = 0
           marked_file = ''
-          score, e = 0, 0
-          for i in 1...(match.size)
+          score, e = 0, nil
+          for i in 1...match.size
             match[i] or next
             b = match.begin(i)
+            e ||= b
             marked_file << path[current...b]
             marked_file << red(path[b, 1])
             score += (b - e)

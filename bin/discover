@@ -80,5 +80,5 @@ when args[?e]
   edit_files finder.paths
 else
   finder.search
-  puts finder.paths
+  puts finder.output
 end
