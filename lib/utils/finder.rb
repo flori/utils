@@ -129,7 +129,7 @@ class Utils::Finder
             e ||= b
             marked_file << path[current...b]
             marked_file << red(path[b, 1])
-            score += (b - e)
+            score += (path.size - (b - e))
             e = match.end(i)
             current = b + 1
           end
