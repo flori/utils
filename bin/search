@@ -141,7 +141,7 @@ args[?h] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }
 
-Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args[?c]
+Term::ANSIColor.coloring = (STDIN.out? && ENV['TERM'] !~ /dumb/) && !args[?c]
 STDOUT.sync = true
 config = Utils::ConfigFile.new
 config.configure_from_paths

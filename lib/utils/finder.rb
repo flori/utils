@@ -92,6 +92,7 @@ class Utils::Finder
 
   def load_paths
     lines = File.readlines(index_path)
+    @args[?v] and warn "Loaded index #{index_path.inspect}."
     lines.empty? and raise Errno::ENOENT
     @args[?d] or lines = lines.grep_v(%r{/$})
     lines.map(&:chomp!)
@@ -118,30 +119,29 @@ class Utils::Finder
     suffixes.full? do |s|
       paths.select! { |path| s.include?(File.extname(path)[1..-1]) }
     end
-    paths.map! { |p| a = File.split(p) ; a.unshift(p) ; a }
-    paths = paths.map! do |path, dir, file|
+    paths = paths.map! do |path|
       if match = @pattern.match(path)
         if FuzzyPattern === @pattern
           current = 0
-          marked_file = ''
+          marked_path = ''
           score, e = 0, nil
           for i in 1...match.size
             match[i] or next
             b = match.begin(i)
             e ||= b
-            marked_file << path[current...b]
-            marked_file << red(path[b, 1])
+            marked_path << path[current...b]
+            marked_path << red(path[b, 1])
             score += (path.size - (b - e))
             e = match.end(i)
             current = b + 1
           end
-          marked_file << match.post_match
-          [ score, file.size, path, File.join(dir, marked_file) ]
+          marked_path << match.post_match
+          [ score, path, marked_path ]
         else
-          marked_file = path[0...match.begin(0)] <<
+          marked_path = path[0...match.begin(0)] <<
             red(path[match.begin(0)...match.end(0)]) <<
             path[match.end(0)..-1]
-          [ 0, file.size, path, File.join(dir, marked_file) ]
+          [ 0, path, marked_path ]
         end
       end
     end

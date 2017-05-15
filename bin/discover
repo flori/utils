@@ -52,7 +52,7 @@ end
 args = go 'I:i:a:p:creEbvdh'
 args[?h] and usage
 
-Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args[?c]
+Term::ANSIColor.coloring = (STDOUT.tty? && ENV['TERM'] !~ /dumb/) && !args[?c]
 STDOUT.sync = true
 config = Utils::ConfigFile.new
 config.configure_from_paths
