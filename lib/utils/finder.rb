@@ -115,7 +115,7 @@ class Utils::Finder
   end
 
   def search_paths(paths)
-    suffixes = @args[?I].ask_and_send(:split, /[\s,]+/).to_a
+    suffixes = Array(@args[?I])
     suffixes.full? do |s|
       paths.select! { |path| s.include?(File.extname(path)[1..-1]) }
     end

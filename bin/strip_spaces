@@ -37,7 +37,7 @@ unless ARGV.empty?
   paths = ARGV.map { |p| File.expand_path(p) }
 end
 
-suffix = args[?I].ask_and_send(:split, /[\s,]+/).to_a
+suffix = Array(args[?I])
 
 config = Utils::ConfigFile.new
 config.configure_from_paths
