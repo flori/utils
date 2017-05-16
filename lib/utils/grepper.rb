@@ -155,7 +155,22 @@ class Utils::Grepper
 
   def search
     suffixes = Array(@args[?I])
-    find(*(@roots + [ { :suffix => suffixes } ])) do |filename|
+    visit = -> filename {
+      s  = filename.stat
+      bn = filename.pathname.basename
+      if !s ||
+          s.directory? && @config.search.prune?(bn) ||
+          s.file? && @config.search.skip?(bn)
+      then
+        @args[?v] and warn "Pruning #{filename.inspect}."
+        prune
+      elsif suffixes.empty?
+        true
+      else
+        suffixes.include?(filename.suffix)
+      end
+    }
+    find(*@roots, visit: visit) do |filename|
       match(filename)
     end
     @paths = @paths.sort_by(&:source_location)

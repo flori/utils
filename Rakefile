@@ -16,7 +16,7 @@ GemHadar do
     'tags', '.bundle', '.DS_Store', '.byebug_history'
   readme      'README.md'
 
-  dependency  'tins',           '~>1.8'
+  dependency  'tins',           '~>1.14'
   dependency  'term-ansicolor', '~>1.3'
   dependency  'pstree',         '~>0.1'
   dependency  'pry-editline'

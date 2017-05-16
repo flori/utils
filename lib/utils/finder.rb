@@ -53,20 +53,21 @@ class Utils::Finder
 
   def build_paths
     paths = []
-    find(*@roots) do |filename|
-      begin
-        bn, s = filename.pathname.basename, filename.stat
-        if !s || s.directory? && @config.discover.prune?(bn)
-          @args[?v] and warn "Pruning #{filename.inspect}."
-          prune
-        end
-        if s.file? && @config.discover.skip?(bn)
-          @args[?v] and warn "Skipping #{filename.inspect}."
-          next
-        end
-        s.directory? and filename << ?/
-        paths << filename
+    visit = -> filename {
+      s  = filename.stat
+      bn = filename.pathname.basename
+      if !s ||
+          s.directory? && @config.discover.prune?(bn) ||
+          s.file? && @config.discover.skip?(bn)
+      then
+        @args[?v] and warn "Pruning #{filename.inspect}."
+        prune
       end
+      true
+    }
+    find(*@roots, visit: visit) do |filename|
+      filename.stat.directory? and filename << ?/
+      paths << filename
     end
     paths.uniq!
     paths.select! { |path| attempt_match?(path) }
