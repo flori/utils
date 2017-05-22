@@ -69,7 +69,7 @@ finder = Finder.new(
 )
 
 case
-when args[?r]
+when pattern.empty? && args[?r]
   exit
 when pattern.empty?
   usage
