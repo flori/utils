@@ -17,7 +17,6 @@ class Utils::Finder
     @args  = opts[:args] || {}
     @roots = discover_roots(opts[:roots])
     @config = opts[:config] || Utils::ConfigFile.new
-    @binary = @args[?b]
     pattern_opts = opts.subhash(:pattern) | {
       :cset  => @args[?a],
       :icase => @args[?i] != ?n,
@@ -31,25 +30,12 @@ class Utils::Finder
 
   attr_reader :output
 
-  def ascii_file?(stat, path)
-    stat.file? && (@binary || stat.size == 0 || File.ascii?(path))
-  end
-
   def search_index
     paths = load_paths
     search_paths(paths)
   end
 
   alias search search_index
-
-  def attempt_match?(path)
-    stat = path.stat
-    stat.symlink? and stat = path.lstat
-    stat.directory? || ascii_file?(stat, path)
-  rescue SystemCallError => e
-    warn "Caught #{e.class}: #{e}"
-    nil
-  end
 
   def build_paths
     paths = []
@@ -70,7 +56,6 @@ class Utils::Finder
       paths << filename
     end
     paths.uniq!
-    paths.select! { |path| attempt_match?(path) }
     paths
   end
 
@@ -148,6 +133,10 @@ class Utils::Finder
     end
     paths.compact!
     @paths, @output = paths.sort.transpose.values_at(-2, -1)
+    if n = @args[?n]&.to_i
+      @paths = @paths.first(n)
+      @output = @output.first(n)
+    end
     self
   end
 

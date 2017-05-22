@@ -39,9 +39,9 @@ Options are
   -a CSET     use only character set CSET from PATTERN
   -iX         use case insensitive matches with X=y (default) or not with X=n
   -I SUFFIX   only include files with suffix SUFFIX during finding
-  -b          match also binary files
   -d          match also directories
   -v          be verbose
+  -n NUMBER   the first NUMBER of matches is returned
   -h          display this help
 
 Version is #{File.basename($0)} #{Utils::VERSION}.
@@ -49,7 +49,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'I:i:a:p:creEbvdh'
+args = go 'n:I:i:a:p:creEvdh'
 args[?h] and usage
 
 Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args[?c]
