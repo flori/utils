@@ -7,17 +7,19 @@ module Utils
 
       CLASS_METHOD_REGEXP    = /\A([A-Z][\w:]+)([#.])([\w!?]+)/
 
-      FILE_LINENUMBER_REGEXP = /\A\s*([^:]+):(\d+)/
+      FILE_LINENUMBER_REGEXP = /\A\s*([^:]+):(\d+)-?(\d+)?/
 
       def source_location
         filename   = nil
         linenumber = nil
+        rangeend   = nil
         if respond_to?(:to_str)
           string = to_str
           case
           when string =~ FILE_LINENUMBER_REGEXP && File.exist?($1)
-            filename = $1
+            filename   = $1
             linenumber = $2.to_i
+            rangeend   = $3&.to_i
           when string =~ CLASS_METHOD_REGEXP && !File.exist?(string)
             klassname   = $1
             method_kind = $2 == '#' ? :instance_method : :method
@@ -35,7 +37,9 @@ module Utils
         array_singleton_class.instance_eval do
           define_method(:filename) { filename }
           define_method(:linenumber) { linenumber }
+          define_method(:rangeend) { rangeend }
           define_method(:to_s) { [ filename, linenumber ].compact * ':' }
+          define_method(:range) { rangeend ? "#{to_s}-#{rangeend}" : "#{to_s}" }
         end
         array
       end

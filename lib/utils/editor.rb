@@ -76,7 +76,7 @@ module Utils
       if filenames.size == 1 and
         source_location = filenames.first.source_location
       then
-        edit_source_location(source_location) # || edit_file(expand_globs(source_location[0, 1]))
+        edit_source_location(source_location)
       elsif source_locations = filenames.map(&:source_location).compact.full?
         filenames = expand_globs(source_locations.map(&:first))
         edit_file(*filenames)
@@ -99,17 +99,24 @@ module Utils
       edit_remote_file(*filenames)
     end
 
-    def edit_file_linenumber(filename, linenumber)
+    def edit_file_linenumber(filename, linenumber, rangeend = nil)
       make_dirs filename
       if wait?
         edit_remote_wait("+#{linenumber}", filename)
       else
         edit_remote("+#{linenumber}", filename)
       end
+      if rangeend
+        edit_remote_send("<ESC>:normal #{linenumber}GV#{rangeend}G<CR>")
+      end
     end
 
     def edit_source_location(source_location)
-      edit_file_linenumber(source_location[0], source_location[1])
+      edit_file_linenumber(
+        source_location.filename,
+        source_location.linenumber,
+        source_location.rangeend
+      )
     end
 
     def start
