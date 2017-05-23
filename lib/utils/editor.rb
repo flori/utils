@@ -73,6 +73,7 @@ module Utils
     end
 
     def edit(*filenames)
+      source_location = nil
       if filenames.size == 1 and
         source_location = filenames.first.source_location
       then
@@ -101,13 +102,18 @@ module Utils
 
     def edit_file_linenumber(filename, linenumber, rangeend = nil)
       make_dirs filename
+      if rangeend
+        Thread.new do
+          while !started?
+            sleep 1
+          end
+          edit_remote_send("<ESC>:normal #{linenumber}GV#{rangeend}G<CR>")
+        end
+      end
       if wait?
         edit_remote_wait("+#{linenumber}", filename)
       else
         edit_remote("+#{linenumber}", filename)
-      end
-      if rangeend
-        edit_remote_send("<ESC>:normal #{linenumber}GV#{rangeend}G<CR>")
       end
     end
 
@@ -147,7 +153,7 @@ module Utils
     end
 
     def serverlist
-      @serverlist ||= `#{vim.map(&:inspect) * ' '} --serverlist`.split
+      `#{vim.map(&:inspect) * ' '} --serverlist`.split
     end
 
     def started?(name = servername)
