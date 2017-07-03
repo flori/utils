@@ -28,6 +28,9 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
 end
 
 def cmd(*args)
+  if ENV.key?('BUNDLE_GEMFILE')
+    args.unshift 'bundle', 'exec'
+  end
   puts args * ' '
   system(*args) or exit $?.exitstatus
 end
@@ -35,13 +38,6 @@ end
 def find_cmd(*cmds)
   cmds.map { |c| `which #{c}`.full?(:chomp) }.compact.first or
     raise fail "no #{cmds * '|'} command found"
-end
-
-def zeus?
-  !`which zeus`.empty? && test(?S, '.zeus.sock')
-end
-singleton_class.class_eval do
-  memoize_function :zeus?
 end
 
 def spring?
@@ -57,9 +53,6 @@ def start_server
   Thread.abort_on_exception = $DEBUG
   spring? and
     puts "Found spring running, I'll try to use it for running tests."
-
-  zeus? and
-    puts "Found a zeus socket file, I'll try to use it for running tests."
 
   begin
     DRb.start_service
@@ -121,33 +114,22 @@ case ($opts[?t] || $config.probe.test_framework).to_sym
 when :rspec
   case
   when spring?
-    rspec = %w[bin/spring rspec -rutils -f Utils::LineFormatter ]
-  when zeus?
-    rspec = %w[-S zeus rspec -rutils -f Utils::LineFormatter ]
+    rspec = %w[ bin/spring rspec ]
   else
-    rspec = [ find_cmd('rspec', 'spec') ] << '-rutils' << '-f' <<
-      'Utils::LineFormatter'
+    rspec = [ find_cmd('rspec', 'spec') ]
   end
-  if linenumber = $opts[?n]
-    cmd 'ruby', '-I', $config.probe.include_dirs_argument, *rspec, '-l',
-      linenumber, *($args + testrunner_args)
-  else
-    $args = $args.map do |a|
-      if Utils::Editor::FILE_LINENUMBER_REGEXP =~ a
-        $~.captures * ':'
-      else
-        a
-      end
+  rspec << '-rutils' << '-f' << 'Utils::LineFormatter'
+  $args = $args.map do |a|
+    if Utils::Editor::FILE_LINENUMBER_REGEXP =~ a
+      $~.captures.compact * ':'
+    else
+      a
     end
-    cmd 'ruby', '-I', $config.probe.include_dirs_argument, *rspec,
-      *($args + testrunner_args)
   end
+  cmd 'ruby', '-I', $config.probe.include_dirs_argument, *rspec,
+    *($args + testrunner_args)
 when :'test-unit'
-  if zeus?
-    testrb = %w[-S zeus testrb]
-  else
-    testrb = find_cmd('testrb')
-  end
+  testrb = find_cmd('testrb')
   if testname = $opts[?n]
     cmd 'ruby', '-I', $config.probe.include_dirs_argument, *testrb,
       '-n', testname, *($args + testrunner_args)
@@ -176,7 +158,7 @@ when :cucumber
   else
     $args = $args.map do |a|
       if Utils::Editor::FILE_LINENUMBER_REGEXP =~ a
-        $~.captures * ':'
+        $~.captures.compact * ':'
       else
         a
       end
