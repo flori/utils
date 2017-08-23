@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+#
+require 'tins/xt'
+require 'set'
+
+$shortcuts = Set.new
+
+def shortcut(fn, suffix = nil)
+  shortcut = fn.scan(/([A-Z])[a-z]/).join.downcase
+  shortcut.empty? and return fn.gsub(' ', ?_)
+  shortcut = "#{shortcut}#{suffix}"
+  while $shortcuts.member?(shortcut)
+    shortcut.sub!(/(\d+)\z/) { $1.to_i + 1 }
+    shortcut.sub!(/\D\z/, '\\&1')
+  end
+  $shortcuts << shortcut
+  shortcut
+end
+
+vcf_path = ARGV.shift || '~/Desktop/Contacts.vcf'
+vcf_path = File.expand_path vcf_path
+alias_path = ARGV.shift || '~/.mutt-aliases'
+alias_path = File.expand_path alias_path
+
+File.secure_write(alias_path) do |aliases|
+  File.open(vcf_path) do |vcf|
+    until vcf.eof?
+      card = vcf.readline('END:VCARD')
+      fn = card[/^FN:(.*)/, 1] or next
+      fn.chomp!
+      hemail = card[/^EMAIL;.*?type=HOME.*?:(.*)/, 1]
+      wemail = card[/^EMAIL;.*?type=WORK.*?:(.*)/, 1]
+      if hemail && wemail
+        aliases.puts "alias #{shortcut(fn, ?h)} #{fn} <#{hemail.chomp}>"
+        aliases.puts "alias #{shortcut(fn, ?w)} #{fn} <#{wemail.chomp}>"
+      elsif email = hemail || wemail
+        aliases.puts "alias #{shortcut(fn)} #{fn} <#{email.chomp}>"
+      end
+    end
+  end
+end
