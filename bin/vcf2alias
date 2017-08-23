@@ -6,7 +6,7 @@ require 'set'
 $shortcuts = Set.new
 
 def shortcut(fn, suffix = nil)
-  shortcut = fn.scan(/([A-Z])[a-z]/).join.downcase
+  shortcut = fn.scan(/([A-ZÄÖÜ])[a-zäöü]/).join.downcase
   shortcut.empty? and return fn.gsub(' ', ?_)
   shortcut = "#{shortcut}#{suffix}"
   while $shortcuts.member?(shortcut)
@@ -19,8 +19,13 @@ end
 
 vcf_path = ARGV.shift || '~/Desktop/Contacts.vcf'
 vcf_path = File.expand_path vcf_path
-alias_path = ARGV.shift || '~/.mutt-aliases'
+alias_path = ARGV.shift || '~/.muttrc-aliases'
 alias_path = File.expand_path alias_path
+begin
+  real_alias_path = File.readlink alias_path
+  alias_path = real_alias_path
+rescue Errno::ENOENT
+end
 
 File.secure_write(alias_path) do |aliases|
   File.open(vcf_path) do |vcf|
@@ -29,11 +34,11 @@ File.secure_write(alias_path) do |aliases|
       fn = card[/^FN:(.*)/, 1] or next
       fn.chomp!
       hemail = card[/^EMAIL;.*?type=HOME.*?:(.*)/, 1]
+      hemail and aliases.puts "alias #{shortcut(fn, ?h)} #{fn} <#{hemail.chomp}>"
       wemail = card[/^EMAIL;.*?type=WORK.*?:(.*)/, 1]
-      if hemail && wemail
-        aliases.puts "alias #{shortcut(fn, ?h)} #{fn} <#{hemail.chomp}>"
-        aliases.puts "alias #{shortcut(fn, ?w)} #{fn} <#{wemail.chomp}>"
-      elsif email = hemail || wemail
+      wemail and aliases.puts "alias #{shortcut(fn, ?w)} #{fn} <#{wemail.chomp}>"
+      email = card[/^EMAIL;.*?:(.*)/, 1]
+      if email && ! [ hemail, wemail ].include?(email)
         aliases.puts "alias #{shortcut(fn)} #{fn} <#{email.chomp}>"
       end
     end
