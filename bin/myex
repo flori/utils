@@ -1,31 +1,40 @@
 #!/usr/bin/env ruby
+## vim: set ft=ruby et sw=2 ts=2:
 # encoding: ascii-8bit
 
 require 'tins/go'
 include Tins::GO
+require 'term/ansicolor'
+include Term::ANSIColor
 
 def usage
   puts <<EOT
-Usage: #{File.basename($0)} list|create|truncate|insert|replace [OPTION] [TABLES]
+Usage: #{File.basename($0)} list|create|truncate|insert|replace|search [OPTION] [TABLES]
 
   Commands are
-    - list:     display all tables in the backup
+    - list:       display all tables in the backup
 
-    - create:   display all create table statements in the backup. If TABLES
-                are given, display only those statements.
-      -d        if this OPTION is given, first drop the table (if it exists)
-                before creation.
+    - create:     display all create table statements in the backup. If TABLES
+                  are given, display only those statements.
+      -d          if this OPTION is given, first drop the table (if it exists)
+                  before creation.
 
-    - truncate: all tables or the given TABLES, if they exist.
+    - truncate:   all tables or the given TABLES, if they exist.
 
-    - insert:   extract insert statemnts from the backup. If TABLES are given,
-                extract only those statements for these TABLES.
-      -t        if this OPTION is given, truncate the table, before starting
-                to insert.
+    - insert:     extract insert statemnts from the backup. If TABLES are given,
+                  extract only those statements for these TABLES.
+      -t          if this OPTION is given, truncate the table, before starting
+                  to insert.
 
-    - replace:  extract insert statemnts from the backup, and convert them
-                into replace statements. If TABLES are given, extract only
-                those statements for these TABLES.
+    - replace:    extract insert statemnts from the backup, and convert them
+                  into replace statements. If TABLES are given, extract only
+                  those statements for these TABLES.
+
+    - search:     search the insert statements from the backup matching the
+                  pattern given with the -p option and output them in a context
+                  of the size (as number of characters) given via the -C option.
+      -p PATTERN the pattern to match.
+      -C NUMBER  the NUMBER of characters for the context.
 EOT
   exit 1
 end
@@ -38,7 +47,7 @@ def bell(n = 1, s = 1)
 end
 
 cmd = ARGV.shift or usage
-opts = go('dtDi')
+opts = go('dtDiC:p:')
 
 STDOUT.sync = true
 STDIN.set_encoding 'ascii-8bit'
@@ -88,6 +97,20 @@ when 'replace'
     table = $1
     puts stmt.sub(/^INSERT INTO `(?:[^`]+)`/, "REPLACE INTO `#{table}`")
     warn "Replaced into table #{table}."
+  end
+when 'search'
+  pattern = opts[?p] or usage
+  c = (opts[?C] || 20).to_i
+  STDIN.each_line do |l|
+    if l =~ /^INSERT INTO `(#{ARGV.empty? ? '[^`]+' : ARGV * '|'})`.*?(#{pattern})/
+      table   = $1
+      match   = $2
+      context = l[ [ $~.begin(2) - c, 0 ].max..($~.end(2) + c) ]
+      context.sub!(match, bold(match))
+      table.encode!('UTF-8', undef: :replace, invalid: :replace)
+      context.encode!('UTF-8', undef: :replace, invalid: :replace)
+      puts "#{table}: …#{context}…"
+    end
   end
 else
   usage
