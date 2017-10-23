@@ -77,7 +77,11 @@ module Utils
       if filenames.size == 1 and
         source_location = filenames.first.source_location
       then
-        edit_source_location(source_location)
+        if source_location.respond_to?(:filename) and source_location.respond_to?(:linenumber)
+          edit_source_location(source_location)
+        else
+          edit_file_linenumber(*source_location)
+        end
       elsif source_locations = filenames.map(&:source_location).compact.full?
         filenames = expand_globs(source_locations.map(&:first))
         edit_file(*filenames)
