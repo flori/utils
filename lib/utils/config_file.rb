@@ -133,6 +133,8 @@ class Utils::ConfigFile
     config :skip_files, /(\A\.|\.sw[pon]\z|\.log\z|~\z)/
 
     config :binary, false
+
+    config :max_matches, 10
   end
 
   def discover(&block)

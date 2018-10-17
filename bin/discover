@@ -57,6 +57,7 @@ STDOUT.sync = true
 config = Utils::ConfigFile.new
 config.configure_from_paths
 args[?b] ||= config.discover.binary
+args[?n] ||= config.discover.max_matches
 
 pattern = ARGV.shift || ''
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }
