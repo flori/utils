@@ -1,14 +1,14 @@
 # -*- encoding: utf-8 -*-
-# stub: utils 0.10.1 ruby lib
+# stub: utils 0.11.0 ruby lib
 
 Gem::Specification.new do |s|
   s.name = "utils".freeze
-  s.version = "0.10.1"
+  s.version = "0.11.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Florian Frank".freeze]
-  s.date = "2018-10-17"
+  s.date = "2018-10-31"
   s.description = "This ruby gem provides some useful command line utilities".freeze
   s.email = "flori@ping.de".freeze
   s.executables = ["discover".freeze, "classify".freeze, "sedit".freeze, "irb_connect".freeze, "ascii7".freeze, "path".freeze, "enum".freeze, "unquarantine_apps".freeze, "ssh-tunnel".freeze, "xmp".freeze, "brakeman2err".freeze, "search".freeze, "chroot-exec".freeze, "edit".freeze, "tmproc".freeze, "json_check".freeze, "edit_wait".freeze, "errf".freeze, "untest".freeze, "blameline".freeze, "remote_copy".freeze, "git-empty".freeze, "vacuum_firefox_sqlite".freeze, "same_files".freeze, "chroot-libs".freeze, "git-versions".freeze, "strip_spaces".freeze, "number_files".freeze, "rssr".freeze, "serve".freeze, "vcf2alias".freeze, "on_change".freeze, "utils-utilsrc".freeze, "myex".freeze, "long_lines".freeze, "dialog-pick".freeze, "probe".freeze, "create_tags".freeze]

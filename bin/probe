@@ -35,9 +35,8 @@ def cmd(*args)
   system(*args) or exit $?.exitstatus
 end
 
-def find_cmd(*cmds)
-  cmds.map { |c| `which #{c}`.full?(:chomp) }.compact.first or
-    raise fail "no #{cmds * '|'} command found"
+def find_cmd(*cmds, on_fail: -> *cmds { raise fail "no #{cmds * '|'} command found" })
+  cmds.map { |c| `which #{c}`.full?(:chomp) }.compact.first or on_fail.(*cmds)
 end
 
 def spring?
@@ -129,23 +128,25 @@ when :rspec
   cmd 'ruby', '-I', $config.probe.include_dirs_argument, *rspec,
     *($args + testrunner_args)
 when :'test-unit'
-  testrb = find_cmd('testrb')
   if testname = $opts[?n]
-    cmd 'ruby', '-I', $config.probe.include_dirs_argument, *testrb,
-      '-n', testname, *($args + testrunner_args)
+    cmd 'ruby', '-I', $config.probe.include_dirs_argument,
+      *($args + testrunner_args), '-n', testname
   else
+    $args = $args.inject([]) { |args, a|
+      args.push(*File.directory?(a) ? Dir[File.join(a, ?*)] : a)
+    }
     for filename in $args
       sl = filename.source_location
       if sl.linenumber
         lf = Tins::LinesFile.for_filename(*sl)
         if testname = lf.match_backward(/def\s+(\S+?)(?:\(|\s*$)/).full?(:first)
-          cmd 'ruby', '-I', $config.probe.include_dirs_argument, *testrb,
-            '-n', testname, sl.filename, *testrunner_args
+          cmd 'ruby', '-I', $config.probe.include_dirs_argument,
+            sl.filename, *testrunner_args, '-n', testname
         else
           warn "no test found before line #{sl.linenumber}"
         end
       else
-        cmd 'ruby', '-I', $config.probe.include_dirs_argument, *testrb,
+        cmd 'ruby', '-I', $config.probe.include_dirs_argument,
           sl.filename, *testrunner_args
       end
     end
