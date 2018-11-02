@@ -5,7 +5,7 @@ include Utils
 require 'tins/xt'
 include Tins::GO
 
-def edit_files(paths, pick: false)
+def edit_files(*paths, pick: false, wait: true)
   editor = Utils::Editor.new
   if pick
     if paths.size > 1
@@ -17,7 +17,7 @@ def edit_files(paths, pick: false)
     end
     editor.edit(path.strip)
   else
-    editor.wait = true
+    editor.wait = wait
     editor.edit(*paths)
   end
 end
@@ -49,7 +49,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'n:I:i:a:p:creEvdh'
+args = go 'n:I:i:a:p:creEvdsh'
 args[?h] and usage
 
 Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args[?c]
@@ -59,28 +59,57 @@ config.configure_from_paths
 args[?b] ||= config.discover.binary
 args[?n] ||= config.discover.max_matches
 
-pattern = ARGV.shift || ''
+if args[?s]
+  pattern = ''
+else
+  pattern = ARGV.shift || ''
+end
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }
 
-finder = Finder.new(
-  :pattern => pattern,
-  :args    => args,
-  :roots   => roots,
-  :config  => config
-)
+finder = -> * {
+  Finder.new(
+    :pattern => pattern,
+    :args    => args,
+    :roots   => roots,
+    :config  => config
+  )
+}
 
 case
+when args[?s]
+  f = nil
+  pattern = pattern.dup
+  args[?n] = Term::ANSIColor.terminal_lines - 1
+  path = nil
+  found = Utils::InteractiveSearch.new(
+    query: -> answer {
+      pattern.replace answer
+      f = finder.()
+      f.search.output.join(?\n)
+    },
+    found: -> answer {
+      f and path = f.paths.first
+    },
+    output: STDERR
+  ).start
+  if found
+    if args[?e]
+      edit_files path, wait: false
+    else
+      found and puts path
+    end
+    exit 0
+  else
+    exit 1
+  end
+when args[?E]
+  edit_files *finder.().paths, pick: true
+when args[?e]
+  edit_files *finder.().search.paths
 when pattern.empty? && args[?r]
   exit
 when pattern.empty?
   usage
-when args[?E]
-  finder.search
-  edit_files finder.paths, pick: true
-when args[?e]
-  finder.search
-  edit_files finder.paths
 else
-  finder.search
-  puts finder.output
+  puts finder.().search.output
 end

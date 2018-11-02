@@ -134,8 +134,8 @@ class Utils::Finder
     paths.compact!
     @paths, @output = paths.sort.transpose.values_at(-2, -1)
     if n = @args[?n]&.to_i
-      @paths = @paths.first(n)
-      @output = @output.first(n)
+      @paths = @paths&.first(n) || []
+      @output = @output&.first(n) || []
     end
     self
   end
