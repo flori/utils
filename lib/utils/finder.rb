@@ -3,6 +3,7 @@ require 'tins/xt'
 require 'tempfile'
 require 'digest/md5'
 require 'fileutils'
+require 'mize'
 
 class ::File
   include Utils::FileXt
@@ -76,6 +77,7 @@ class Utils::Finder
     paths
   end
 
+  memoize method:
   def load_paths
     lines = File.readlines(index_path)
     @args[?v] and warn "Loaded index #{index_path.inspect}."
@@ -90,6 +92,7 @@ class Utils::Finder
     path = index_path
     @args[?v] and warn "Resetting index #{path.inspect}."
     FileUtils.rm_f path
+    mize_cache_clear
   end
 
   def search_index
