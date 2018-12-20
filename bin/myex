@@ -21,12 +21,12 @@ Usage: #{File.basename($0)} list|create|truncate|insert|replace|search [OPTION] 
 
     - truncate:   all tables or the given TABLES, if they exist.
 
-    - insert:     extract insert statemnts from the backup. If TABLES are given,
+    - insert:     extract insert statements from the backup. If TABLES are given,
                   extract only those statements for these TABLES.
       -t          if this OPTION is given, truncate the table, before starting
                   to insert.
 
-    - replace:    extract insert statemnts from the backup, and convert them
+    - replace:    extract insert statements from the backup, and convert them
                   into replace statements. If TABLES are given, extract only
                   those statements for these TABLES.
 

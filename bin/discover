@@ -24,7 +24,7 @@ end
 
 def usage
   puts <<-EOT
-Usage: #{File.basename($0)} [OPTS] PATTERN [PATHS]
+Usage: #{File.basename($0)} [OPTS] [PATTERN] [PATHS]
 
 PATTERN is a pattern expression which is find the files. PATHS are the
 directory and file paths that are searched.
@@ -42,6 +42,7 @@ Options are
   -d          match also directories
   -v          be verbose
   -n NUMBER   the first NUMBER of matches is returned
+  -s          search by interactively inputting PATTERN
   -h          display this help
 
 Version is #{File.basename($0)} #{Utils::VERSION}.
