@@ -50,7 +50,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'n:I:i:a:p:creEvdsh'
+args = go 'n:I:i:a:p:creEvdsDh'
 args[?h] and usage
 
 Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args[?c]
@@ -107,6 +107,17 @@ when args[?E]
   edit_files *finder.().paths, pick: true
 when args[?e]
   edit_files *finder.().search.paths
+when args[?D]
+  args[?d] = true
+  paths = finder.().load_paths.select { |p| File.directory?(p) }.reverse
+  leaf_dirs = []
+  until paths.empty?
+    path = paths.shift
+    unless leaf_dirs.any? { |ld| ld.start_with?(path) }
+      leaf_dirs.push path
+    end
+  end
+  puts leaf_dirs
 when pattern.empty? && args[?r]
   exit
 when pattern.empty?
