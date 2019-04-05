@@ -40,6 +40,7 @@ Options are
   -iX         use case insensitive matches with X=y (default) or not with X=n
   -I SUFFIX   only include files with suffix SUFFIX during finding
   -d          match also directories
+  -D          list all search leaf directories
   -v          be verbose
   -n NUMBER   the first NUMBER of matches is returned
   -s          search by interactively inputting PATTERN
