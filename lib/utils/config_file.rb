@@ -144,6 +144,21 @@ class Utils::ConfigFile
     @discover ||= Discover.new
   end
 
+  class Scope < FileFinder
+    config :prune_dirs, /\A(\.svn|\.git|CVS|tmp)\z/
+
+    config :skip_files, /(\A\.|\.sw[pon]\z|\.log\z|~\z)/
+
+    config :binary, false
+  end
+
+  def scope(&block)
+    if block
+      @scope = Scope.new(&block)
+    end
+    @scope ||= Scope.new
+  end
+
   class StripSpaces < FileFinder
     config :prune_dirs, /\A(\..*|CVS)\z/
 

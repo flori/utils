@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+require 'utils'
+require 'infobar'
+
+config = Utils::ConfigFile.new
+config.configure_from_paths
+
+roots = %w[ . ] + `bundle list --paths`.lines.map(&:chomp)
+
+IO.popen('cscope 2>/dev/null -R -b -i - -f cscope.out', 'w') do |scope|
+  finder = Utils::Finder.new(
+    pattern: '',
+    roots:   roots,
+    config:  config,
+  )
+  finder.search.paths.with_infobar(label: 'Collecting files') do |path|
+    scope.puts path
+    +infobar
+  end
+
+  infobar.newline
+  Infobar.busy(label: 'Creating cstags') do
+    scope.close
+  end
+end
+
+if megabytes = File.size('cscope.out').to_f / 1024 ** 2 rescue nil
+  infobar.puts 'Created %.3fM of cstags.' % megabytes
+end
