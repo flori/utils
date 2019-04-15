@@ -18,7 +18,7 @@ GemHadar do
 
   dependency  'tins',           '~>1.14'
   dependency  'term-ansicolor', '~>1.3'
-  dependency  'pstree',         '~>0.1'
+  dependency  'pstree',         '~>0.3'
   dependency  'pry-editline'
   dependency  'infobar'
   dependency   'mize'
