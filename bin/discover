@@ -120,6 +120,7 @@ when args[?D]
   end
   puts leaf_dirs
 when pattern.empty? && args[?r]
+  finder.()
   exit
 when pattern.empty?
   usage
