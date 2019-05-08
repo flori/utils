@@ -24,7 +24,7 @@ class Utils::Finder
     }
     @pattern = choose(@args[?p], pattern_opts)
     @paths  = []
-    @args[?r] and reset_index
+    reset_index
   end
 
   attr_reader :paths
@@ -90,9 +90,12 @@ class Utils::Finder
 
   def reset_index
     path = index_path
-    @args[?v] and warn "Resetting index #{path.inspect}."
-    FileUtils.rm_f path
-    mize_cache_clear
+    if @args[?r] || index_expired?(path)
+      @args[?v] and warn "Resetting index #{path.inspect}."
+      FileUtils.rm_f path
+      mize_cache_clear
+    end
+    self
   end
 
   def search_index
@@ -144,6 +147,16 @@ class Utils::Finder
   end
 
   private
+
+  def index_expired?(path)
+    if duration = @config.discover.index_expire_after
+      Time.now - duration >= File.mtime(path)
+    else
+      false
+    end
+  rescue Errno::ENOENT
+    false
+  end
 
   def discover_roots(roots)
     roots ||= []

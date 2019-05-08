@@ -135,6 +135,8 @@ class Utils::ConfigFile
     config :binary, false
 
     config :max_matches, 10
+
+    config :index_expire_after
   end
 
   def discover(&block)
