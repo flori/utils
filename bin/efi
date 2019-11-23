@@ -1,0 +1,58 @@
+#!/usr/bin/env ruby
+
+require 'json'
+require 'term/ansicolor'
+class String
+  include Term::ANSIColor
+end
+
+alias old_x `
+
+$output = false
+public def o
+  $output ^= true
+end
+
+def `(cmd)
+  prompt = cmd =~ /\A\s*sudo/ ? ?# : ?$
+  output = old_x cmd
+  if $?.success?
+    print "#{prompt} #{cmd}".green
+    $output or puts " >/dev/null".yellow
+  else
+    print "#{prompt} #{cmd}".red
+    $output or puts " >/dev/null".yellow
+    STDERR.puts "command #{cmd.inspect} failed with exit status #{$?.exitstatus}".on_red.white
+  end
+  if $output
+    print output.bold
+  end
+  output
+end
+
+value   = `bdmesg`.lines.find { |l| l =~ /SelfDevicePath=(.*)\r/ and break $1 }
+uuid    = value.split('\\').last[/(?:<?GPT,)([\h-]+)/, 1] or exit 1
+dev     = `partutil --search-uuid #{uuid}`.chomp
+volname = `partutil --show-volumename #{dev}`.chomp
+disk    = `partutil --show-wholedisk #{dev}`.chomp
+sdisk   = `diskutil list #{disk}`.lines.grep(/Apple_APFS/).first.split(/\s+/)[4]
+vols    = `diskutil list #{sdisk}`.lines.grep(/^\s*[1-9]\d*:/).join.scan(/(?:<?Volume\s+)(\S+)/).flatten
+
+puts "Bootdisk information".bold.yellow, JSON.pretty_generate(
+  { dev: dev, volname: volname, uuid: uuid, disk: disk, sdisk: sdisk, vols: vols }
+).bold
+
+case ARGV.shift
+when 'mount'
+  `sudo diskutil mount #{dev}`
+when /\Aun?mount\z/
+  `sudo diskutil unmount #{dev}`
+when /\Abackup_un?mount\z/
+  `sudo diskutil unmount "BACKUP EFI"`
+when 'backup_mount'
+  `sudo diskutil mount "BACKUP EFI"`
+when /\Aorig_un?mount\z/
+  `sudo diskutil unmount "EFI"`
+when 'orig_mount'
+  `sudo diskutil mount "EFI"`
+end
