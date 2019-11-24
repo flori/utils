@@ -18,16 +18,28 @@ def `(cmd)
   output = old_x cmd
   if $?.success?
     print "#{prompt} #{cmd}".green
-    $output or puts " >/dev/null".yellow
+    puts $output ? "" : " >/dev/null".yellow
   else
     print "#{prompt} #{cmd}".red
-    $output or puts " >/dev/null".yellow
+    puts $output ? "" : " >/dev/null".yellow
     STDERR.puts "command #{cmd.inspect} failed with exit status #{$?.exitstatus}".on_red.white
   end
   if $output
     print output.bold
   end
   output
+end
+
+def clone(from:, to:)
+  `sudo diskutil mount "#{from}"`
+  `sudo diskutil mount "#{to}"`
+  `rsync -nav --exclude ".*" --delete "/Volumes/#{from}/" "/Volumes/#{to}/"`
+  print "This will be copied/deleted. Really do it? (y/n) ".bold.yellow
+  if gets !~ /\Ay/i
+    puts " *** Interrupted.".bold.yellow
+    exit 1
+  end
+  `rsync -av --exclude ".*" --delete "/Volumes/#{from}/" "/Volumes/#{to}/"`
 end
 
 value   = `bdmesg`.lines.find { |l| l =~ /SelfDevicePath=(.*)\r/ and break $1 }
@@ -42,17 +54,22 @@ puts "Bootdisk information".bold.yellow, JSON.pretty_generate(
   { dev: dev, volname: volname, uuid: uuid, disk: disk, sdisk: sdisk, vols: vols }
 ).bold
 
+o
 case ARGV.shift
 when 'mount'
-  `sudo diskutil mount #{dev}`
+  `sudo diskutil mount "#{dev}"`
 when /\Aun?mount\z/
-  `sudo diskutil unmount #{dev}`
+  `sudo diskutil unmount "#{dev}"`
 when /\Abackup_un?mount\z/
-  `sudo diskutil unmount "BACKUP EFI"`
+  `sudo diskutil unmount "BACKUP_EFI"`
 when 'backup_mount'
-  `sudo diskutil mount "BACKUP EFI"`
+  `sudo diskutil mount "BACKUP_EFI"`
 when /\Aorig_un?mount\z/
   `sudo diskutil unmount "EFI"`
 when 'orig_mount'
   `sudo diskutil mount "EFI"`
+when 'backup'
+  clone from: 'EFI', to: 'BACKUP_EFI'
+when 'restore'
+  clone from: 'BACKUP_EFI', to: 'EFI'
 end
