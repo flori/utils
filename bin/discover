@@ -84,13 +84,13 @@ when args[?s]
   args[?n] = Term::ANSIColor.terminal_lines - 1
   path = nil
   found = Utils::SearchUI.new(
-    query: -> answer {
+    query: -> answer, selector {
       pattern.replace answer
       f = finder.()
-      f.search.output.join(?\n)
+      f.search.output.each_with_index.map { |l, i| (i == selector ? '> ' : '  ') + l }.join(?\n)
     },
-    found: -> answer {
-      f and path = f.paths.first
+    found: -> answer, selector {
+      f and path = f.paths[selector]
     },
     output: STDERR
   ).start
