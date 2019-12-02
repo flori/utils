@@ -83,7 +83,7 @@ when args[?s]
   pattern = pattern.dup
   args[?n] = Term::ANSIColor.terminal_lines - 1
   path = nil
-  found = Utils::InteractiveSearch.new(
+  found = Utils::SearchUI.new(
     query: -> answer {
       pattern.replace answer
       f = finder.()
