@@ -1,5 +1,6 @@
 require 'term/ansicolor'
-class Utils::InteractiveSearch
+
+class Utils::SearchUI
   include Term::ANSIColor
 
   def initialize(query:, found:, output: STDOUT, prompt: 'Search? %s')
@@ -11,20 +12,24 @@ class Utils::InteractiveSearch
   end
 
   def start
-    @output.print clear_screen
+    @output.print clear_screen, move_home, reset
     loop do
-      @output.print move_home(@prompt % @answer)
+      @output.print move_home { @prompt % @answer }
       case getc
       when true
-        @output.print clear_screen move_home reset
-        return !!@found.(@answer)
+        @output.print clear_screen, move_home, reset
+        if result = @found.(@answer)
+          return result
+        else
+          return nil
+        end
       when false
-        return false
+        return nil
       end
       result = @query.(@answer)
       @output.print clear_screen
       unless @answer.empty?
-        @output.print clear_screen move_to_line(2, result)
+        @output.print move_home { ?\n + result }
       end
     end
   end
@@ -45,6 +50,7 @@ class Utils::InteractiveSearch
       nil
     when "\v"
       @answer.clear
+      nil
     when /\A[\x00-\x1f]\z/
       nil
     else
