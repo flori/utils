@@ -19,7 +19,6 @@ GemHadar do
   dependency  'tins',           '~>1.14'
   dependency  'term-ansicolor', '~>1.3'
   dependency  'pstree',         '~>0.3'
-  dependency  'pry-editline'
   dependency  'infobar'
   dependency   'mize'
 
@@ -40,6 +39,6 @@ GemHadar do
         install(file, bindir, :mode => 0755)
       end
     end
-    ENV['NO_GEMS'].to_i == 1 or sh 'gem install tins term-ansicolor pstree pry-editline infobar mize'
+    ENV['NO_GEMS'].to_i == 1 or sh 'gem install tins term-ansicolor pstree infobar mize'
   end
 end
