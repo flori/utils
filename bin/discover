@@ -51,7 +51,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'n:I:i:a:p:creEvdsDh'
+args = go 'n:I:i:a:p:creEvdsDh', defaults: { ?a => '\\w' }
 args[?h] and usage
 
 Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args[?c]
