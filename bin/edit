@@ -43,10 +43,6 @@ editor = Editor.new do |c|
   c.mkdir = $opt[?m]
 end
 
-if ENV['TMUX']
-  system "tmux rename-window #{File.basename($0)}"
-end
-
 if $opt[?l]
   puts editor.serverlist
   exit 0

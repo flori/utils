@@ -15,12 +15,11 @@ module Utils
       yield self if block_given?
     end
 
-    def derive_server_name
+    private def derive_server_name
       name = ENV['VIM_SERVER'] || Dir.pwd
       RbConfig::CONFIG['host_os'] =~ /mswin|mingw/ and name = "G_#{name}"
       name.upcase
     end
-    private :derive_server_name
 
     attr_accessor :pause_duration
 
@@ -90,14 +89,13 @@ module Utils
       end
     end
 
-    def make_dirs(*filenames)
+    private def make_dirs(*filenames)
       if mkdir
         for filename in filenames
           FileUtils.mkdir_p File.dirname(filename)
         end
       end
     end
-    private :make_dirs
 
     def edit_file(*filenames)
       make_dirs(*filenames)
@@ -129,7 +127,13 @@ module Utils
       )
     end
 
+    private def rename_window
+      return if started?
+      ENV['TMUX'] and system "tmux rename-window #{File.basename($0)}"
+    end
+
     def start
+      rename_window
       started? or cmd(*vim, '--servername', servername)
     end
 
@@ -165,14 +169,17 @@ module Utils
     end
 
     def edit_remote(*args)
+      rename_window
       cmd(*vim, '--servername', servername, '--remote', *args)
     end
 
-    def edit_remote_wait(*args)
+    def edit_remote(*args)
+      rename_window
       cmd(*vim, '--servername', servername, '--remote-wait', *args)
     end
 
     def edit_remote_send(*args)
+      rename_window
       cmd(*vim, '--servername', servername, '--remote-send', *args)
     end
 
