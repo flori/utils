@@ -4,6 +4,8 @@ require 'utils'
 include Utils
 require 'tins/xt'
 include Tins::GO
+require 'search_ui'
+include SearchUI
 
 def edit_files(*paths, pick: false, wait: true)
   editor = Utils::Editor.new
@@ -83,22 +85,28 @@ when args[?s]
   pattern = pattern.dup
   args[?n] = Term::ANSIColor.terminal_lines - 1
   path = nil
-  found = Utils::SearchUI.new(
-    query: -> answer, selector {
+  found = Search.new(
+    match: -> answer {
       pattern.replace answer
       f = finder.()
-      f.search.output.each_with_index.map { |l, i| (i == selector ? '> ' : '  ') + l }.join(?\n)
+      matches = f.search.output
+      matches.first(Tins::Terminal.lines - 1)
     },
-    found: -> answer, selector {
-      f and path = f.paths[selector]
+    query: -> _answer, matches, selector {
+      matches.each_with_index.map { |l, i| (i == selector ? '> ' : '  ') + l }.join(?\n)
+    },
+    found: -> _answer, matches, selector {
+      if f
+        path = f.paths[selector]
+      end
     },
     output: STDERR
   ).start
   if found
     if args[?e]
-      edit_files path, wait: false
+      edit_files found, wait: false
     else
-      found and puts path
+      found and puts found
     end
     exit 0
   else

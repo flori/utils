@@ -20,7 +20,8 @@ GemHadar do
   dependency  'term-ansicolor', '~>1.3'
   dependency  'pstree',         '~>0.3'
   dependency  'infobar'
-  dependency   'mize'
+  dependency  'mize'
+  dependency  'search_ui'
 
   install_library do
     libdir = CONFIG["sitelibdir"]
