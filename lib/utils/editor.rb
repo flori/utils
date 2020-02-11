@@ -173,7 +173,7 @@ module Utils
       cmd(*vim, '--servername', servername, '--remote', *args)
     end
 
-    def edit_remote(*args)
+    def edit_remote_wait(*args)
       rename_window
       cmd(*vim, '--servername', servername, '--remote-wait', *args)
     end
