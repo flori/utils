@@ -14,8 +14,7 @@ Options are
 
   -e CODE       CODE is execute on the remote irb
   -l PATH       load file PATH into remote irb context
-  -r HOSTNAME   name of the remote host (defaults to #{Utils::IRB::Service.hostname})
-  -p PORTNUMBER number of the remote port (defaults to #{Utils::IRB::Service.port})
+  -u URL        druby url to connect to
   -h            display this help
 
 Version is #{File.basename($0)} #{Utils::VERSION}.
@@ -24,10 +23,10 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
 end
 
 
-$opts = go 'e:r:p:l:h'
+$opts = go 'e:u:l:h'
 $opts[?h] and usage
 
-proxy = Utils::IRB::Service.connect($opts[?r], $opts[?p])
+proxy = Utils::IRB::Service.connect($opts[?u])
 case
 when load_path = $opts[?l]
   proxy.load(load_path)

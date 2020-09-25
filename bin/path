@@ -35,4 +35,4 @@ end
 
 path.uniq!
 
-puts "#{'export ' if $opt[?e]}PATH=#{path * path_separator}"
+puts "#{'export ' if $opts[?e]}PATH=#{path * path_separator}"
