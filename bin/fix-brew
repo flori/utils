@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 PREFIX=$(brew --prefix)
 sudo chgrp -R brew $PREFIX
