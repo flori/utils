@@ -1,0 +1,5 @@
+#!/bin/sh
+
+PREFIX=$(brew --prefix)
+sudo chgrp -R brew $PREFIX
+sudo chmod -R g+w $PREFIX
