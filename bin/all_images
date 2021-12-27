@@ -38,7 +38,7 @@ def provide_image(image, dockerfile)
         #{dockerfile}
       end
     end
-    sh "docker build -t '#{tag}' ."
+    sh "docker build --pull -t '#{tag}' ."
   end
   tag
 ensure
