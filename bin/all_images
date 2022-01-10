@@ -1,20 +1,23 @@
 #!/usr/bin/env ruby
 # Configure like so:
-# dockerfile: |-
-#   RUN apk add --no-cache build-base git
-#   RUN gem install gem_hadar bundler
-# 
-# script: &script |-
-#   ruby -v
-#   rake test
-# 
-# images:
-#   ruby:3.0-alpine: *script
-#   ruby:2.7-alpine: *script
-#   ruby:2.6-alpine: *script
-#   ruby:2.5-alpine: *script
-#   ruby:2.4-alpine: *script
-#   ruby:2.3-alpine: *script
+#dockerfile: |-
+#  RUN apk add --no-cache build-base git
+#  RUN gem install gem_hadar bundler
+#
+#script: &script |-
+#  echo -e "\e[1m"
+#  ruby -v
+#  bundle
+#  echo -e "\e[0m"
+#  if rake test
+#
+#images:
+#  ruby:3.0-alpine: *script
+#  ruby:2.7-alpine: *script
+#  ruby:2.6-alpine: *script
+#  ruby:2.5-alpine: *script
+#  ruby:2.4-alpine: *script
+#  ruby:2.3-alpine: *script
 
 require 'yaml'
 require 'tmpdir'
