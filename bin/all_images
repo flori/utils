@@ -28,7 +28,8 @@ include FileUtils
 alias sh system
 
 def provide_image(image, dockerfile)
-  tag = "all_images/#{image}"
+  prefix = $config.fetch('prefix', File.basename(Dir.pwd))
+  tag = "#{prefix}/all_images/#{image}"
   sh "docker pull '#{image}'"
   build_dir = File.join(Dir.tmpdir, 'build')
   mkdir_p build_dir
@@ -57,9 +58,9 @@ def green(string)
   "\e[32m#{string}\e[0m"
 end
 
-config = YAML.load_file(ARGV.shift || '.all_images.yml')
-dockerfile = config['dockerfile'].to_s
-Array(config['images']).each do |image, script|
+$config = YAML.load_file(ARGV.shift || '.all_images.yml')
+dockerfile = $config['dockerfile'].to_s
+Array($config['images']).each do |image, script|
   tag = provide_image image, dockerfile
   if sh "docker run --name all_images -v `pwd`:/work '#{tag}' sh -c '#{script}'"
     puts green('SUCCESS')
