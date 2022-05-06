@@ -15,6 +15,7 @@ GemHadar do
   ignore      '.*.sw[pon]', 'pkg', 'Gemfile.lock', '.rvmrc', '.AppleDouble',
     'tags', '.bundle', '.DS_Store', '.byebug_history'
   readme      'README.md'
+  licenses << 'GPL-2.0'
 
   dependency  'tins',           '~>1.14'
   dependency  'term-ansicolor', '~>1.3'
