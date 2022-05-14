@@ -24,6 +24,7 @@ GemHadar do
   dependency  'infobar'
   dependency  'mize'
   dependency  'search_ui'
+  dependency  'all_images'
 
   install_library do
     libdir = CONFIG["sitelibdir"]
