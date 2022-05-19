@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+
+format = -> s {
+  if /^\((?<f>[^)]+)\):\ (?<m>.*?) at line (?<l>\d+) column (?<c>\d+)/ =~ s
+    [ f, l, c, m ] * ?:
+  else
+    s
+  end
+}
+
+if filename = ARGV.first
+  begin
+    yaml = YAML.load_file(filename).to_yaml
+    ENV['DEBUG'].to_i == 1 and puts yaml
+    puts 'ok'
+  rescue => e
+    STDERR.puts format.(e.message)
+    puts 'nak'
+    exit 1
+  end
+else
+  string = STDIN.read
+  begin
+    yaml = YAML.load(string).to_yaml
+    ENV['DEBUG'].to_i == 1 and puts yaml
+    puts 'ok'
+  rescue => e
+    STDERR.puts format.(e.message)
+    puts 'nak'
+    exit 1
+  end
+end
