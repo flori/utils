@@ -156,11 +156,12 @@ class Utils::Grepper
   def search
     suffixes = Array(@args[?I])
     visit = -> filename {
-      s  = filename.stat
+      s  = filename.lstat
       bn = filename.pathname.basename
       if !s ||
           s.directory? && @config.search.prune?(bn) ||
-          s.file? && @config.search.skip?(bn)
+          (s.file? || s.symlink?) && @config.search.skip?(bn) ||
+          @args[?F] && s.symlink?
       then
         @args[?v] and warn "Pruning #{filename.inspect}."
         prune

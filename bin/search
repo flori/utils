@@ -116,6 +116,7 @@ Options are
   -B NUMBER   displays NUMBER lines of context before the match
   -C NUMBER   displays NUMBER lines of context around the match
   -f          just list the paths of the files that would be searched
+  -F          just consider real files when searching
   -l          just list the paths of the files with matches
   -L          list only the path:linenumber of the files with matches
   -pX         interpret PATTERN argument as X=f fuzzy or X=r for regexp
@@ -136,7 +137,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'r:p:I:A:B:C:s:S:n:N:a:i:cflLeEvbgh'
+args = go 'r:p:I:A:B:C:s:S:n:N:a:i:cfFlLeEvbgh'
 args[?h] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }
