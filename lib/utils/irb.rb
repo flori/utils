@@ -276,7 +276,7 @@ module Utils
           expired = Time.now - start
           diffs = cur.zip(pre).map { |c, p| c - p }
           rates = diffs.map { |d| d / duration }
-          warn "#{expired} #{cur.zip(rates, diffs).map(&:inspect) * ' '} # / per sec."
+          warn "#{expired} #{cur.zip(diffs, rates).map(&:inspect) * ' '} 𝝙 / per sec."
           pre = cur.map(&:to_f)
           sleep duration
         end
