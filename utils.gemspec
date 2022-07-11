@@ -1,14 +1,14 @@
 # -*- encoding: utf-8 -*-
-# stub: utils 0.30.1 ruby lib
+# stub: utils 0.30.2 ruby lib
 
 Gem::Specification.new do |s|
   s.name = "utils".freeze
-  s.version = "0.30.1"
+  s.version = "0.30.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Florian Frank".freeze]
-  s.date = "2022-07-07"
+  s.date = "2022-07-11"
   s.description = "This ruby gem provides some useful command line utilities".freeze
   s.email = "flori@ping.de".freeze
   s.executables = ["ascii7".freeze, "blameline".freeze, "check-yaml".freeze, "classify".freeze, "create_cstags".freeze, "create_tags".freeze, "discover".freeze, "edit".freeze, "edit_wait".freeze, "enum".freeze, "fix-brew".freeze, "git-empty".freeze, "git-versions".freeze, "irb_connect".freeze, "json_check".freeze, "long_lines".freeze, "myex".freeze, "number_files".freeze, "on_change".freeze, "path".freeze, "probe".freeze, "rd2md".freeze, "search".freeze, "sedit".freeze, "serve".freeze, "ssh-tunnel".freeze, "ssl_cert_info".freeze, "strip_spaces".freeze, "untest".freeze, "utils-utilsrc".freeze, "vcf2alias".freeze]
@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/flori/utils".freeze
   s.licenses = ["GPL-2.0".freeze]
   s.rdoc_options = ["--title".freeze, "Utils - Some useful command line utilities".freeze, "--main".freeze, "README.md".freeze]
-  s.rubygems_version = "3.3.14".freeze
+  s.rubygems_version = "3.3.7".freeze
   s.summary = "Some useful command line utilities".freeze
 
   if s.respond_to? :specification_version then
@@ -32,7 +32,7 @@ Gem::Specification.new do |s|
     s.add_runtime_dependency(%q<infobar>.freeze, [">= 0"])
     s.add_runtime_dependency(%q<mize>.freeze, [">= 0"])
     s.add_runtime_dependency(%q<search_ui>.freeze, [">= 0"])
-    s.add_runtime_dependency(%q<all_images>.freeze, [">= 0"])
+    s.add_runtime_dependency(%q<all_images>.freeze, [">= 0.0.2"])
   else
     s.add_dependency(%q<gem_hadar>.freeze, ["~> 1.12.0"])
     s.add_dependency(%q<tins>.freeze, ["~> 1.14"])
@@ -41,6 +41,6 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<infobar>.freeze, [">= 0"])
     s.add_dependency(%q<mize>.freeze, [">= 0"])
     s.add_dependency(%q<search_ui>.freeze, [">= 0"])
-    s.add_dependency(%q<all_images>.freeze, [">= 0"])
+    s.add_dependency(%q<all_images>.freeze, [">= 0.0.2"])
   end
 end
