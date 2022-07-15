@@ -250,17 +250,23 @@ module Utils
         nil
       end
 
-      def irb_time
+      def irb_time(n = 1)
         s = Time.now
-        yield
+        n.times do
+          yield
+        end
         d = Time.now - s
-        warn "Took %.3fs seconds." % d
+        if n == 1
+          warn "Took %.3fs seconds." % d
+        else
+          warn "Took %.3fs seconds, %.3fs per call (avg)." % [ d, d / n ]
+        end
         d
       end
 
-      def irb_time_tap
+      def irb_time_tap(n = 1)
         r = nil
-        irb_time { r = yield }
+        irb_time(n) { r = yield }
         r
       end
 
