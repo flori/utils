@@ -12,7 +12,7 @@ format = -> s {
 
 if filename = ARGV.first
   begin
-    yaml = YAML.load_file(filename).to_yaml
+    yaml = YAML.unsafe_load_file(filename).to_yaml
     ENV['DEBUG'].to_i == 1 and puts yaml
     puts 'ok'
   rescue => e
@@ -23,7 +23,7 @@ if filename = ARGV.first
 else
   string = STDIN.read
   begin
-    yaml = YAML.load(string).to_yaml
+    yaml = YAML.unsafe_load(string).to_yaml
     ENV['DEBUG'].to_i == 1 and puts yaml
     puts 'ok'
   rescue => e
