@@ -273,6 +273,7 @@ module Utils
       def irb_time_watch(duration = 1)
         start = Time.now
         pre = nil
+        avg = Hash.new
         loop do
           cur = [ yield ].flatten
           unless pre
@@ -282,7 +283,20 @@ module Utils
           expired = Time.now - start
           diffs = cur.zip(pre).map { |c, p| c - p }
           rates = diffs.map { |d| d / duration }
-          warn "#{expired} #{cur.zip(diffs, rates).map(&:inspect) * ' '} 𝝙 / per sec."
+          durs = cur.zip(rates).each_with_index.map { |(c, r), i|
+            if r < 0
+              x = c.to_f / -r
+              a = avg[i].to_f
+              a -= a / 2
+              a += x / 2
+              d = Tins::Duration.new(a)
+              ds = d.to_s
+              ds.singleton_class { define_method(:to_f) { d.to_f } }
+              avg[i] = ds
+            end
+            avg[i]
+          }
+          warn "#{expired} #{cur.zip(diffs, rates, durs).map(&:inspect) * ' '} 𝝙 / per sec."
           pre = cur.map(&:to_f)
           sleep duration
         end
