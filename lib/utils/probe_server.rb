@@ -227,7 +227,7 @@ module Utils
         call << bundle << 'exec'
       end
       call.push($0, *job)
-      #output_message "Executing #{call.inspect} now.", type: :info
+      output_message "Executing #{call.inspect} now.", type: :info
       call
     end
   end

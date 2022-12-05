@@ -20,6 +20,7 @@ Options are
   -C FOO[=BAR]  set/get env variable on probe server
   -l            start probe as a server
   -u URI        use this DRb URI communication
+  -f FORMATTER  use FORMATTER to display rspec output
   -h            display this help
 
 Version is #{File.basename($0)} #{Utils::VERSION}.
@@ -31,6 +32,7 @@ def cmd(*args)
   if ENV.key?('BUNDLE_GEMFILE')
     args.unshift 'bundle', 'exec'
   end
+  p args
   puts args * ' '
   system(*args) or exit $?.exitstatus
 end
@@ -76,7 +78,7 @@ def connect_server
     end
   end
   if $opts[?c]
-    opts = $opts.subhash('n', 't').each_with_object([]) { |(k, v), a|
+    opts = $opts.subhash(*%w[n t f]).each_with_object([]) { |(k, v), a|
       v.full? and a.concat [ "-#{k}", v ]
     }
     probe_server.enqueue opts + $args
@@ -93,7 +95,7 @@ if i = ARGV.index('--')
 else
   $args = ARGV.dup
 end
-$opts = go 'lct:n:u:C:h', $args
+$opts = go 'lct:n:u:C:f:h', $args
 $opts[?h] and usage
 
 $uri = $opts[?u] || 'drbunix:probe.socket'
@@ -117,7 +119,10 @@ when :rspec
   else
     rspec = [ find_cmd('rspec', 'spec') ]
   end
-  rspec << '-rutils' << '-f' << 'Utils::LineFormatter'
+  rspec << '-rutils'
+  unless $args.any? { |a| a.start_with?('-f') }
+    rspec << '-f' << ($opts[?f] || 'Utils::LineFormatter')
+  end
   $args = $args.map do |a|
     if Utils::Editor::FILE_LINENUMBER_REGEXP =~ a
       $~.captures.compact * ':'
