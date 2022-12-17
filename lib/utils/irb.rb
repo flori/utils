@@ -318,7 +318,7 @@ module Utils
             end
           end
         else
-          IO.read filename
+          File.read filename
         end
       end
 
