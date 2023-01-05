@@ -336,31 +336,17 @@ module Utils
                 STDERR.puts "Loaded '#{f}'."
               end
             end
-            Find.find('.') do |f|
-              File.directory?(f) and next
-              md5_f = Utils::MD5.md5(f)
-              if f.end_with?(file) and !loaded[md5_f]
-                Kernel.load f
-                loaded[md5_f] = true
-                STDERR.puts "Loaded '#{f}'."
-              end
-            end
           end
         end
         nil
       end
 
-      def irb_edit(*files)
-        $editor.full?(:edit, *files)
-      end
-
-      def edit
-        $editor.full?(:edit, self)
-      end
-
-      # List contents of directory
-      def ls(*args)
-        puts `ls #{args.map { |x| "'#{x}'" } * ' '}`
+      def ed(*files)
+        if files.empty?
+          $editor.full?(:edit, self)
+        else
+          $editor.full?(:edit, *files)
+        end
       end
 
       if defined?(ActiveRecord::Base)

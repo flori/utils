@@ -5,6 +5,10 @@ require 'tins/xt'
 require 'tins/lines_file'
 include Tins::GO
 require 'utils'
+begin
+  require 'utils/line_formatter'
+rescue LoadError
+end
 include Utils
 require 'drb'
 
