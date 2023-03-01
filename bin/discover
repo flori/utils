@@ -79,8 +79,7 @@ finder = -> * {
   )
 }
 
-case
-when args[?s]
+search = -> * {
   f = nil
   pattern = pattern.dup
   args[?n] = Term::ANSIColor.terminal_lines - 1
@@ -112,6 +111,11 @@ when args[?s]
   else
     exit 1
   end
+}
+
+case
+when args[?s]
+  search.()
 when args[?E]
   edit_files *finder.().paths, pick: true
 when args[?e]
@@ -131,7 +135,8 @@ when pattern.empty? && args[?r]
   finder.()
   exit
 when pattern.empty?
-  usage
+  args[?e] = true
+  search.()
 else
   puts finder.().search.output
 end
