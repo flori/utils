@@ -7,6 +7,7 @@ require 'tins/xt'
 include Tins::GO
 require 'term/ansicolor'
 include Term::ANSIColor
+require 'tempfile'
 
 def convert_ruby_to_vim_regexp(pattern)
   regexp = pattern.source.dup
@@ -18,20 +19,25 @@ end
 def read_line(path)
   filename, lineno = path.source_location
   line = File.open(filename) do |file|
-    file.lazy.each_with_index.select { |l, n| n + 1 == lineno }.first&.first 
+    file.lazy.each_with_index.select { |l, n| n + 1 == lineno }.first&.first
   end
 end
 
 def replace_line(path, new_line)
   filename, lineno = path.source_location
-  File.secure_write filename do |output|
-    File.open(filename) do |file|
+  Tempfile.open do |output|
+    File.open(filename, 'r+') do |file|
       file.each_with_index do |line, n|
         if n + 1 == lineno
           output.write new_line
         else
           output.write line
         end
+      end
+      file.rewind
+      output.rewind
+      output.each do |line|
+        file.write line
       end
     end
   end
@@ -51,7 +57,7 @@ def replace_ask(editor, path, pattern, replace, all)
       replace_line path, new_line
       break true
     else
-      print "Replace? (#{bold(?y)}/n/e/a) "
+      print "Replace? (#{bold(?y)}/n/e/a/q) "
       case answer = STDIN.gets.chomp
       when ?y, '', ?a
         new_line = line.gsub(pattern.matcher, replace)
@@ -59,6 +65,8 @@ def replace_ask(editor, path, pattern, replace, all)
         break answer == ?a
       when ?n
         break false
+      when ?q
+        throw :quit
       when ?e
         editor.edit(path.strip)
         break false
@@ -78,8 +86,10 @@ def edit_files(pattern, paths, pick: false, replace: nil)
   when replace
     editor.wait = true
     all = false
-    for path in paths
-      all |= replace_ask editor, path, pattern, replace, all
+    catch :quit do
+      for path in paths
+        all |= replace_ask editor, path, pattern, replace, all
+      end
     end
   when pick
     if paths.size > 1
