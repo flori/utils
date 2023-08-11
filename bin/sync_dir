@@ -1,0 +1,70 @@
+#!/usr/bin/env ruby
+
+require 'pathname'
+require 'tins/xt'
+require 'fileutils'
+include FileUtils::Verbose
+
+def local_path(path)
+  Pathname.new(path).expand_path.relative_path_from(
+    Pathname.new(?.).expand_path
+  ).to_s
+end
+
+def diff_dir
+  `diff -rq #{$src.inspect} #{$dst.inspect}`
+end
+
+def ask?(prompt:)
+  print prompt
+  answer = gets.chomp
+end
+
+$src = ARGV.shift or fail "need source directory as first argument"
+$src = local_path $src
+$dst = ARGV.shift || ?.
+$dst = local_path $dst
+
+puts diff_dir
+
+diff_dir.each_line do |line|
+  case line
+  when /^Only in (.*?): (.*?)$/
+    sd = local_path($1)
+    s  = local_path(File.join(sd, $2))
+    dd = [ $src, $dst ].find { _1 != sd }
+    d  = local_path(File.join(dd, $2))
+    if File.file?(s) and File.ascii?(s)
+      puts File.read(s)
+    end
+    puts " Only found in #{s.inspect} ".center(Tins::Terminal.cols, ?*)
+    puts <<~end
+      (C)opy #{s.inspect} to #{d.inspect}
+      (E)dit #{s.inspect}
+      (D)elete #{s.inspect}
+      (S)kip
+    end
+    case ask?(prompt: 'action? ')
+    when /\Ac/i
+      cp s, d
+    when /\Ae/i
+      system "vim #{s.inspect}"
+      redo
+    when /\Ad/i
+      rm s
+    end
+  when /^Files (.*?) and (.*?) differ$/
+    s = local_path($1)
+    d = local_path($2)
+    puts `diff --color=always -u #{s.inspect} #{d.inspect}`
+    puts " Difference found #{s.inspect} #{d.inspect} ".center(Tins::Terminal.cols, ?*)
+    puts <<~end
+      (V)imdiff
+      (S)kip
+    end
+    ask?(prompt: 'action? ') =~ /\Av/i or next
+    system "vimdiff #{s.inspect} #{d.inspect}"
+  end
+rescue Interrupt
+  exit
+end
