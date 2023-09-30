@@ -21,6 +21,13 @@ when 'prefix', 'postfix'
   else
     path.push part
   end
+when 'list'
+  if path_argument = ARGV.first
+    path = path_argument.split(path_separator)
+    path.map! { |part| File.expand_path(part) }
+  end
+  puts path
+  exit
 when 'edit'
   if path_argument = ARGV.first
     path = path_argument.split(path_separator)
