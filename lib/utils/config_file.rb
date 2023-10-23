@@ -278,6 +278,21 @@ class Utils::ConfigFile
     @classify ||= Classify.new
   end
 
+  class SyncDir < BlockConfig
+    config :skip_path, %r((\A|/)\.\w)
+
+    def skip?(path)
+      path =~ skip_path
+    end
+  end
+
+  def sync_dir(&block)
+    if block
+      @sync_dir = SyncDir.new(&block)
+    end
+    @sync_dir ||= SyncDir.new
+  end
+
   def to_ruby
     result = "# vim: set ft=ruby:\n"
     for bc in %w[search discover strip_spaces probe ssh_tunnel edit classify]

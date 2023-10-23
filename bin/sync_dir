@@ -4,6 +4,10 @@ require 'pathname'
 require 'tins/xt'
 require 'fileutils'
 include FileUtils::Verbose
+require 'utils'
+
+$config = Utils::ConfigFile.new
+$config.configure_from_paths
 
 def local_path(path)
   Pathname.new(path).expand_path.relative_path_from(
@@ -30,10 +34,12 @@ puts diff_dir
 diff_dir.each_line do |line|
   case line
   when /^Only in (.*?): (.*?)$/
-    sd = local_path($1)
-    s  = local_path(File.join(sd, $2))
+    s, d = $~.captures
+    sd = local_path(s)
+    s  = local_path(File.join(sd, d))
+    $config.sync_dir.skip?(s) and next
     dd = [ $src, $dst ].find { _1 != sd }
-    d  = local_path(File.join(dd, $2))
+    d  = local_path(File.join(dd, d))
     if File.file?(s) and File.ascii?(s)
       puts File.read(s)
     end
@@ -54,8 +60,10 @@ diff_dir.each_line do |line|
       rm s
     end
   when /^Files (.*?) and (.*?) differ$/
-    s = local_path($1)
-    d = local_path($2)
+    s, d = $~.captures
+    s = local_path(s)
+    $config.sync_dir.skip?(s) and next
+    d = local_path(d)
     puts `diff --color=always -u #{s.inspect} #{d.inspect}`
     puts " Difference found #{s.inspect} #{d.inspect} ".center(Tins::Terminal.cols, ?*)
     puts <<~end
