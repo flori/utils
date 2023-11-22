@@ -5,6 +5,8 @@ require 'tins/xt'
 require 'fileutils'
 include FileUtils::Verbose
 require 'utils'
+require 'term/ansicolor'
+include Term::ANSIColor
 
 $config = Utils::ConfigFile.new
 $config.configure_from_paths
@@ -41,7 +43,7 @@ diff_dir.each_line do |line|
     dd = [ $src, $dst ].find { _1 != sd }
     d  = local_path(File.join(dd, d))
     if File.file?(s) and File.ascii?(s)
-      puts File.read(s)
+      puts color(214, File.read(s))
     end
     puts " Only found in #{s.inspect} ".center(Tins::Terminal.cols, ?*)
     puts <<~end
