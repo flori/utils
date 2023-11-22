@@ -51,7 +51,6 @@ end
 
 $opts = go 'bdtsp:n:'
 
-
 string = ARGV.shift or fail "need a class/filepath/filename"
 string = Term::ANSIColor.uncolor string
 
