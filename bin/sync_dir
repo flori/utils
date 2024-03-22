@@ -23,7 +23,7 @@ end
 
 def ask?(prompt:)
   print prompt
-  answer = gets.chomp
+  gets.chomp
 end
 
 $src = ARGV.shift or fail "need source directory as first argument"
@@ -74,6 +74,7 @@ diff_dir.each_line do |line|
     end
     ask?(prompt: 'action? ') =~ /\Av/i or next
     system "vimdiff #{s.inspect} #{d.inspect}"
+    redo
   end
 rescue Interrupt
   exit
