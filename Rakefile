@@ -24,6 +24,7 @@ GemHadar do
   dependency  'infobar'
   dependency  'mize'
   dependency  'search_ui'
+  dependency  'drb'
   dependency  'all_images',     '>=0.0.2'
   development_dependency 'debug'
 
