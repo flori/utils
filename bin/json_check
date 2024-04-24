@@ -5,6 +5,6 @@ require 'json'
 begin
   JSON.parse(ARGF.read)
   exit 0
-rescue JSON::ParserError => e
+rescue JSON::ParserError
   exit 1
 end

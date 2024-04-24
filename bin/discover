@@ -12,7 +12,7 @@ def edit_files(*paths, pick: false, wait: true)
   if pick
     if paths.size > 1
       path = complete(prompt: 'Pick? ') do |p|
-        paths.grep /#{p}/
+        paths.grep(/#{p}/)
       end
     else
       path = paths.first
@@ -83,7 +83,6 @@ search = -> * {
   f = nil
   pattern = pattern.dup
   args[?n] = Term::ANSIColor.terminal_lines - 1
-  path = nil
   found = Search.new(
     match: -> answer {
       pattern.replace answer
@@ -95,9 +94,7 @@ search = -> * {
       matches.each_with_index.map { |l, i| (i == selector ? '> ' : '  ') + l }.join(?\n)
     },
     found: -> _answer, matches, selector {
-      if f
-        path = f.paths[selector]
-      end
+      f.paths[selector] if f
     },
     output: STDERR
   ).start
@@ -117,9 +114,9 @@ case
 when args[?s]
   search.()
 when args[?E]
-  edit_files *finder.().paths, pick: true
+  edit_files(*finder.().paths, pick: true)
 when args[?e]
-  edit_files *finder.().search.paths
+  edit_files(*finder.().search.paths)
 when args[?D]
   args[?d] = true
   paths = finder.().load_paths.select { |p| File.directory?(p) }.reverse

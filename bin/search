@@ -18,7 +18,7 @@ end
 
 def read_line(path)
   filename, lineno = path.source_location
-  line = File.open(filename) do |file|
+  File.open(filename) do |file|
     file.lazy.each_with_index.select { |l, n| n + 1 == lineno }.first&.first
   end
 end
@@ -71,8 +71,6 @@ def replace_ask(editor, path, pattern, replace, all)
       when ?e
         editor.edit(path.strip)
         break false
-      when ?a
-        break true
       else
         next
       end
@@ -95,7 +93,7 @@ def edit_files(pattern, paths, pick: false, replace: nil)
   when pick
     if paths.size > 1
       path = complete(prompt: 'Pick? ') do |p|
-        paths.grep /#{p}/
+        paths.grep(/#{p}/)
       end
     else
       path = paths.first
@@ -139,6 +137,7 @@ Options are
   -r REPLACE  replace the searched match with REPLACE
   -b          also search binary files
   -g          use git to determine author of the line
+  -G AUTHOR   only display lines authored by AUTHOR
   -a CSET     use only character set CSET from PATTERN
   -v          be verbose
   -h          display this help
@@ -148,7 +147,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'r:p:I:A:B:C:s:S:n:N:a:i:cfFlLeEvbgh'
+args = go 'r:p:I:A:B:C:s:S:n:N:a:i:G:cfFlLeEvbgh'
 args[?h] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }

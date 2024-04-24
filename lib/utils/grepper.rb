@@ -97,9 +97,12 @@ class Utils::Grepper
         @output.each do |l|
           blamer = LineBlamer.for_line(l)
           if blame = blamer.perform
+            author = nil
             blame.sub!(/^[0-9a-f^]+/) { Term::ANSIColor.yellow($&) }
-            blame.sub!(/\(([^)]+)\)/) { "(#{Term::ANSIColor.red($1)})" }
-            puts "#{blame.chomp} #{Term::ANSIColor.blue(l)}"
+            blame.sub!(/\(([^)]+)\)/) { author = $1; "(#{Term::ANSIColor.red($1)})" }
+            if !@args[?G] || author&.downcase&.match?(@args[?G].downcase)
+              puts "#{blame.chomp} #{Term::ANSIColor.blue(l)}"
+            end
           end
         end
       when @args[?l], @args[?e], @args[?E], @args[?r]

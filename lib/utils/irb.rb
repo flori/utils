@@ -51,7 +51,7 @@ module Utils
       end
 
       def yri(*patterns)
-        ri *patterns, doc: 'yri'
+        ri(*patterns, doc: 'yri')
       end
 
       def irb_open(url = nil, &block)

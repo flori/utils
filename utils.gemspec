@@ -1,14 +1,14 @@
 # -*- encoding: utf-8 -*-
-# stub: utils 0.41.0 ruby lib
+# stub: utils 0.42.0 ruby lib
 
 Gem::Specification.new do |s|
   s.name = "utils".freeze
-  s.version = "0.41.0".freeze
+  s.version = "0.42.0".freeze
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Florian Frank".freeze]
-  s.date = "2024-04-17"
+  s.date = "2024-04-24"
   s.description = "This ruby gem provides some useful command line utilities".freeze
   s.email = "flori@ping.de".freeze
   s.executables = ["ascii7".freeze, "blameline".freeze, "check-yaml".freeze, "classify".freeze, "create_cstags".freeze, "create_tags".freeze, "discover".freeze, "edit".freeze, "edit_wait".freeze, "enum".freeze, "fix-brew".freeze, "git-empty".freeze, "git-versions".freeze, "irb_connect".freeze, "json_check".freeze, "long_lines".freeze, "myex".freeze, "number_files".freeze, "on_change".freeze, "path".freeze, "probe".freeze, "rd2md".freeze, "search".freeze, "sedit".freeze, "serve".freeze, "ssh-tunnel".freeze, "strip_spaces".freeze, "sync_dir".freeze, "untest".freeze, "utils-utilsrc".freeze, "vcf2alias".freeze]
@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/flori/utils".freeze
   s.licenses = ["GPL-2.0".freeze]
   s.rdoc_options = ["--title".freeze, "Utils - Some useful command line utilities".freeze, "--main".freeze, "README.md".freeze]
-  s.rubygems_version = "3.5.3".freeze
+  s.rubygems_version = "3.5.9".freeze
   s.summary = "Some useful command line utilities".freeze
 
   s.specification_version = 4

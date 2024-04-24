@@ -89,7 +89,7 @@ module Utils
     def help
       docs      = doc_annotations.sort_by(&:first)
       docs_size = docs.map { |a| a.first.size }.max
-      format = '%-20s %-3s %s'
+      format = "%-#{docs_size}s %-3s %s"
       output_message [
           (format % %w[ command sho description ]).on_color(20).white
         ] << docs.map { |cmd, doc|
@@ -198,7 +198,7 @@ module Utils
 
     def run_job(job)
       output_message " → #{job.inspect} now running.", type: :info
-      system *cmd(job.args)
+      system(*cmd(job.args))
       message = " → #{job.inspect} was just run"
       if $?.success?
         job.ok = true

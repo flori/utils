@@ -5,15 +5,7 @@ module Utils
     end
 
     def self.for_line(line)
-      location = line.source_location and new *location
-    end
-
-    def self.blame(line)
-      blamer = for_line(line)
-      if blame = blamer.perform
-        blame.sub!(/^[0-9a-f^]+/) { Term::ANSIColor.yellow($&) }
-        blame.sub!(/\(([^)]+)\)/) { "(#{Term::ANSIColor.red($1)})" }
-      end
+      location = line.source_location and new(*location)
     end
 
     def perform(options = '')
