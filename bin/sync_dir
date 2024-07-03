@@ -51,6 +51,7 @@ diff_dir.each_line do |line|
       (E)dit #{s.inspect}
       (D)elete #{s.inspect}
       (S)kip
+      (Q)uit
     end
     case ask?(prompt: 'action? ')
     when /\Ac/i
@@ -60,6 +61,8 @@ diff_dir.each_line do |line|
       redo
     when /\Ad/i
       rm s
+    when /\Aq/i
+      exit
     end
   when /^Files (.*?) and (.*?) differ$/
     s, d = $~.captures
@@ -71,9 +74,16 @@ diff_dir.each_line do |line|
     puts <<~end
       (V)imdiff
       (S)kip
+      (Q)uit
     end
-    ask?(prompt: 'action? ') =~ /\Av/i or next
-    system "vimdiff #{s.inspect} #{d.inspect}"
+    case ask?(prompt: 'action? ')
+    when /\Av/i
+      system "vimdiff #{s.inspect} #{d.inspect}"
+    when /\Aq/i
+      exit
+    else 
+      next
+    end
     redo
   end
 rescue Interrupt
