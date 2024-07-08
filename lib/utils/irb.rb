@@ -11,8 +11,6 @@ $pager = ENV['PAGER'] || 'less -r'
 
 module Utils
   module IRB
-    require 'utils/irb/service'
-
     module Shell
       require 'fileutils'
       include FileUtils
@@ -69,16 +67,6 @@ module Utils
         else
           raise ArgumentError, 'need an url or block'
         end
-      end
-
-      # Start an irb server.
-      def irb_server(uri = nil)
-        Utils::IRB::Service.start(uri) {}
-      end
-
-      # Connect to an irb server.
-      def irb_connect(uri = nil)
-        Utils::IRB::Service.connect(uri)
       end
 
       # TODO: change the API of this stuff
