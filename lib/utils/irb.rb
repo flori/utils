@@ -229,6 +229,10 @@ module Utils
         temp.read
       end
 
+      def le(with_stderr = false, &block)
+        less(with_stderr) { block.call(self) }
+      end
+
       # Use pager on the output of the commands given in the block.
       def less(with_stderr = false, &block)
         IO.popen($pager, 'w') do |f|

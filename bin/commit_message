@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+config =
+  if (xdg = ENV['XDG_CONFIG_HOME'].to_s.strip).size == 0
+    File.join(ENV.fetch('HOME'), '.config', 'commit_message')
+  else
+    File.join(xdg, 'commit_message')
+  end
+
+exec 'ollama_cli', '-M', "#{config}/options.json",
+  '-s', "#{config}/system.txt", '-p', "#{config}/prompt.txt"

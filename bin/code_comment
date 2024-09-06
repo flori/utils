@@ -1,0 +1,178 @@
+#!/usr/bin/env ruby
+
+require 'utils'
+require 'ollama'
+include Ollama
+
+def fetch_method(filename_linenumber)
+  result = ''
+  source_location = filename_linenumber.source_location
+  lf = Tins::LinesFile.for_filename(source_location.filename, source_location.linenumber)
+  if spaces = lf.match_backward(/^(\s*)def\s+(?:\S+?)(?:\(|\s*$)/)&.first
+    line_number_begin = lf.line_number
+    lf.match_forward(/^#{spaces}end/)
+    line_number_end = lf.line_number
+    line_number_begin.upto(line_number_end) do |line_number|
+      lf.line_number = line_number
+      result << lf.line
+    end
+  end
+  result
+end
+
+def fetch_file(filename_linenumber)
+  source_location = filename_linenumber.source_location
+  File.read(source_location.filename)
+end
+
+filename_linenumber = ARGV.shift or fail "require file_name as second argument"
+method   = fetch_method(filename_linenumber)
+#file     = fetch_file(filename_linenumber)
+files = Dir['{lib,spec,test}/**/*.rb']
+base_url = ENV['OLLAMA_URL'] || 'http://%s' % ENV.fetch('OLLAMA_HOST')
+model    = ENV.fetch('OLLAMA_MODEL', 'llama3.1')
+#file                = File.read(file_name)
+#call_sites          = %x(cscope -L -3 "#{method_name}" $(find . -name '*.rb') | awk '{ print $1 ":" $3 }').lines.map(&:chomp).uniq
+#methods             = call_sites.map { fetch_method(_1) } * ?\n
+
+cheatsheet = <<EOT
+# YARD CHEATSHEET http://yardoc.org
+
+## May 2020 - updated fork: https://gist.github.com/phansch/db18a595d2f5f1ef16646af72fe1fb0e
+
+cribbed from http://pastebin.com/xgzeAmBn
+
+Templates to remind you of the options and formatting for the different types of objects you might
+want to document using YARD.
+
+## Modules
+
+    # Namespace for classes and modules that handle serving documentation over HTTP
+
+## Classes
+
+    # Abstract base class for CLI utilities. Provides some helper methods for
+    # the option parser
+    #
+    # @author Full Name
+    # @abstract
+    # @attr [Types] attribute_name a full description of the attribute
+    # @attr_reader [Types] name description of a readonly attribute
+    # @attr_writer [Types] name description of writeonly attribute
+    # @deprecated Describe the reason or provide alt. references here
+
+## Methods
+
+    # An alias to {Parser::SourceParser}'s parsing method
+    #
+    # @author Donovan Bray
+    #
+    # @see http://example.com Description of URL
+    # @see SomeOtherClass#method
+    #
+    # @deprecated Use {#my_new_method} instead of this method because
+    #   it uses a library that is no longer supported in Ruby 1.9.
+    #   The new method accepts the same parameters.
+    #
+    # @abstract
+    # @private
+    #
+    # @param subject [String] The subject
+    # @param from [String] ('nobody') From address
+    # @param to [String] Recipient email
+    # @param body [String] ('') The email's body
+    #
+    # @param (see User#initialize)
+    # @param [OptionParser] opts the option parser object
+    # @param [Array<String>] args the arguments passed from input. This
+    #   array will be modified.
+    # @param [Array<String, Symbol>] list the list of strings and symbols.
+    #
+    # The options parsed out of the commandline.
+    # Default options are:
+    #   :format => :dot
+    #
+    # @example Reverse a string
+    #   "mystring.reverse" #=> "gnirtsym"
+    #
+    # @example Parse a glob of files
+    #   YARD.parse('lib/**/*.rb')
+    #
+    # @raise [ExceptionClass] description
+    #
+    # @return [optional, types, ...] description
+    # @return [true] always returns true
+    # @return [void]
+    # @return [String, nil] the contents of our object or nil
+    #   if the object has not been filled with data.
+    #
+    # We don't care about the "type" here:
+    # @return the object
+    #
+    # @return [String, #read] a string or object that responds to #read
+    # @return description here with no types
+
+## Anywhere
+
+    # @todo Add support for Jabberwocky service
+    #   There is an open source Jabberwocky library available
+    #   at http://somesite.com that can be integrated easily
+    #   into the project.
+
+## Blocks
+
+    # for block {|a, b, c| ... }
+    # @yield [a, b, c] Description of block
+    #
+    # @yieldparam [optional, types, ...] argname description
+    # @yieldreturn [optional, types, ...] description
+EOT
+
+system = <<EOT
+You are a Ruby code commenter that writes succinct, simple ruby YARD comments.
+EOT
+system = nil
+
+prompt = <<EOT
+Analyze this code:
+
+#{files.map { File.read(_1) } * ?\n}
+
+Then output a succinct YARD comment for the method below.
+
+Follow the following guidelines:
+- Do not repeat the ruby method code.
+- Do not use `, `ruby, ```, ```ruby in your response.
+- Start each line of your comment with a single # character.
+
+Here's a cheatsheet for YARD you can peek into:
+
+#{cheatsheet}
+
+And this is the method you should document:
+
+#{method}
+EOT
+
+options = Ollama::Options.new(
+  #repeat_penalty: 1.8,
+  num_ctx: 8192,
+  num_predict: 512,
+  temperature: 0,
+  #repeat_last_n: -1,
+  ##seed: 1337,
+  top_p: 1,
+  min_p: 0.1,
+)
+
+if ENV['DEBUG'].to_i == 1
+  File.open('debug.log', ?w) do |log|
+    log.puts "system:\n#{system}"
+    log.puts "prompt:\n#{prompt}"
+    log.puts "filename_linenumber: #{filename_linenumber}"
+    log.puts JSON.pretty_generate(options)
+  end
+end
+
+ollama = Client.new(base_url:, read_timeout: 120)
+ollama.generate(model:, system:, prompt:, options:, stream: false, &Print)
