@@ -81,7 +81,7 @@ diff_dir.each_line do |line|
       system "vimdiff #{s.inspect} #{d.inspect}"
     when /\Aq/i
       exit
-    else 
+    else
       next
     end
     redo
