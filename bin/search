@@ -108,40 +108,40 @@ def edit_files(pattern, paths, pick: false, replace: nil)
 end
 
 def usage
-  puts <<-EOT
-Usage: #{File.basename($0)} [OPTS] PATTERN [PATHS]
+  puts <<~EOT
+    Usage: #{File.basename($0)} [OPTS] PATTERN [PATHS]
 
-PATTERN is a pattern expression which is used to match against the content of
-the files. PATHS are the directory and file paths that are searched.
+    PATTERN is a pattern expression which is used to match against the content of
+    the files. PATHS are the directory and file paths that are searched.
 
-Options are
+    Options are
 
-  -n PATTERN  only search files whose names match fuzzy PATTERN
-  -N PATTERN  only search files whose names match regexp PATTERN
-  -s PATTERN  skip lines that match fuzzy PATTERN
-  -S PATTERN  skip lines that match regexp PATTERN
-  -A NUMBER   displays NUMBER lines of context after the match
-  -B NUMBER   displays NUMBER lines of context before the match
-  -C NUMBER   displays NUMBER lines of context around the match
-  -f          just list the paths of the files that would be searched
-  -F          just consider real files when searching
-  -l          just list the paths of the files with matches
-  -L          list only the path:linenumber of the files with matches
-  -pX         interpret PATTERN argument as X=f fuzzy or X=r for regexp
-  -c          disable color output
-  -iX         use case insensitive matches with X=y (default) or not with X=n
-  -I SUFFIX   only include files with suffix SUFFIX in search
-  -e          open the matching files with edit command
-  -E          pick one file to edit
-  -r REPLACE  replace the searched match with REPLACE
-  -b          also search binary files
-  -g          use git to determine author of the line
-  -G AUTHOR   only display lines authored by AUTHOR
-  -a CSET     use only character set CSET from PATTERN
-  -v          be verbose
-  -h          display this help
+      -n PATTERN  only search files whose names match fuzzy PATTERN
+      -N PATTERN  only search files whose names match regexp PATTERN
+      -s PATTERN  skip lines that match fuzzy PATTERN
+      -S PATTERN  skip lines that match regexp PATTERN
+      -A NUMBER   displays NUMBER lines of context after the match
+      -B NUMBER   displays NUMBER lines of context before the match
+      -C NUMBER   displays NUMBER lines of context around the match
+      -f          just list the paths of the files that would be searched
+      -F          just consider real files when searching
+      -l          just list the paths of the files with matches
+      -L          list only the path:linenumber of the files with matches
+      -pX         interpret PATTERN argument as X=f fuzzy or X=r for regexp
+      -c          disable color output
+      -iX         use case insensitive matches with X=y (default) or not with X=n
+      -I SUFFIX   only include files with suffix SUFFIX in search
+      -e          open the matching files with edit command
+      -E          pick one file to edit
+      -r REPLACE  replace the searched match with REPLACE
+      -b          also search binary files
+      -g          use git to determine author of the line
+      -G AUTHOR   only display lines authored by AUTHOR
+      -a CSET     use only character set CSET from PATTERN
+      -v          be verbose
+      -h          display this help
 
-Version is #{File.basename($0)} #{Utils::VERSION}.
+    Version is #{File.basename($0)} #{Utils::VERSION}.
   EOT
   exit 1
 end
