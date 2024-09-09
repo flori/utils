@@ -5,10 +5,6 @@ require 'tins/xt'
 require 'tins/lines_file'
 include Tins::GO
 require 'utils'
-begin
-  require 'utils/line_formatter'
-rescue LoadError
-end
 include Utils
 require 'drb'
 
@@ -45,19 +41,8 @@ def find_cmd(*cmds, on_fail: -> *cmds { raise fail "no #{cmds * '|'} command fou
   cmds.map { |c| `which #{c}`.full?(:chomp) }.compact.first or on_fail.(*cmds)
 end
 
-def spring?
-  `bin/spring status`.lines.first =~ /^Spring is running:/
-rescue Errno::ENOENT
-  false
-end
-singleton_class.class_eval do
-  memoize_function :spring?
-end
-
 def start_server
   Thread.abort_on_exception = $DEBUG
-  spring? and
-    puts "Found spring running, I'll try to use it for running tests."
 
   begin
     DRb.start_service
@@ -82,7 +67,7 @@ def connect_server
     end
   end
   if $opts[?c]
-    opts = $opts.subhash(*%w[n t f]).each_with_object([]) { |(k, v), a|
+    opts = $opts.subhash(*%w[n t]).each_with_object([]) { |(k, v), a|
       v.full? and a.concat [ "-#{k}", v ]
     }
     probe_server.enqueue opts + $args
@@ -99,7 +84,7 @@ if i = ARGV.index('--')
 else
   $args = ARGV.dup
 end
-$opts = go 'lct:n:u:C:f:h', $args
+$opts = go 'lct:n:u:C:h', $args
 $opts[?h] and usage
 
 $uri = $opts[?u] || 'drbunix:probe.socket'
@@ -117,16 +102,7 @@ puts "Running tests in #{$args.inspect}"
 
 case ($opts[?t] || $config.probe.test_framework).to_sym
 when :rspec
-  case
-  when spring?
-    rspec = %w[ bin/spring rspec ]
-  else
-    rspec = [ find_cmd('rspec', 'spec') ]
-  end
-  rspec << '-rutils'
-  unless $args.any? { |a| a.start_with?('-f') }
-    rspec << '-f' << ($opts[?f] || 'Utils::LineFormatter')
-  end
+  rspec = [ find_cmd('rspec', 'spec') ]
   $args = $args.map do |a|
     if Utils::Editor::FILE_LINENUMBER_REGEXP =~ a
       $~.captures.compact * ':'
