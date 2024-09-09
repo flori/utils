@@ -20,7 +20,7 @@ end
 def underscore(string)
   string = path_shifter(string, n: $opts[?n], separator: '::')
   string = Tins::StringUnderscore.instance_method(:underscore).bind(string).()
-  $opts[?s] and string << '.rb'
+  $opts[?s] and string.sub!(/(\.rb)?\z/, '.rb')
   string
 end
 
@@ -49,20 +49,54 @@ def compute_shift(config, string)
   result
 end
 
-$opts = go 'bdtsp:n:'
+def usage
+  puts <<~EOT
+    Usage: #{File.basename($0)} [OPTS]
 
+    Classifies pathes like foo/bar_baz into Foo::BarBaz if necessary.
+
+    Options are
+
+      -d           declassifies Foo::BarBaz into foo/bar_baz if necessary
+      -t           toogle Foo::BarBaz into foo/bar_baz and vice versa
+      -n NUMBER    the number of module namespaces to skip from the left
+      -b           return right most module namespace
+      -s           adds .rb suffix to foo/bar_baz.rb if necessary
+      -p SEPARATOR used for declassification
+      -h           display this help
+
+  EOT
+  exit 0
+end
+
+$opts = go 'dtn:bsp:h'
+
+$opts[?h] and usage
 string = ARGV.shift or fail "need a class/filepath/filename"
 string = Term::ANSIColor.uncolor string
 
 config = Utils::ConfigFile.new
 config.configure_from_paths
 
-$opts[?n] ||= compute_shift(config, string)
+if $opts[?b]
+  $opts[?n] = '-1'
+else
+  $opts[?n] ||= compute_shift(config, string)
+end
 
-$opts[?b] and $opts[?n] = '-1'
-print case
-when $opts[?t]
-  if camelcase?(string)
+print(
+  case
+  when $opts[?t]
+    if camelcase?(string)
+      if separator = $opts[?p]
+        parameterize string, separator
+      else
+        underscore string
+      end
+    else
+      camelize string
+    end
+  when $opts[?d]
     if separator = $opts[?p]
       parameterize string, separator
     else
@@ -71,12 +105,4 @@ when $opts[?t]
   else
     camelize string
   end
-when $opts[?d]
-  if separator = $opts[?p]
-    parameterize string, separator
-  else
-    underscore string
-  end
-else
-  camelize string
-end
+)
