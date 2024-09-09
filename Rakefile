@@ -20,6 +20,7 @@ GemHadar do
   licenses << 'GPL-2.0'
 
   dependency  'drb'
+  dependency  'webrick'
   dependency  'tins',           '~> 1.14'
   dependency  'term-ansicolor', '~> 1.3'
   dependency  'pstree',         '~> 0.3'

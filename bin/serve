@@ -21,4 +21,3 @@ s = WEBrick::HTTPServer.new(
 trap('INT') { s.shutdown }
 puts "You have been served: http://localhost:#{port}/"
 s.start
-
