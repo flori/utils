@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+
+require 'utils'
+
+inputs = ARGV.empty? ? STDIN : ARGV
+
+inputs.each do |filename_linenumber|
+  source_location = filename_linenumber.source_location
+  lf = Tins::LinesFile.for_filename(source_location.filename, source_location.linenumber)
+  if spaces = lf.match_backward(/^(\s*)def\s+(?:\S+?)(?:\(|\s*$)/)&.first
+    line_number_begin = lf.line_number
+    lf.match_forward(/^#{spaces}end/)
+    line_number_end = lf.line_number
+    line_number_begin.upto(line_number_end) do |line_number|
+      lf.line_number = line_number
+      puts lf.line
+    end
+  end
+end

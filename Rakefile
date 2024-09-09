@@ -10,7 +10,8 @@ GemHadar do
   summary     'Some useful command line utilities'
   description 'This ruby gem provides some useful command line utilities'
   bindir      'bin'
-  executables Dir['bin/*'].map(&File.method(:basename))
+  executables Dir['bin/*'].select { |e| File.new(e).readline =~ /ruby/ }.
+    map(&File.method(:basename))
   test_dir    'tests'
   ignore      '.*.sw[pon]', 'pkg', 'Gemfile.lock', '.rvmrc', '.AppleDouble',
     'tags', '.bundle', '.DS_Store', '.byebug_history'
@@ -18,14 +19,15 @@ GemHadar do
   readme      'README.md'
   licenses << 'GPL-2.0'
 
-  dependency  'tins',           '~>1.14'
-  dependency  'term-ansicolor', '~>1.3'
-  dependency  'pstree',         '~>0.3'
-  dependency  'infobar'
-  dependency  'mize'
-  dependency  'search_ui'
   dependency  'drb'
-  dependency  'all_images',     '>=0.0.2'
+  dependency  'tins',           '~> 1.14'
+  dependency  'term-ansicolor', '~> 1.3'
+  dependency  'pstree',         '~> 0.3'
+  dependency  'infobar',        '~> 0.8'
+  dependency  'mize',           '~> 0.6'
+  dependency  'search_ui',      '~> 0.0'
+  dependency  'all_images',     '~> 0.5.0'
+  dependency  'ollama-ruby',    '~> 0.3.0'
   development_dependency 'debug'
 
   install_library do
