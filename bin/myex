@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-## vim: set ft=ruby et sw=2 ts=2:
+# vim: set ft=ruby et sw=2 ts=2:
 # encoding: ascii-8bit
 
 require 'tins/go'
@@ -21,8 +21,8 @@ Usage: #{File.basename($0)} list|create|truncate|insert|replace|search [OPTION] 
 
     - truncate:   all tables or the given TABLES, if they exist.
 
-    - insert:     extract insert statements from the backup. If TABLES are given,
-                  extract only those statements for these TABLES.
+    - insert:     extract insert statements from the backup. If TABLES are
+                  given, extract only those statements for these TABLES.
       -t          if this OPTION is given, truncate the table, before starting
                   to insert.
 
@@ -31,8 +31,9 @@ Usage: #{File.basename($0)} list|create|truncate|insert|replace|search [OPTION] 
                   those statements for these TABLES.
 
     - search:     search the insert statements from the backup matching the
-                  pattern given with the -p option and output them in a context
-                  of the size (as number of characters) given via the -C option.
+                  pattern given with the -p option and output them in a
+                  context of the size (as number of characters) given via the
+                  -C option.
       -p PATTERN the pattern to match.
       -C NUMBER  the NUMBER of characters for the context.
 EOT
