@@ -20,22 +20,22 @@ Host *
 SSH_CONFIG_END
 
 def usage
-  puts <<EOT
-Usage: #{File.basename($0)} [OPTS] [user@]remote[:port]"
+  puts <<~EOT
+    Usage: #{File.basename($0)} [OPTS] [user@]remote[:port]"
 
-OPTS is one of
-  -N                                  list all session names on the specified remote
-  -n NAME                             name of the multiplexer session (default: $USER)
-  -T                                  list current tunnels
-  -e VARIABLE=VALUE [...]             set variables to values
-  -t [LHOST:][LPORT:][HOST:PORT|PORT] host:port to tunnel if different from LOCALPORT
-  -m screen|tmux                      use sshscreen or tmux as a terminal multiplexer
-  -C (ssh|rc)-default|rc              output ssh or rc config file
-  -d                                  enable debugging
-  -h                                  to display this help
+    OPTS is one of
+      -N                                  list all session names on the specified remote
+      -n NAME                             name of the multiplexer session (default: $USER)
+      -T                                  list current tunnels
+      -e VARIABLE=VALUE [...]             set variables to values
+      -t [LHOST:][LPORT:][HOST:PORT|PORT] host:port to tunnel if different from LOCALPORT
+      -m screen|tmux                      use sshscreen or tmux as a terminal multiplexer
+      -C (ssh|rc)-default|rc              output ssh or rc config file
+      -d                                  enable debugging
+      -h                                  to display this help
 
-Version is #{File.basename($0)} #{Utils::VERSION}.
-EOT
+    Version is #{File.basename($0)} #{Utils::VERSION}.
+  EOT
   exit 1
 end
 
