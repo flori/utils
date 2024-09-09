@@ -20,7 +20,7 @@ IO.popen('cscope 2>/dev/null -R -b -i - -f cscope.out', 'w') do |scope|
   end
 
   infobar.newline
-  Infobar.busy(label: 'Creating cstags') do
+  Infobar.busy(label: 'Creating cstags', frames: :braille7) do
     scope.close
   end
 end
