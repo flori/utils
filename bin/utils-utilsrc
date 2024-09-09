@@ -35,7 +35,7 @@ when 'edit'
     system "vimdiff #{default_utilsrc.inspect} #{utilsrc.inspect}"
   end
 else
-  puts <<EOT
-Usage: #{File.basename($0)} show|diff|edit
-EOT
+  puts <<~EOT
+    Usage: #{File.basename($0)} show|diff|edit
+  EOT
 end
