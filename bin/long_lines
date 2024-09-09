@@ -8,9 +8,9 @@ require 'term/ansicolor'
 $opts = go 'm:h'
 
 if $opts[?h]
-  puts <<USAGE
-#{File.basename($0)} [OPTIONS] [FILES]
-USAGE
+  puts <<~USAGE
+    #{File.basename($0)} [OPTIONS] [FILES]
+  USAGE
   exit
 end
 max = ($opts[?m] || 80).to_i
@@ -24,7 +24,7 @@ for file in files
       if size > max
         lineno = f.lineno + 1
         blamer = Utils::LineBlamer.new(file, lineno) or next
-        blame = blamer.perform
+        blame = blamer.perform or next
         author = blame[/\((.*?)\d{4}/, 1]
         puts [ author, size, "#{file}:#{lineno}" ] * ?\t
       end
