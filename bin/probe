@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-# encoding: UTF-8
 
 require 'tins/xt'
 require 'tins/lines_file'
