@@ -6,23 +6,23 @@ include Tins::GO
 require 'utils'
 include Utils
 require 'drb'
+require 'shellwords'
 
 def usage
-  puts <<-EOT
-Usage: #{File.basename($0)} [OPTS] [FILENAME[:LINENO]]
+  puts <<~EOT
+    Usage: #{File.basename($0)} [OPTS] [FILENAME[:LINENO]]
 
-Options are
+    Options are
 
-  -n TESTNAME   run the test TESTNAME in file FILENAME
-  -t FRAMEWORK  use test framework FRAMEWORK (rspec, test-unit or cucumber)
-  -c            start probe as a client
-  -C FOO[=BAR]  set/get env variable on probe server
-  -l            start probe as a server
-  -u URI        use this DRb URI communication
-  -f FORMATTER  use FORMATTER to display rspec output
-  -h            display this help
+      -n TESTNAME   run the test TESTNAME in file FILENAME
+      -t FRAMEWORK  use test framework FRAMEWORK (rspec, test-unit or cucumber)
+      -c            start probe as a client
+      -C FOO[=BAR]  set/get env variable on probe server
+      -l            start probe as a server
+      -u URI        use this DRb URI communication
+      -h            display this help
 
-Version is #{File.basename($0)} #{Utils::VERSION}.
+    Version is #{File.basename($0)} #{Utils::VERSION}.
   EOT
   exit 1
 end
@@ -31,8 +31,7 @@ def cmd(*args)
   if ENV.key?('BUNDLE_GEMFILE')
     args.unshift 'bundle', 'exec'
   end
-  p args
-  puts args * ' '
+  puts Shellwords.join(args)
   system(*args) or exit $?.exitstatus
 end
 
