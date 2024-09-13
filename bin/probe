@@ -28,9 +28,7 @@ def usage
 end
 
 def cmd(*args)
-  if ENV.key?('BUNDLE_GEMFILE')
-    args.unshift 'bundle', 'exec'
-  end
+  args.unshift 'bundle', 'exec'
   puts Shellwords.join(args)
   system(*args) or exit $?.exitstatus
 end
