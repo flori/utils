@@ -26,7 +26,7 @@ end
 
 def compute_change(range_from, range_to)
   range_from = range_from.to_s.sub(/\Av?/, ?v)
-  if range_to == :HEAD
+  if range_to.to_s == 'HEAD'
     range = "#{range_from}..HEAD"
   else
     range_to = range_to.to_s.sub(/\Av?/, ?v)
@@ -99,7 +99,20 @@ when 'pending'
   last_version = x("git tag").lines.grep(/^v?\d+\.\d+\.\d+$/).map(&:chomp).map {
     Tins::StringVersion::Version.new(_1.sub(/\Av/, ''))
   }.max
-  puts compute_change(last_version, :HEAD)
+  if last_version
+    puts compute_change(last_version, :HEAD)
+  else
+    fail 'need at least one version tag to work'
+  end
+when 'current'
+  version1, version2 = x("git tag").lines.grep(/^v?\d+\.\d+\.\d+$/).map(&:chomp).map {
+    Tins::StringVersion::Version.new(_1.sub(/\Av/, ''))
+  }.sort.last(2)
+  if version1 and version2
+    puts compute_change(version1, version2)
+  else
+    fail 'need at least two version tags to work'
+  end
 when 'range'
   range = ARGV.shift
   if range =~ /\A(.+)\.\.(.+)\z/
