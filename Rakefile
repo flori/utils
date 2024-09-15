@@ -29,6 +29,7 @@ GemHadar do
   dependency  'search_ui',      '~> 0.0'
   dependency  'all_images',     '~> 0.5.0'
   dependency  'ollama-ruby',    '~> 0.3.0'
+  dependency  'simplecov'
   development_dependency 'debug'
 
   install_library do
