@@ -18,11 +18,15 @@ class Utils::Finder
     @args  = opts[:args] || {}
     @roots = discover_roots(opts[:roots])
     @config = opts[:config] || Utils::ConfigFile.new
-    pattern_opts = opts.subhash(:pattern) | {
-      :cset  => @args[?a],
-      :icase => @args[?i] != ?n,
-    }
-    @pattern = choose(@args[?p], pattern_opts)
+    if @args[?l] || @args[?L]
+      @pattern = nil
+    else
+      pattern_opts = opts.subhash(:pattern) | {
+        :cset  => @args[?a],
+        :icase => @args[?i] != ?n,
+      }
+      @pattern = choose(@args[?p], pattern_opts)
+    end
     @paths  = []
     reset_index
   end
@@ -112,7 +116,9 @@ class Utils::Finder
       paths.select! { |path| s.include?(File.extname(path)[1..-1]) }
     end
     paths = paths.map! do |path|
-      if match = @pattern.match(path)
+      if @pattern.nil?
+        [ [ path.count(?/), path ], path, path ]
+      elsif match = @pattern.match(path)
         if FuzzyPattern === @pattern
           current = 0
           marked_path = ''

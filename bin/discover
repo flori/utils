@@ -64,7 +64,7 @@ STDOUT.sync = true
 config = Utils::ConfigFile.new
 config.configure_from_paths
 args[?b] ||= config.discover.binary
-args[?n] ||= args[?l] ? 1 << 60 : config.discover.max_matches
+args[?n] ||= (args[?l] || args[?L]) ? 1 << 60 : config.discover.max_matches
 
 if args[?s]
   pattern = ''
