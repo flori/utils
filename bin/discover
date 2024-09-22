@@ -6,6 +6,7 @@ require 'tins/xt'
 include Tins::GO
 require 'search_ui'
 include SearchUI
+require 'pathname'
 
 def edit_files(*paths, pick: false, wait: true)
   editor = Utils::Editor.new
@@ -46,6 +47,8 @@ Options are
   -v          be verbose
   -n NUMBER   the first NUMBER of matches is returned
   -s          search by interactively inputting PATTERN
+  -l          list all paths in cache relative to current directory
+  -L          list all paths in cahce as absolute pathes from root
   -h          display this help
 
 Version is #{File.basename($0)} #{Utils::VERSION}.
@@ -53,7 +56,7 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'n:I:i:a:p:lcreEvdsDh', defaults: { ?a => '\\w' }
+args = go 'n:I:i:a:p:lLcreEvdsDh', defaults: { ?a => '\\w' }
 args[?h] and usage
 
 Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args[?c]
@@ -112,6 +115,10 @@ search = -> * {
 
 case
 when args[?l]
+  puts finder.().search_index.paths.map {
+    Pathname.new(_1).expand_path.relative_path_from(Dir.pwd)
+  }
+when args[?L]
   puts finder.().search_index.paths
 when args[?s]
   search.()
