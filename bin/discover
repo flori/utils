@@ -112,7 +112,7 @@ search = -> * {
 
 case
 when args[?l]
-  puts finder.().search_index.output
+  puts finder.().search_index.paths
 when args[?s]
   search.()
 when args[?E]
