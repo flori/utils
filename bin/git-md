@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+
+require 'ollama'
+require 'shellwords'
+
+def markdown(message)
+  Ollama::Utils::ANSIMarkdown.parse(message)
+end
+
+cmd = %{git log --color=always --pretty=format:"commit %C(auto)%H%d%nDate:   %Cgreen%cD (%cr)%Creset%nAuthor: %Cblue%an <%ae>%Creset%n%nMARKUP%n%s%n%n%bMARKDOWN"}
+
+IO.popen("#{cmd} #{Shellwords.join(ARGV)}") do |log|
+  until log.eof?
+    message = nil
+    log.each do |line|
+      case line
+      when /^MARKUP$/
+        message =  ''
+      when /^MARKDOWN$/
+        puts markdown(message)
+        message = nil
+      else
+        if message
+          message << line
+        else
+          puts line
+        end
+      end
+    end
+  end
+end

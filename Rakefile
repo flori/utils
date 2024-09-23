@@ -28,7 +28,7 @@ GemHadar do
   dependency 'mize',           '~> 0.6'
   dependency 'search_ui',      '~> 0.0'
   dependency 'all_images',     '~> 0.5.0'
-  dependency 'ollama-ruby',    '~> 0.3.0'
+  dependency 'ollama-ruby',    '~> 0.4.0'
   dependency 'simplecov'
   dependency 'debug'
 
