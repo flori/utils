@@ -7,7 +7,7 @@ def markdown(message)
   Ollama::Utils::ANSIMarkdown.parse(message)
 end
 
-cmd = %{git log --color=always --pretty=format:"commit %C(auto)%H%d%nDate:   %Cgreen%cD (%cr)%Creset%nAuthor: %Cblue%an <%ae>%Creset%n%nMARKUP%n%s%n%n%bMARKDOWN"}
+cmd = %{git log --color=always --pretty=format:"commit %C(auto)%H%d%nDate:   %Cgreen%cD (%cr)%Creset%nAuthor: %Cblue%an <%ae>%Creset%n%nMARKUP%n%s%n%n%b%nMARKDOWN%n"}
 
 IO.popen("#{cmd} #{Shellwords.join(ARGV)}") do |log|
   until log.eof?
@@ -17,7 +17,7 @@ IO.popen("#{cmd} #{Shellwords.join(ARGV)}") do |log|
       when /^MARKUP$/
         message =  ''
       when /^MARKDOWN$/
-        puts markdown(message)
+        puts markdown(message + "\n---\n")
         message = nil
       else
         if message
