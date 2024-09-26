@@ -2,7 +2,7 @@
 
 require 'ollama'
 include Ollama
-require 'tins'
+require 'tins/xt'
 
 def x(cmd)
   output=`#{cmd}`
@@ -18,9 +18,7 @@ def find_highest_version_tag(filename)
         tags << $1
       end
     end
-    tags.map {
-      Tins::StringVersion::Version.new(_1)
-    }.max
+    tags.map(&:verion).max
   end
 end
 
@@ -97,7 +95,7 @@ x("git fetch --tags")
 case command = ARGV.shift
 when 'pending'
   last_version = x("git tag").lines.grep(/^v?\d+\.\d+\.\d+$/).map(&:chomp).map {
-    Tins::StringVersion::Version.new(_1.sub(/\Av/, ''))
+    _1.sub(/\Av/, '').version
   }.max
   if last_version
     puts compute_change(last_version, :HEAD)
@@ -106,7 +104,7 @@ when 'pending'
   end
 when 'current'
   version1, version2 = x("git tag").lines.grep(/^v?\d+\.\d+\.\d+$/).map(&:chomp).map {
-    Tins::StringVersion::Version.new(_1.sub(/\Av/, ''))
+    _1.sub(/\Av/, '').version
   }.sort.last(2)
   if version1 and version2
     puts compute_change(version1, version2)
@@ -124,7 +122,7 @@ when 'range'
 when 'full', 'add'
   ary = []
   tags = x("git tag").lines.grep(/^v?\d+\.\d+\.\d+$/).map(&:chomp).map {
-    Tins::StringVersion::Version.new(_1.sub(/\Av/, ''))
+    _1.sub(/\Av/, '').version
   }.sort
   if command == 'full'
     date=x("git log -n1 --pretty='format:%cd' --date=short v#{tags.first}").chomp
