@@ -7,6 +7,6 @@ config =
     File.join(xdg, 'commit_message')
   end
 
-branch=`git rev-parse --abbrev-ref HEAD`.chomp
+branch = `git rev-parse --abbrev-ref HEAD`.chomp
 exec 'ollama_cli', '-M', "#{config}/options.json", '-P', "branch=#{branch}",
   '-s', "#{config}/system.txt", '-p', "#{config}/prompt.txt"
