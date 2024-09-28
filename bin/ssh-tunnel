@@ -95,11 +95,7 @@ user, remote, rport =
 ssh_dir = File.expand_path('~/.ssh')
 mkdir_p ssh_dir
 sock_file = "#{ssh_dir}/#{user}@#{remote}:#{rport}.sock"
-if env_user = ENV['USER']
-  opts[?n] ||= env_user
-else
-  opts[?n] ||= 'session'
-end
+opts[?n] ||= config.ssh_tunnel.login_session
 if opts[?N]
   cmd "ssh -p #{rport} -S #{sock_file} #{user}@#{remote} #{config.ssh_tunnel.multiplexer_list}"
 else

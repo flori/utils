@@ -179,6 +179,10 @@ class Utils::ConfigFile
 
     config :env, {}
 
+    config :login_session do
+      ENV.fetch('HOME',  'session')
+    end
+
     def initialize
       super
       self.terminal_multiplexer = terminal_multiplexer
