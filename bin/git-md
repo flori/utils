@@ -1,11 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'ollama'
+require 'utils/markdown'
+include Utils::Markdown
 require 'shellwords'
-
-def markdown(message)
-  Ollama::Utils::ANSIMarkdown.parse(message)
-end
 
 cmd = %{git log --color=always --pretty=format:"commit %C(auto)%H%d%nDate:   %Cgreen%cD (%cr)%Creset%nAuthor: %Cblue%an <%ae>%Creset%n%nMARKUP%n%s%n%n%b%nMARKDOWN%n"}
 

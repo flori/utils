@@ -10,6 +10,7 @@ module Utils
   require 'utils/probe_server'
   require 'utils/ssh_tunnel_specification'
   require 'utils/line_blamer'
+  require 'utils/markdown'
 
   require 'utils/xt/source_location_extension'
   class ::Object
