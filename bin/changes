@@ -5,7 +5,7 @@ include Ollama
 require 'tins/xt'
 
 def x(cmd)
-  output=`#{cmd}`
+  output = `#{cmd}`
   $?.success? or fail "failed to execute #{cmd.inspect}"
   output
 end
@@ -31,10 +31,10 @@ def compute_change(range_from, range_to)
     range = "#{range_from}..#{range_to}"
   end
 
-  log=x("git log #{range}")
+  log = x("git log #{range}")
   $?.success? or exit 1
 
-  date=x("git log -n1 --pretty='format:%cd' --date=short #{range_to}")
+  date = x("git log -n1 --pretty='format:%cd' --date=short #{range_to}")
 
   if log.strip.empty?
     return <<~EOT
@@ -125,7 +125,7 @@ when 'full', 'add'
     _1.sub(/\Av/, '').version
   }.sort
   if command == 'full'
-    date=x("git log -n1 --pretty='format:%cd' --date=short v#{tags.first}").chomp
+    date = x("git log -n1 --pretty='format:%cd' --date=short v#{tags.first}").chomp
     ary << <<~EOT
 
       ## #{date} v#{tags.first}
