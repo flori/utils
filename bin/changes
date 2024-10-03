@@ -80,7 +80,8 @@ def compute_change(range_from, range_to)
   )
 
   ollama = Client.new(base_url:, read_timeout: 120)
-  changes = ollama.generate(model:, system:, prompt:, options:, stream: false).response
+  changes = ollama.generate(model:, system:, prompt:, options:, stream: false)
+  changes = changes.response.gsub(/\t/, '  ')
 
   return <<~EOT
 
