@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require 'utils/markdown'
+include Utils::Markdown
+
+puts markdown(ARGF.read)
