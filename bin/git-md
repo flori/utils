@@ -3,9 +3,11 @@
 require 'utils/markdown'
 include Utils::Markdown
 require 'utils/pager'
+require 'term/ansicolor'
+include Term::ANSIColor
 require 'shellwords'
 
-cmd = %{git log --color=always --pretty=format:"commit %C(auto)%H%d%nDate:   %Cgreen%cD (%cr)%Creset%nAuthor: %Cblue%an <%ae>%Creset%n%nMARKUP%n%s%n%n%b%nMARKDOWN%n"}
+cmd = %{git log --color=always --pretty=format:"commit %H%C(auto)%d%nDate:   %Cgreen%cD (%cr)%Creset%nAuthor: %Cblue%an <%ae>%Creset%n%nMARKUP%n%s%n%n%b%nMARKDOWN%n"}
 
 core_pager     = `git config get core.pager`.chomp.full?
 git_pager      = ENV['GIT_PAGER'].full?
@@ -14,6 +16,14 @@ if fallback_pager = `which less`.chomp.full? || `which more`.chomp.full?
   fallback_pager << ' -r'
 end
 my_pager = git_pager || core_pager || default_pager || fallback_pager
+
+repo_url = case git_origin_url = `git remote get-url origin`.chomp
+           when %r(\Ahttps://)
+             u = git_origin_url.sub(%r(\.git\z), '')
+             u << '/commit/'
+           when %r(\Agit@github.com:([^.]+))
+             "https://github.com/#$1/commit/"
+           end
 
 Utils::Pager.pager(command: my_pager) do |output|
   IO.popen("#{cmd} #{Shellwords.join(ARGV)}") do |log|
@@ -30,7 +40,9 @@ Utils::Pager.pager(command: my_pager) do |output|
           if message
             message << line
           else
-            output.puts line
+            output.puts line.sub(/(?<=^commit )(\h{40})/) {
+              yellow { repo_url ? hyperlink(repo_url + $1) { $1 }  : $1 }
+            }
           end
         end
       end
