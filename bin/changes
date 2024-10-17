@@ -55,8 +55,10 @@ def compute_change(range_from, range_to)
     - Summarize the changes in the following git log messages as bullet points.
     - List significant changes as bullet points using markdown when applicable.
     - Mark all names and values for variables, methods, functions, and
-    constants, you see in the messages  as markdown `code`.
-    - Mark all version numbers you see in the messages as markdown **bold**.
+      constants, you see in the messages  as markdown code surrounded by
+      backtick characters.
+    - Mark all version numbers you see in the messages as markdown bold
+     surrounded by two asterisk characters.
     - Don't refer to single commits by sha1 hash.
     - Don't add information about changes you are not sure about.
     - Don't output any additional chatty remarks, notes, introductions,
