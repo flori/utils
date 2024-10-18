@@ -53,6 +53,8 @@ def compute_change(range_from, range_to)
 
   prompt = <<~EOT
     - Summarize the changes in the following git log messages as bullet points.
+    - Don't mention the version of the change set
+    - Skip bullet points about version bumps.
     - List significant changes as bullet points using markdown when applicable.
     - Mark all names and values for variables, methods, functions, and
       constants, you see in the messages  as markdown code surrounded by
