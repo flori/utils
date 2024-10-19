@@ -156,7 +156,7 @@ EOT
 
 options = Ollama::Options.new(
   #repeat_penalty: 1.8,
-  num_ctx: 8192,
+  num_ctx: 16384,
   num_predict: 512,
   temperature: 0,
   #repeat_last_n: -1,

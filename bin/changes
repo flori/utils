@@ -75,7 +75,7 @@ def compute_change(range_from, range_to)
   end
 
   options = Ollama::Options.new(
-    num_ctx: 8192,
+    num_ctx: 16384,
     num_predict: 1024,
     temperature: 0,
     #seed: 1337,
