@@ -22,7 +22,7 @@ for file in files
     for line  in f
       size = line.size
       if size > max
-        lineno = f.lineno + 1
+        lineno = f.lineno
         blamer = Utils::LineBlamer.new(file, lineno) or next
         blame = blamer.perform or next
         author = blame[/\((.*?)\d{4}/, 1]
