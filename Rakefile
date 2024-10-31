@@ -29,7 +29,7 @@ GemHadar do
   dependency 'search_ui',      '~> 0.0'
   dependency 'all_images',     '~> 0.5.0'
   dependency 'ollama-ruby'
-  dependency 'kramdown-ansi'
+  dependency 'kramdown-ansi',  '~> 0.0.1'
   dependency 'simplecov'
   dependency 'debug'
 
