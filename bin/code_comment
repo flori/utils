@@ -36,96 +36,53 @@ model    = ENV.fetch('OLLAMA_MODEL', 'llama3.1')
 #methods             = call_sites.map { fetch_method(_1) } * ?\n
 
 cheatsheet = <<EOT
-# YARD CHEATSHEET http://yardoc.org
+Documenting Code with YARD
 
-## May 2020 - updated fork: https://gist.github.com/phansch/db18a595d2f5f1ef16646af72fe1fb0e
+By default, YARD is compatible with the same RDoc syntax most Ruby developers
+are already familiar with. However, one of the biggest advantages of YARD is
+the extended meta-data syntax, commonly known as "tags", that you can use to
+express small bits of information in a structured and formal manner. While RDoc
+syntax expects you to describe your method in a completely free-form manner,
+YARD recommends declaring your parameters, return types, etc. with the @tag
+syntax, which makes outputting the documentation more consistent and easier to
+read. Consider the RDoc documentation for a method to_format:
 
-cribbed from http://pastebin.com/xgzeAmBn
+# Converts the object into textual markup given a specific `format`
+# (defaults to `:html`)
+#
+# == Parameters:
+# format::
+#   A Symbol declaring the format to convert the object to. This
+#   can be `:text` or `:html`.
+#
+# == Returns:
+# A string representing the object in a specified
+# format.
+#
+def to_format(format = :html)
+  # format the object
+end
 
-Templates to remind you of the options and formatting for the different types of objects you might
-want to document using YARD.
+While this may seem easy enough to read and understand, it's hard for a machine
+to properly pull this data back out of our documentation. Also we've tied our
+markup to our content, and now our documentation becomes hard to maintain if we
+decide later to change our markup style (maybe we don't want the ":" suffix on
+our headers anymore).
 
-## Modules
+In YARD, we would simply define our method as:
 
-    # Namespace for classes and modules that handle serving documentation over HTTP
+# Converts the object into textual markup given a specific format.
+#
+# @param format [Symbol] the format type, `:text` or `:html`
+# @return [String] the object converted into the expected format.
+# @raise [CannotFormatException] the object cannot be formatted
+def to_format(format = :html)
+  # format the object
+end
 
-## Classes
-
-    # Abstract base class for CLI utilities. Provides some helper methods for
-    # the option parser
-    #
-    # @author Full Name
-    # @abstract
-    # @attr [Types] attribute_name a full description of the attribute
-    # @attr_reader [Types] name description of a readonly attribute
-    # @attr_writer [Types] name description of writeonly attribute
-    # @deprecated Describe the reason or provide alt. references here
-
-## Methods
-
-    # An alias to {Parser::SourceParser}'s parsing method
-    #
-    # @author Donovan Bray
-    #
-    # @see http://example.com Description of URL
-    # @see SomeOtherClass#method
-    #
-    # @deprecated Use {#my_new_method} instead of this method because
-    #   it uses a library that is no longer supported in Ruby 1.9.
-    #   The new method accepts the same parameters.
-    #
-    # @abstract
-    # @private
-    #
-    # @param subject [String] The subject
-    # @param from [String] ('nobody') From address
-    # @param to [String] Recipient email
-    # @param body [String] ('') The email's body
-    #
-    # @param (see User#initialize)
-    # @param [OptionParser] opts the option parser object
-    # @param [Array<String>] args the arguments passed from input. This
-    #   array will be modified.
-    # @param [Array<String, Symbol>] list the list of strings and symbols.
-    #
-    # The options parsed out of the commandline.
-    # Default options are:
-    #   :format => :dot
-    #
-    # @example Reverse a string
-    #   "mystring.reverse" #=> "gnirtsym"
-    #
-    # @example Parse a glob of files
-    #   YARD.parse('lib/**/*.rb')
-    #
-    # @raise [ExceptionClass] description
-    #
-    # @return [optional, types, ...] description
-    # @return [true] always returns true
-    # @return [void]
-    # @return [String, nil] the contents of our object or nil
-    #   if the object has not been filled with data.
-    #
-    # We don't care about the "type" here:
-    # @return the object
-    #
-    # @return [String, #read] a string or object that responds to #read
-    # @return description here with no types
-
-## Anywhere
-
-    # @todo Add support for Jabberwocky service
-    #   There is an open source Jabberwocky library available
-    #   at http://somesite.com that can be integrated easily
-    #   into the project.
-
-## Blocks
-
-    # for block {|a, b, c| ... }
-    # @yield [a, b, c] Description of block
-    #
-    # @yieldparam [optional, types, ...] argname description
-    # @yieldreturn [optional, types, ...] description
+Using tags we can add semantic metadata to our code without worrying about
+presentation. YARD will handle presentation for us when we decide to generate
+documentation later.
 EOT
 
 system = <<EOT
