@@ -1,25 +1,25 @@
 #!/usr/bin/env ruby
 
-require 'tins/xt'
+require 'tins'
 require 'term/ansicolor'
-include Tins::GO
-
-$opts = go 'r:v'
-
 class String
   include Term::ANSIColor
+  include Tins::StringVersion
 end
+require 'shellwords'
 
-regexp = $opts[?r] && Regexp.new($opts[?r]) || /^v((?:\d+\.)*\d+)/
+args = ARGV.dup
+args.empty? and args.concat %w[ --color --stat ]
+
+regexp = ENV['GIT_VERSIONS_REGEXP']
+regexp = regexp ? Regexp.new(regexp) : /^v((?:\d+\.)*\d+)/
 
 versions = `git tag`.lines.map(&:chomp).grep(regexp).sort_by { |x|
   x[regexp, 1].version
 }.reverse
+
+git_options = args.empty? ? ' ' : " #{Shellwords.join(args)} "
 versions.each_cons(2) do |new, old|
   puts "Version #{new}".red.bold
-  if $opts[?v]
-    puts `git log --color --stat -u #{old}..#{new}`
-  else
-    puts `git log --color --stat #{old}..#{new}`
-  end
+  puts `git log #{git_options}#{old}..#{new}`
 end
