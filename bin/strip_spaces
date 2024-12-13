@@ -6,11 +6,8 @@ require 'tins/secure_write'
 include Tins::SecureWrite
 require 'tins/find'
 include Tins::Find
+require 'tins/xt/file_binary'
 require 'utils'
-
-class ::File
-  include Utils::FileXt
-end
 
 def usage
   puts <<-EOT

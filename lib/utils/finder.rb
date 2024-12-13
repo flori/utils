@@ -5,10 +5,6 @@ require 'digest/md5'
 require 'fileutils'
 require 'mize'
 
-class ::File
-  include Utils::FileXt
-end
-
 class Utils::Finder
   include Tins::Find
   include Utils::Patterns

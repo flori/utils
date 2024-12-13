@@ -1,10 +1,6 @@
 require 'term/ansicolor'
 require 'tins/xt'
 
-class ::File
-  include Utils::FileXt
-end
-
 class Utils::Grepper
   include Tins::Find
   include Utils::Patterns
