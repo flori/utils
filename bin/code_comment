@@ -8,7 +8,7 @@ def fetch_method(filename_linenumber)
   result = ''
   source_location = filename_linenumber.source_location
   lf = Tins::LinesFile.for_filename(source_location.filename, source_location.linenumber)
-  if spaces = lf.match_backward(/^(\s*)def\s+(?:\S+?)(?:\(|\s*$)/)&.first
+  if spaces = lf.match_backward(/^(\s*|.*?(private|protected)\s+)def\s+(?:\S+?)(?:\(|\s*$)/)&.first
     line_number_begin = lf.line_number
     lf.match_forward(/^#{spaces}end/)
     line_number_end = lf.line_number
@@ -26,11 +26,12 @@ def fetch_file(filename_linenumber)
 end
 
 filename_linenumber = ARGV.shift or fail "require file_name as second argument"
-method   = fetch_method(filename_linenumber)
-#file     = fetch_file(filename_linenumber)
-files = Dir['{lib,spec,test}/**/*.rb']
-base_url = ENV['OLLAMA_URL'] || 'http://%s' % ENV.fetch('OLLAMA_HOST')
-model    = ENV.fetch('OLLAMA_MODEL', 'llama3.1')
+method              = fetch_method(filename_linenumber)
+method_indent       = method[/\A( *)/, 1].size
+#file                = fetch_file(filename_linenumber)
+files               = Dir['{lib,spec,test}/**/*.rb']
+base_url            = ENV['OLLAMA_URL'] || 'http://%s' % ENV.fetch('OLLAMA_HOST')
+model               = ENV.fetch('OLLAMA_MODEL', 'llama3.2')
 #file                = File.read(file_name)
 #call_sites          = %x(cscope -L -3 "#{method_name}" $(find . -name '*.rb') | awk '{ print $1 ":" $3 }').lines.map(&:chomp).uniq
 #methods             = call_sites.map { fetch_method(_1) } * ?\n
@@ -86,7 +87,10 @@ documentation later.
 EOT
 
 system = <<EOT
-You are a Ruby code commenter that writes succinct, simple ruby YARD comments.
+Provide high-quality YARD comments for the given Ruby method, including a brief
+description of its purpose, parameters, raised exceptions (and why), and
+return values, assuming an expert-level understanding of the programming
+concepts involved.
 EOT
 system = nil
 
@@ -95,20 +99,52 @@ Analyze this code:
 
 #{files.map { File.read(_1) } * ?\n}
 
-Then output a succinct YARD comment for the method below.
+Here's an example for how you should document a method.
 
-Follow the following guidelines:
-- Do not repeat the ruby method code.
-- Do not use `, `ruby, ```, ```ruby in your response.
-- Start each line of your comment with a single # character.
-
-Here's a cheatsheet for YARD you can peek into:
-
-#{cheatsheet}
+    # The foo method computes the bar result by processing…
+    # then it returns the result.
+    #
+    # @param first [ String ] the foo string
+    # @param second [ Integer ] the number of bars lengthy detailed mutltiline
+    #                           detailed explanation including a newline.
+    # @param third [ TrueClass, FalseClass ]
+    #
+    # @yield [ a, b ]
+    #
+    # @raise [ ArgumentError ] if block argument wasn't provided
+    # @raise [ ArgumentError ] if second parameter was too small.
+    #
+    # @example
+    #   bar.foo("blub", 4) { |a, b| … } #=> …
+    #
+    # @return [ ProcessResult ]
+    def foo(first, second, third: false, &block)
+      block or raise ArgumentError, 'no &block'
+      a = first * 2
+      if second < 0
+        raise ArgumentError, 'too small'
+      end
+      b = "foo" * second
+      if third
+        a = a * b
+      end
+      block_result = block.(a, b)
+      result = process block_result
+      return result
+    end
 
 And this is the method you should document:
 
 #{method}
+
+Output a YARD comment for this method:
+
+Format requirements:
+
+1. Focus on providing a description of the method's purpose, without including any code snippets.
+2. Never use `, `ruby, ```, ```ruby in your response.
+3. Never add any other remarks or explanation to your response.
+4. Start each line of your comment with a single # character.
 EOT
 
 options = Ollama::Options.new(
@@ -131,5 +167,6 @@ if ENV['DEBUG'].to_i == 1
   end
 end
 
-ollama = Client.new(base_url:, read_timeout: 120)
-ollama.generate(model:, system:, prompt:, options:, stream: false, &Print)
+ollama   = Client.new(base_url:, read_timeout: 120)
+response = ollama.generate(model:, system:, prompt:, options:, stream: false).response
+puts response.gsub(/^/) { ' ' * method_indent }
