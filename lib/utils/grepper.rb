@@ -72,15 +72,11 @@ class Utils::Grepper
       (!@name_pattern || @name_pattern.match(bn))
     then
       File.open(filename, 'rb', encoding: Encoding::UTF_8) do |file|
-        if @args[?b] && !@args[?g] || file.binary? != true
-          @args[?v] and warn "Matching #{filename.inspect}."
-          if @args[?f]
-            @output << filename
-          else
-            match_lines file
-          end
+        @args[?v] and warn "Matching #{filename.inspect}."
+        if @args[?f]
+          @output << filename
         else
-          @args[?v] and warn "Skipping binary file #{filename.inspect}."
+          match_lines file
         end
       end
     else

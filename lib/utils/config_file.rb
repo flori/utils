@@ -132,8 +132,6 @@ class Utils::ConfigFile
 
     config :skip_files, /(\A\.|\.sw[pon]\z|\.log\z|~\z)/
 
-    config :binary, false
-
     config :max_matches, 10
 
     config :index_expire_after
@@ -150,8 +148,6 @@ class Utils::ConfigFile
     config :prune_dirs, /\A(\.svn|\.git|CVS|tmp)\z/
 
     config :skip_files, /(\A\.|\.sw[pon]\z|\.log\z|~\z)/
-
-    config :binary, false
   end
 
   def scope(&block)

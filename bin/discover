@@ -63,7 +63,6 @@ Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args[?c]
 STDOUT.sync = true
 config = Utils::ConfigFile.new
 config.configure_from_paths
-args[?b] ||= config.discover.binary
 args[?n] ||= (args[?l] || args[?L]) ? 1 << 60 : config.discover.max_matches
 
 if args[?s]
