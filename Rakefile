@@ -22,7 +22,7 @@ GemHadar do
   dependency 'drb'
   dependency 'webrick'
   dependency 'tins',           '~> 1.14'
-  dependency 'term-ansicolor', '~> 1.3'
+  dependency 'term-ansicolor', '~> 1.11'
   dependency 'pstree',         '~> 0.3'
   dependency 'infobar',        '~> 0.8'
   dependency 'mize',           '~> 0.6'

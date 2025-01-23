@@ -1,14 +1,14 @@
 # -*- encoding: utf-8 -*-
-# stub: utils 0.62.0 ruby lib
+# stub: utils 0.63.0 ruby lib
 
 Gem::Specification.new do |s|
   s.name = "utils".freeze
-  s.version = "0.62.0".freeze
+  s.version = "0.63.0".freeze
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["Florian Frank".freeze]
-  s.date = "2025-01-10"
+  s.date = "2025-01-23"
   s.description = "This ruby gem provides some useful command line utilities".freeze
   s.email = "flori@ping.de".freeze
   s.executables = ["ascii7".freeze, "blameline".freeze, "changes".freeze, "classify".freeze, "code_comment".freeze, "commit_message".freeze, "create_cstags".freeze, "create_tags".freeze, "discover".freeze, "edit".freeze, "edit_wait".freeze, "enum".freeze, "git-empty".freeze, "git-versions".freeze, "json_check".freeze, "long_lines".freeze, "myex".freeze, "number_files".freeze, "on_change".freeze, "path".freeze, "print_method".freeze, "probe".freeze, "rd2md".freeze, "search".freeze, "sedit".freeze, "serve".freeze, "ssh-tunnel".freeze, "strip_spaces".freeze, "sync_dir".freeze, "untest".freeze, "utils-utilsrc".freeze, "vcf2alias".freeze, "yaml_check".freeze]
@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency(%q<drb>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<webrick>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<tins>.freeze, ["~> 1.14".freeze])
-  s.add_runtime_dependency(%q<term-ansicolor>.freeze, ["~> 1.3".freeze])
+  s.add_runtime_dependency(%q<term-ansicolor>.freeze, ["~> 1.11".freeze])
   s.add_runtime_dependency(%q<pstree>.freeze, ["~> 0.3".freeze])
   s.add_runtime_dependency(%q<infobar>.freeze, ["~> 0.8".freeze])
   s.add_runtime_dependency(%q<mize>.freeze, ["~> 0.6".freeze])
