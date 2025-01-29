@@ -95,7 +95,7 @@ EOT
 system = nil
 
 prompt = <<EOT
-Analyze this code:
+Look at this code to document it:
 
 #{files.map { File.read(_1) } * ?\n}
 
