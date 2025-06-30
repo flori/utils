@@ -32,6 +32,7 @@ GemHadar do
   dependency 'kramdown-ansi',  '~> 0.0.1'
   dependency 'simplecov'
   dependency 'debug'
+  development_dependency 'test-unit'
 
   install_library do
     libdir = CONFIG["sitelibdir"]
