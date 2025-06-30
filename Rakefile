@@ -19,7 +19,7 @@ GemHadar do
   readme      'README.md'
   licenses << 'GPL-2.0'
 
-  dependency 'drb'
+  dependency 'unix_socks'
   dependency 'webrick'
   dependency 'tins',           '~> 1.14'
   dependency 'term-ansicolor', '~> 1.11'
