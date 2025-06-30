@@ -5,7 +5,6 @@ require 'tins/lines_file'
 include Tins::GO
 require 'utils'
 include Utils
-require 'drb'
 require 'shellwords'
 
 def usage
@@ -19,7 +18,6 @@ def usage
       -c            start probe as a client
       -C FOO[=BAR]  set/get env variable on probe server
       -l            start probe as a server
-      -u URI        use this DRb URI communication
       -h            display this help
 
     Version is #{File.basename($0)} #{Utils::VERSION}.
@@ -39,25 +37,17 @@ end
 
 def start_server
   Thread.abort_on_exception = $DEBUG
-
-  begin
-    DRb.start_service
-    DRbObject.new_with_uri($uri).shutdown
-  rescue DRb::DRbConnError
-  end
-
-  Utils::ProbeServer.new($uri).start
+  Utils::ProbeServer.new.start
 end
 
 def connect_server
-  DRb.start_service
-  probe_server = DRbObject.new_with_uri($uri)
+  probe_client = ProbeClient.new
   if setting = $opts[?C]
     case setting
     when /\A([^=]+)=([^=]+)\z/
-      probe_server.env[$1] = $2
+      probe_client.env[$1] = $2
     when /\A([^=]+)\z/
-      puts probe_server.env[$1]
+      puts probe_client.env[$1]
     else
       usage
     end
@@ -66,7 +56,7 @@ def connect_server
     opts = $opts.subhash(*%w[n t]).each_with_object([]) { |(k, v), a|
       v.full? and a.concat [ "-#{k}", v ]
     }
-    probe_server.enqueue opts + $args
+    probe_client.enqueue opts + $args
     exit
   end
 end
@@ -80,10 +70,8 @@ if i = ARGV.index('--')
 else
   $args = ARGV.dup
 end
-$opts = go 'lct:n:u:C:h', $args
+$opts = go 'lct:n:C:h', $args
 $opts[?h] and usage
-
-$uri = $opts[?u] || 'drbunix:probe.socket'
 
 case
 when $opts[?l]

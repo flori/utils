@@ -1,3 +1,4 @@
+require 'unix_socks'
 require 'tins/xt'
 require 'term/ansicolor'
 class String
@@ -5,48 +6,91 @@ class String
 end
 
 module Utils
-  class ProbeServer
-    class Job
-      def initialize(probe_server, args)
-        @id           = probe_server.next_job_id
-        @args         = Array(args)
-      end
-
-      attr_reader :id
-
-      attr_reader :args
-
-      attr_writer :ok
-
-      def ok
-        case @ok
-        when false then 'n'
-        when true  then 'y'
-        else            '…'
-        end
-      end
-
-      def ok_colorize(string)
-        case @ok
-        when false then string.white.on_red
-        when true  then string.black.on_green
-        else            string
-        end
-      end
-
-      def inspect
-        ok_colorize("#{id} #{args.map { |a| a.include?(' ') ? a.inspect : a } * ' '}")
-      end
-
-      alias to_s inspect
+  class ProcessJob
+    def initialize(args:, probe_server: nil)
+      @id           = probe_server&.next_job_id
+      @args         = Array(args)
     end
 
-    def initialize(uri)
-      @uri        = uri
-      @history    = [].freeze
-      @jobs_queue = Queue.new
+    attr_reader :id
+
+    attr_reader :args
+
+    attr_writer :ok
+
+    def type
+      'process_job'
+    end
+
+    def ok
+      case @ok
+      when false then 'n'
+      when true  then 'y'
+      else            '…'
+      end
+    end
+
+    def ok_colorize(string)
+      case @ok
+      when false then string.white.on_red
+      when true  then string.black.on_green
+      else            string
+      end
+    end
+
+    def inspect
+      ok_colorize("#{id} #{args.map { |a| a.include?(' ') ? a.inspect : a } * ' '}")
+    end
+
+    alias to_s inspect
+
+    def as_json(*)
+      { type:, id:, args:, }
+    end
+
+    def to_json(*)
+      as_json.to_json(*)
+    end
+  end
+
+  class ProbeClient
+    class EnvProxy
+      def initialize(server)
+        @server = server
+      end
+
+      def []=(key, value)
+        sock = @server.transmit(type: 'set_env', key:, value:)
+        sock.gets.chomp.full?
+      end
+
+      def [](key)
+        sock = @server.transmit(type: 'get_env', key:)
+        sock.gets.chomp.full?
+      end
+
+      attr_reader :env
+    end
+
+    def initialize
+      @server = UnixSocks::Server.new(socket_name: 'probe.sock', runtime_dir: Dir.pwd)
+    end
+
+    def env
+      EnvProxy.new(@server)
+    end
+
+    def enqueue(args)
+      @server.transmit({ type: 'process_job', args: })
+    end
+  end
+
+  class ProbeServer
+    def initialize
+      @server         = UnixSocks::Server.new(socket_name: 'probe.sock', runtime_dir: Dir.pwd)
+      @history        = [].freeze
+      @jobs_queue     = Queue.new
       @current_job_id = 0
-      Thread.new { work_loop }
     end
 
     def print(*msg)
@@ -56,10 +100,15 @@ module Utils
     end
 
     def start
-      output_message "Starting probe server listening to #{@uri.inspect}.", type: :info
-      DRb.start_service(@uri, self)
+      output_message "Starting probe server listening to #{@server.server_socket_path}.", type: :info
+      work_loop = Thread.new do
+        loop do
+          job = @jobs_queue.pop
+          run_job job
+        end
+      end
       begin
-        DRb.thread.join
+        receive_loop.join
       rescue Interrupt
         ARGV.clear << '-f'
         output_message %{\nEntering interactive mode.}, type: :info
@@ -70,7 +119,8 @@ module Utils
         ensure
           $VERBOSE = old
         end
-        output_message "Quitting interactive mode, but still listening to #{@uri.inspect}.", type: :info
+        @server.remove_socket_path
+        output_message "Quitting interactive mode, but still listening to #{@server.server_socket_path}.", type: :info
         retry
       end
     end
@@ -91,17 +141,17 @@ module Utils
       docs_size = docs.map { |a| a.first.size }.max
       format = "%-#{docs_size}s %-3s %s"
       output_message [
-          (format % %w[ command sho description ]).on_color(20).white
-        ] << docs.map { |cmd, doc|
-          shortcut = shortcut_of(cmd) and shortcut = "(#{shortcut})"
-          format % [ cmd, shortcut, doc ]
-        }
+        (format % %w[ command sho description ]).on_color(20).white
+      ] << docs.map { |cmd, doc|
+        shortcut = shortcut_of(cmd) and shortcut = "(#{shortcut})"
+        format % [ cmd, shortcut, doc ]
+      }
     end
 
-    doc 'Enqueue a new job with the argument array <job_args>.'
+    doc 'Enqueue a new job with the argument array <args>.'
     shortcut :e
-    def job_enqueue(job_args)
-      job = Job.new(self, job_args)
+    def job_enqueue(args)
+      job = ProcessJob.new(args:, probe_server: self)
       output_message " → #{job.inspect} enqueued.", type: :info
       @jobs_queue.push job
     end
@@ -118,7 +168,7 @@ module Utils
     doc 'Repeat the job with <job_id> or the last, it will be assigned a new id, though.'
     shortcut :r
     def job_repeat(job_id = @history.last)
-      Job === job_id and job_id = job_id.id
+      ProcessJob === job_id and job_id = job_id.id
       if old_job = @history.find { |job| job.id == job_id }
         job_enqueue old_job.args
         true
@@ -209,15 +259,21 @@ module Utils
         message << " and failed with exit status #{$?.exitstatus}!"
         output_message message, type: :failure
       end
-      @history += [ @job.freeze ]
+      @history += [ job.freeze ]
       @history.freeze
-      @job = nil
     end
 
-    def work_loop
-      loop do
-        @job = @jobs_queue.shift
-        run_job @job
+    def receive_loop
+      @server.receive_in_background do |job|
+        case job.type
+        when 'process_job'
+          enqueue job.args
+        when 'set_env'
+          env[job.key] = job.value
+          job.socket.puts env[job.key]
+        when 'get_env'
+          job.socket.puts env[job.key]
+        end
       end
     end
 
