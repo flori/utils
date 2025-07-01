@@ -60,13 +60,13 @@ module Utils
       end
 
       def []=(key, value)
-        sock = @server.transmit(type: 'set_env', key:, value:)
-        sock.gets.chomp.full?
+        response = @server.transmit_with_response(type: 'set_env', key:, value:)
+        response.env
       end
 
       def [](key)
-        sock = @server.transmit(type: 'get_env', key:)
-        sock.gets.chomp.full?
+        response = @server.transmit_with_response(type: 'get_env', key:)
+        response.env
       end
 
       attr_reader :env
@@ -270,9 +270,9 @@ module Utils
           enqueue job.args
         when 'set_env'
           env[job.key] = job.value
-          job.socket.puts env[job.key]
+          job.respond(env: env[job.key])
         when 'get_env'
-          job.socket.puts env[job.key]
+          job.respond(env: env[job.key])
         end
       end
     end

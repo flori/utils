@@ -45,7 +45,7 @@ def connect_server
   if setting = $opts[?C]
     case setting
     when /\A([^=]+)=([^=]+)\z/
-      probe_client.env[$1] = $2
+      puts probe_client.env[$1] = $2
     when /\A([^=]+)\z/
       puts probe_client.env[$1]
     else
