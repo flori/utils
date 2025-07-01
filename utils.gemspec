@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/flori/utils".freeze
   s.licenses = ["GPL-2.0".freeze]
   s.rdoc_options = ["--title".freeze, "Utils - Some useful command line utilities".freeze, "--main".freeze, "README.md".freeze]
-  s.rubygems_version = "3.6.7".freeze
+  s.rubygems_version = "3.6.9".freeze
   s.summary = "Some useful command line utilities".freeze
   s.test_files = ["tests/test_helper.rb".freeze, "tests/utils_test.rb".freeze]
 
