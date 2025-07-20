@@ -34,7 +34,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency(%q<mize>.freeze, ["~> 0.6".freeze])
   s.add_runtime_dependency(%q<search_ui>.freeze, ["~> 0.0".freeze])
   s.add_runtime_dependency(%q<all_images>.freeze, ["~> 0.5.0".freeze])
-  s.add_runtime_dependency(%q<ollama-ruby>.freeze, [">= 0".freeze])
+  s.add_runtime_dependency(%q<ollama-ruby>.freeze, ["~> 1.4.0".freeze])
   s.add_runtime_dependency(%q<kramdown-ansi>.freeze, ["~> 0.0.1".freeze])
   s.add_runtime_dependency(%q<simplecov>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<debug>.freeze, [">= 0".freeze])
