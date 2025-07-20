@@ -6,5 +6,6 @@ include Utils::XDGConfig
 config = xdg_config('commit_message')
 
 branch = `git rev-parse --abbrev-ref HEAD`.chomp
-exec 'ollama_cli', '-M', "#{config}/options.json", '-P', "branch=#{branch}",
+exec 'ollama_cli', '-c', "#{config}/client.json",
+  '-M', "#{config}/options.json", '-P', "branch=#{branch}",
   '-s', "#{config}/system.txt", '-p', "#{config}/prompt.txt"
