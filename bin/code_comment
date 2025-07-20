@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby
 
-require 'utils'
 require 'ollama'
 include Ollama
+require 'utils'
+include Utils::XDGConfig
 
 def fetch_method(filename_linenumber)
   result = ''
@@ -167,6 +168,9 @@ if ENV['DEBUG'].to_i == 1
   end
 end
 
-ollama   = Client.new(base_url:, read_timeout: 120)
+config = xdg_config('code_comment')
+client_config = Client::Config.load_from_json "#{config}/client.json"
+client_config.base_url = base_url
+ollama   = Client.configure_with(client_config)
 response = ollama.generate(model:, system:, prompt:, options:, stream: false).response
 puts response.gsub(/^/) { ' ' * method_indent }
