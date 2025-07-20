@@ -1,11 +1,9 @@
 #!/usr/bin/env ruby
 
-config =
-  if (xdg = ENV['XDG_CONFIG_HOME'].to_s.strip).size == 0
-    File.join(ENV.fetch('HOME'), '.config', 'commit_message')
-  else
-    File.join(xdg, 'commit_message')
-  end
+require 'utils'
+include Utils::XDGConfig
+
+config = xdg_config('commit_message')
 
 branch = `git rev-parse --abbrev-ref HEAD`.chomp
 exec 'ollama_cli', '-M', "#{config}/options.json", '-P', "branch=#{branch}",
