@@ -3,6 +3,8 @@
 require 'ollama'
 include Ollama
 require 'tins/xt'
+require 'utils'
+include Utils::XDGConfig
 
 def x(cmd)
   output = `#{cmd}`
@@ -43,48 +45,23 @@ def compute_change(range_from, range_to)
     EOT
   end
 
-  base_url = ENV['OLLAMA_URL'] || 'http://%s' % ENV.fetch('OLLAMA_HOST')
-  model    = ENV.fetch('OLLAMA_MODEL', 'llama3.1')
+  config = xdg_config('changes')
 
-  system = <<~EOT
-    You are a Ruby programmer generating a change log entry in markdown syntax,
-    summarizing the code changes for a new version in a professional way.
-  EOT
-
-  prompt = <<~EOT
-    - Summarize the changes in the following git log messages as bullet points.
-    - Don't mention the version of the change set
-    - Skip bullet points about version bumps.
-    - List significant changes as bullet points using markdown when applicable.
-    - Mark all names and values for variables, methods, functions, and
-      constants, you see in the messages  as markdown code surrounded by
-      backtick characters.
-    - Mark all version numbers you see in the messages as markdown bold
-     surrounded by two asterisk characters.
-    - Don't refer to single commits by sha1 hash.
-    - Don't add information about changes you are not sure about.
-    - Don't output any additional chatty remarks, notes, introductions,
-      communications, etc.
-
-    #{log}
-  EOT
+  base_url      = ENV['OLLAMA_URL'] || 'http://%s' % ENV.fetch('OLLAMA_HOST')
+  model         = ENV.fetch('OLLAMA_MODEL', 'llama3.1')
+  system        = File.read("#{config}/system.txt")
+  prompt        = File.read("#{config}/prompt.txt") + "\n\n#{log}\n"
+  client_config = Client::Config.load_from_json("#{config}/client.json")
+  client_config.base_url = base_url
 
   if ENV['DEBUG'].to_i == 1
     STDERR.puts "system:\n#{system}"
     STDERR.puts "prompt:\n#{prompt}"
   end
 
-  options = Ollama::Options.new(
-    num_ctx: 16384,
-    num_predict: 1024,
-    temperature: 0,
-    #seed: 1337,
-    top_p: 1,
-    min_p: 0.1,
-  )
-
-  ollama = Client.new(base_url:, read_timeout: 120)
-  changes = ollama.generate(model:, system:, prompt:, options:, stream: false)
+  ollama  = Client.configure_with(client_config)
+  options = Options.load_from_json "#{config}/options.json"
+  changes = ollama.generate(model:, system:, prompt:, options:, stream: false, think: false)
   changes = changes.response.gsub(/\t/, '  ')
 
   return <<~EOT
