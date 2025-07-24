@@ -172,5 +172,5 @@ config = xdg_config('code_comment')
 client_config = Client::Config.load_from_json "#{config}/client.json"
 client_config.base_url = base_url
 ollama   = Client.configure_with(client_config)
-response = ollama.generate(model:, system:, prompt:, options:, stream: false).response
+response = ollama.generate(model:, system:, prompt:, options:, stream: false, think: false).response
 puts response.gsub(/^/) { ' ' * method_indent }
