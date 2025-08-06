@@ -23,6 +23,9 @@ end
 ssh_tunnel do
   terminal_multiplexer :tmux
   login_session "/home/#{ENV['USER']}"
+  env(
+    FOO: 'test'
+  )
 end
 
 classify do

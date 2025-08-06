@@ -113,11 +113,11 @@ else
     end
   end
   config.ssh_tunnel.env.each do |var, val|
-    ENV[var.to_s] = val.to_s
+    env << "#{var}='#{val}'"
   end
   opts[?e].to_a.each do |setting|
     var, val = setting.split('=', 2)
-    ENV[var] = val
+    env << "#{var}='#{val}'"
   end
   cmd "ssh -p #{rport} -Mt  "\
     "-S #{sock_file} #{user}@#{remote} #{tunnels * ' '} "\
