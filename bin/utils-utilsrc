@@ -7,6 +7,20 @@ include Utils
 $config = Utils::ConfigFile.new
 $utilsrc = File.expand_path('~/.utilsrc')
 
+# Creates a default utilsrc file by generating configuration content and
+# yielding temporary and source paths.
+#
+# This method checks if a utilsrc file exists at the configured path, and if so,
+# creates a temporary file containing the Ruby representation of the current
+# configuration. It then yields both the temporary file path and the original
+# utilsrc path to the provided block for further processing.
+#
+# @return [ nil ] returns nil if no utilsrc file exists at the configured path
+#
+# @yield [ tmp_path, source_path ]
+#
+# @yieldparam tmp_path [ String ] the path to the temporary file containing configuration
+# @yieldparam source_path [ String ] the path to the original utilsrc file
 def create_default_utilsrc
   if File.exist?($utilsrc)
     Tempfile.open('utilsrc') do |tmp|
