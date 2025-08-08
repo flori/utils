@@ -97,13 +97,7 @@ end
 
 def execute_command(command, format, tuple)
   formatted = (format % tuple).split(/:/)
-  if $limited
-    $limited.execute do
-      system sprintf(command, *formatted)
-    end
-  else
-    system sprintf(command, *formatted)
-  end
+  system sprintf(command, *formatted)
 end
 
 def usage
@@ -157,11 +151,26 @@ ranges = parse_ranges($ranges)
 generator = Generator.new(ranges)
 $opts[?f] ||= %w[ %s ] * generator.size * ':'
 
-generator.each do |tuple|
-  if $opts[?e]
-    execute_command($opts[?e], $opts[?f], tuple)
-  else
-    puts $opts[?f] % tuple
+if $limited
+  $limited.process do |l|
+    generator.each do |tuple|
+      l.execute do
+        if $opts[?e]
+          execute_command($opts[?e], $opts[?f], tuple)
+        else
+          puts $opts[?f] % tuple
+        end
+      end
+    end
+    $limited.stop
+  end
+else
+  generator.each do |tuple|
+    if $opts[?e]
+      execute_command($opts[?e], $opts[?f], tuple)
+    else
+      puts $opts[?f] % tuple
+    end
   end
 end
 exit 0
