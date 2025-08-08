@@ -5,12 +5,34 @@ include Ollama
 require 'tins/xt'
 require 'utils'
 
+# Executes a shell command and returns its output.
+#
+# This method runs the provided command in a shell environment and captures its
+# standard output. If the command fails (returns a non-zero exit status), it
+# raises an exception with details about the failure.
+#
+# @param cmd [ String ] the shell command to be executed
+#
+# @return [ String ] the standard output of the executed command
+#
+# @raise [ RuntimeError ] if the executed command returns a non-zero exit status
 def x(cmd)
   output = `#{cmd}`
   $?.success? or fail "failed to execute #{cmd.inspect}"
   output
 end
 
+# Finds the highest version tag from a CHANGES file by parsing version strings
+# in YYYY-MM-DD vMAJOR.MINOR.PATCH format.
+#
+# This method reads through the specified file line by line, extracting version
+# tags that match the pattern "## YYYY-MM-DD vMAJOR.MINOR.PATCH" and determines
+# the highest version number among them.
+#
+# @param filename [ String ] the path to the file containing version tags
+#
+# @return [ String, nil ] the highest version string found in the file, or nil
+# if no valid version tags are present
 def find_highest_version_tag(filename)
   File.open(filename, ?r) do |input|
     tags = []
@@ -23,6 +45,17 @@ def find_highest_version_tag(filename)
   end
 end
 
+# The compute_change method generates a changelog entry by processing Git log
+# information and using an LLM to create a formatted summary.
+#
+# This method takes two range parameters, computes the Git log between them,
+# retrieves the commit date, and then uses an LLM to generate a human-readable
+# changelog entry based on configuration files and prompt templates.
+#
+# @param range_from [ Object ] the starting point of the Git log range
+# @param range_to [ Object ] the ending point of the Git log range
+#
+# @return [ String ] a formatted changelog entry including the date and LLM-generated content
 def compute_change(range_from, range_to)
   range_from = range_from.to_s.sub(/\Av?/, ?v)
   if range_to.to_s == 'HEAD'
