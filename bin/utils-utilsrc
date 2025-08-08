@@ -2,10 +2,6 @@
 
 require 'tempfile'
 require 'utils'
-include Utils
-
-$config = Utils::ConfigFile.new
-$utilsrc = File.expand_path('~/.utilsrc')
 
 # Creates a default utilsrc file by generating configuration content and
 # yielding temporary and source paths.
@@ -31,6 +27,14 @@ def create_default_utilsrc
   end
 end
 
+$config = Utils::ConfigFile.new
+utilsrc_path = if ARGV.size == 2
+                 ARGV.pop
+               else
+                 '~/.utilsrc'
+               end
+$utilsrc = File.expand_path(utilsrc_path)
+
 case cmd = ARGV.shift
 when 'show'
   if File.exist?($utilsrc)
@@ -50,6 +54,19 @@ when 'edit'
   end
 else
   puts <<~EOT
-    Usage: #{File.basename($0)} show|diff|edit
+    Usage: #{File.basename($0)} show|diff|edit|default [UTILSRC]
+
+    Commands:
+
+    show     - Display current ~/.utilsrc file or default config if none exists
+    default  - Show the default Ruby configuration representation
+    diff     - Show differences between current config and default using 'diff'
+    edit     - Open current config in vimdiff to compare with default for editing
+
+
+    Arguments:
+
+    UTILSRC   - Optional path to configuration file (defaults to ~/.utilsrc)
+
   EOT
 end
