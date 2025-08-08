@@ -1,5 +1,33 @@
 #!/usr/bin/env ruby
 
+# This script generates a visual representation of how 7-bit ASCII characters #
+# are interpreted when the upper 2 bits (prefix) are varied while keeping the
+# lower 5 bits constant. It demonstrates the relationship between binary
+# patterns and character representations in classic ASCII encoding.
+#
+# The output shows:
+# - First column: Lower 5 bits of ASCII values (0-31 in binary)
+# - Remaining columns: Character names for each prefix combination (00, 01, 10, 11)
+#   where prefix + lower_bits = full 7-bit ASCII value
+#
+# This reveals how early computer systems treated the same bit patterns differently
+# depending on context or system interpretation, and illustrates the evolution
+# from control characters to printable ASCII ranges.
+#
+# The script uses bit manipulation: (prefix << 5) | lower_bits
+# to generate all 32 combinations of the lower 5 bits with 4 possible prefixes.
+#
+# This demonstrates fundamental concepts in computer science:
+# - Bit-level character encoding
+# - Historical ASCII design principles  
+# - Binary representation and manipulation
+# - Control character vs printable character distinctions
+#
+# References:
+# - Original 7-bit ASCII standard
+# - Early computer system character set conventions
+# - Bit manipulation in low-level programming
+
 map = Hash.new { |h, k| h[k] = k }.merge(
   " "    => "Spc",
   "\x7f" => "DEL"
