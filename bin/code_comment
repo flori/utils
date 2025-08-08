@@ -5,10 +5,32 @@ include Ollama
 require 'utils'
 include Utils::XDGConfig
 
+META_METHOD = /(
+  (class_)?                   # Optional "class_" prefix
+  attr(                       # "attr" keyword
+    _reader|                  # reader variant
+    _writer|                  # writer variant  
+    _accessor                 # accessor variant
+  )?                          # Optional variant
+  |                           # OR
+  dsl_(accessor|reader)       # DSL accessor patterns
+  |                           # OR
+  constant                    # Constant definitions
+  |                           # OR
+  (instance_)?                # Optional "instance_" prefix
+  thread(                     # "thread" keyword
+    _local|                    # local variant
+    _global                   # global variant
+  )?                          # Optional variant
+)\s+:/x
+
 def fetch_method(filename_linenumber)
   result = ''
   source_location = filename_linenumber.source_location
   lf = Tins::LinesFile.for_filename(source_location.filename, source_location.linenumber)
+  if lf.line =~ META_METHOD
+    return lf.line
+  end
   if spaces = lf.match_backward(/^(\s*|.*?(private|protected)\s+)def\s+(?:\S+?)(?:\(|\s*$)/)&.first
     line_number_begin = lf.line_number
     lf.match_forward(/^#{spaces}end/)
@@ -102,37 +124,20 @@ Look at this code to document it:
 
 Here's an example for how you should document a method.
 
-    # The foo method computes the bar result by processing…
-    # then it returns the result.
-    #
-    # @param first [ String ] the foo string
-    # @param second [ Integer ] the number of bars lengthy detailed mutltiline
-    #                           detailed explanation including a newline.
-    # @param third [ TrueClass, FalseClass ]
-    #
-    # @yield [ a, b ]
-    #
-    # @raise [ ArgumentError ] if block argument wasn't provided
-    # @raise [ ArgumentError ] if second parameter was too small.
-    #
-    # @example
-    #   bar.foo("blub", 4) { |a, b| … } #=> …
-    #
-    # @return [ ProcessResult ]
-    def foo(first, second, third: false, &block)
-      block or raise ArgumentError, 'no &block'
-      a = first * 2
-      if second < 0
-        raise ArgumentError, 'too small'
-      end
-      b = "foo" * second
-      if third
-        a = a * b
-      end
-      block_result = block.(a, b)
-      result = process block_result
-      return result
-    end
+  # The foo method computes the bar result by processing…
+  # then it returns the result.
+  #
+  # @param first [ String ] the foo string
+  # @param second [ Integer ] the number of bars lengthy detailed mutltiline
+  #                           detailed explanation including a newline.
+  # @param third [ TrueClass, FalseClass ]
+  #
+  # @yield [ a, b ]
+  #
+  # @raise [ ArgumentError ] if block argument wasn't provided
+  # @raise [ ArgumentError ] if second parameter was too small.
+  #
+  # @return [ ProcessResult ]
 
 And this is the method you should document:
 
@@ -142,10 +147,13 @@ Output a YARD comment for this method:
 
 Format requirements:
 
-1. Focus on providing a description of the method's purpose, without including any code snippets.
-2. Never use `, `ruby, ```, ```ruby in your response.
-3. Never add any other remarks or explanation to your response.
-4. Start each line of your comment with a single # character.
+1. Focus on providing a description of the method's purpose
+   without including any code snippets.
+2. You should ommit the @return if it is void.
+2. You should ommit the @raise if you are not sure.
+3. Never use `, `ruby, ```, ```ruby in your response.
+4. Never add any other remarks or explanation to your response.
+5. Start each line of your comment with a single # character.
 EOT
 
 options = Ollama::Options.new(
