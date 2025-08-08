@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+
+require 'figlet'
+require 'term/ansicolor'
+include Term::ANSIColor
+
+def fetch_font(font_name)
+  font_name += ".flf" unless font_name.end_with?(".flf")
+
+  font_path =
+    if File.exist?(font_name)
+      font_name
+    else
+      `find $(brew --prefix figlet)/share/figlet/fonts -name #{font_name}`.chomp
+    end
+
+  if font_path.empty?
+    fonts = `find $(brew --prefix figlet)/share/figlet/fonts -name '*.flf'`.
+      lines.map { File.basename(it.chomp) }
+    STDERR.puts "Font #{font_name} not found in\n#{fonts.sort * ?\n}"
+    exit 1
+  end
+
+  Figlet::Font.new(font_path)
+end
+
+def create_rainbow_ascii(text)
+  ascii_art = $t[text]
+
+  colors = [red, yellow, green, cyan, blue, magenta, red]
+
+  lines = ascii_art.lines.to_a
+
+  colored_lines = lines.map.with_index do |line, index|
+    color = colors[index % colors.length]
+    "#{color}#{line}#{clear}"
+  end
+
+  colored_lines.join
+end
+
+if STDIN.tty?
+  text = ARGV.shift || [ 'ruby', RUBY_VERSION ] * ' '
+else
+  text = STDIN.read 
+end
+
+font = fetch_font(ARGV.shift || "big.flf")
+$t = Figlet::Typesetter.new(font)
+puts create_rainbow_ascii(text)

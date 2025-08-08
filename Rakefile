@@ -30,6 +30,7 @@ GemHadar do
   dependency 'all_images',     '~> 0.5.0'
   dependency 'ollama-ruby',    '~> 1.5.0'
   dependency 'kramdown-ansi',  '~> 0.0.1'
+  dependency 'figlet',         '~> 1.0'
   dependency 'simplecov'
   dependency 'debug'
   development_dependency 'test-unit'
