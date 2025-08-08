@@ -1,6 +1,28 @@
 #!/usr/bin/env ruby
-
-require 'yaml'
+#
+# YAML Validator - Checks YAML syntax correctness
+#
+# This script validates YAML files or stdin input for proper syntax.
+# It uses YAML.unsafe_load which can execute arbitrary Ruby code, so
+# use with caution on untrusted input.
+#
+# Usage:
+#   ./yaml_check <filename>     # Validate a file
+#   cat file.yaml | ./yaml_check # Validate from stdin
+#
+# Options:
+#   DEBUG=1                     # Enable verbose output with parsed YAML
+#
+# Output:
+#   'ok' - if YAML is valid
+#   'nak' - if YAML is invalid
+#   Error messages to STDERR with line/column information
+#
+# Examples:
+#   ./yaml_check config.yaml
+#   echo "name: John" | ./yaml_check
+#   DEBUG=1 ./yaml_check data.yaml
+#
 
 format = -> s {
   if /^\((?<f>[^)]+)\):\ (?<m>.*?) at line (?<l>\d+) column (?<c>\d+)/ =~ s
