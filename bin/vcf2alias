@@ -1,10 +1,22 @@
 #!/usr/bin/env ruby
-#
+
 require 'tins/xt'
 require 'set'
 
 $shortcuts = Set.new
 
+# The shortcut method generates a unique shorthand identifier for a given
+# function name.
+#
+# This method creates a concise shortcut representation by extracting initial
+# capital letters from the function name and appending an optional suffix.
+# It ensures uniqueness by incrementing a numeric suffix or appending a digit
+# when conflicts are detected in the global shortcuts collection.
+#
+# @param fn [ String ] the full name to generate a shortcut for
+# @param suffix [ String, nil ] an optional suffix to append to the shortcut
+#
+# @return [ String ] the generated unique shortcut identifier
 def shortcut(fn, suffix = nil)
   shortcut = fn.scan(/([A-ZÄÖÜ])[a-zäöü]/).join.downcase
   shortcut.empty? and return fn.gsub(' ', ?_)
