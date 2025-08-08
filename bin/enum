@@ -5,21 +5,48 @@ include Tins
 include Tins::GO
 
 class CompoundRange
+  # Initializes a new instance with an empty ranges array.
   def initialize
     @ranges = []
   end
 
+  # The concat method adds a range to the internal ranges collection and
+  # returns the instance for chaining.
+  #
+  # @param range [ Object ] the range to be added to the collection
+  #
+  # @return [ self ] the instance itself, enabling method chaining
   def concat(range)
     @ranges << range
     self
   end
 
+  # The each method iterates over each range in the instance's ranges
+  # collection and yields each element to the provided block.
+  #
+  # This method delegates the iteration to each range object in the @ranges
+  # collection, allowing the block to be executed for every element contained
+  # within these ranges.
+  #
+  # @yield [ element ]
+  #
+  # @return [ nil ] returns nil after completing the iteration over all ranges
   def each(&block)
     @ranges.each { |r| r.each(&block) }
   end
 end
 
 class Step
+  # Initializes a new Range instance with the specified parameters.
+  #
+  # This method sets up the internal state of a Range object by storing the
+  # start value, end value, step size, and exclusive flag. It also adjusts the
+  # end value when the range is exclusive to ensure proper iteration behavior.
+  #
+  # @param a [ Object ] the starting value of the range
+  # @param b [ Object ] the ending value of the range
+  # @param step [ Object ] the step size for incrementing through the range
+  # @param exclusive [ TrueClass, FalseClass ] whether the range excludes the end value
   def initialize(a, b, step = 1, exclusive = false)
     @a = a
     @b = b
@@ -33,12 +60,33 @@ class Step
     end
   end
 
+  # The each method iterates over a range of values using a step increment.
+  #
+  # This method executes a block for each value in the range from @a to @b,
+  # incrementing by @step each time. It provides a way to perform operations
+  # on a sequence of numbers with a specified increment.
+  #
+  # @param block [ Proc ] the block to be executed for each value in the range
+  #
+  # @return [ Integer ] the final value of the iteration
   def each(&block)
     @a.step(@b, @step, &block)
   end
 end
 
 class StringRange
+  # Initializes a new Range instance with the specified bounds and exclusivity.
+  #
+  # This method creates a range object by determining the appropriate bounds
+  # based on the relationship between the first and second parameters. It
+  # handles both inclusive and exclusive range creation, supporting reverse
+  # ordering of bounds.
+  #
+  # @param a [ Integer ] the first boundary value of the range
+  # @param b [ Integer ] the second boundary value of the range
+  # @param exclusive [ TrueClass, FalseClass ] whether the range should be exclusive
+  #
+  # @return [ Range ] a new Range instance with the specified parameters
   def initialize(a, b, exclusive = false)
     @range = if a > b
       if exclusive
@@ -51,12 +99,33 @@ class StringRange
     end
   end
 
+  # The each method iterates over the range and yields each element to the
+  # provided block.
+  #
+  # @yield [ element ]
+  #
+  # @return [ nil ] returns nil after completing the iteration
+  def each(&block)
+    @range.each(&block)
+  end
   def each(&block)
     @range.each(&block)
   end
 end
 
 class IntegerRange < Step
+  # Initializes a new instance with the specified parameters and sets up
+  # internal state.
+  #
+  # This method configures the object's internal attributes based on the
+  # provided arguments and initializes the parent class with computed values.
+  # It handles parameter validation and setup for exclusive access scenarios.
+  #
+  # @param a [ Object ] the first parameter used in initialization
+  # @param b [ Object ] the second parameter used in initialization
+  # @param exclusive [ TrueClass, FalseClass ] flag indicating whether exclusive access should be enabled
+  #
+  # @return [ void ] returns nil after initialization is complete
   def initialize(a, b, exclusive = false)
     @a = a
     @b = b
@@ -64,6 +133,16 @@ class IntegerRange < Step
   end
 end
 
+# The parse_range method converts a range string into a range object.
+#
+# This method handles various range formats including single numbers, 
+# number ranges, string ranges, and stepped ranges.
+# It parses the input string and returns the appropriate range object
+# based on the format encountered.
+#
+# @param range [ String ] the range string to be parsed
+#
+# @return [ Object ] a range object corresponding to the parsed string
 def parse_range(range)
   case range
   when /,/
@@ -91,15 +170,44 @@ def parse_range(range)
   end
 end
 
+# The parse_ranges method processes a pattern string by splitting it on colons
+# and parsing each resulting range component.
+#
+# This method takes a pattern string, splits it into individual range
+# components using colons as delimiters, and then parses each component into a
+# structured format using the parse_range helper method.
+#
+# @param pattern [ String ] the pattern string containing ranges separated by colons
+#
+# @return [ Array<Object> ] an array of parsed range objects resulting from
+# splitting and parsing the input pattern
 def parse_ranges(pattern)
   pattern.split(/:/).map { |range| parse_range(range) }
 end
 
+# The execute_command method formats a command string with provided arguments
+# and executes it.
+#
+# This method takes a command template, a format string, and a tuple of values
+# to be inserted into the command. It processes the format string with the
+# tuple values, splits the result by colons, and then executes the system
+# command with the formatted arguments.
+#
+# @param command [ String ] the command template string with format placeholders
+# @param format [ String ] the format string used to process the tuple values
+# @param tuple [ Array ] the array of values to be inserted into the formatted command
+#
+# @return [ Boolean ] returns the result of the system command execution
 def execute_command(command, format, tuple)
   formatted = (format % tuple).split(/:/)
   system sprintf(command, *formatted)
 end
 
+# The usage method displays the help message and exits the program.
+#
+# This method prints a detailed usage message to the standard output,
+# explaining how to use the command-line tool, including information
+# about valid range specifications and available options.
 def usage
   puts <<EOT
 Usage: #{File.basename($0)} [OPTIONS] RANGES
