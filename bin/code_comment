@@ -59,56 +59,6 @@ model               = ENV.fetch('OLLAMA_MODEL', 'llama3.1')
 #call_sites          = %x(cscope -L -3 "#{method_name}" $(find . -name '*.rb') | awk '{ print $1 ":" $3 }').lines.map(&:chomp).uniq
 #methods             = call_sites.map { fetch_method(_1) } * ?\n
 
-cheatsheet = <<EOT
-Documenting Code with YARD
-
-By default, YARD is compatible with the same RDoc syntax most Ruby developers
-are already familiar with. However, one of the biggest advantages of YARD is
-the extended meta-data syntax, commonly known as "tags", that you can use to
-express small bits of information in a structured and formal manner. While RDoc
-syntax expects you to describe your method in a completely free-form manner,
-YARD recommends declaring your parameters, return types, etc. with the @tag
-syntax, which makes outputting the documentation more consistent and easier to
-read. Consider the RDoc documentation for a method to_format:
-
-# Converts the object into textual markup given a specific `format`
-# (defaults to `:html`)
-#
-# == Parameters:
-# format::
-#   A Symbol declaring the format to convert the object to. This
-#   can be `:text` or `:html`.
-#
-# == Returns:
-# A string representing the object in a specified
-# format.
-#
-def to_format(format = :html)
-  # format the object
-end
-
-While this may seem easy enough to read and understand, it's hard for a machine
-to properly pull this data back out of our documentation. Also we've tied our
-markup to our content, and now our documentation becomes hard to maintain if we
-decide later to change our markup style (maybe we don't want the ":" suffix on
-our headers anymore).
-
-In YARD, we would simply define our method as:
-
-# Converts the object into textual markup given a specific format.
-#
-# @param format [Symbol] the format type, `:text` or `:html`
-# @return [String] the object converted into the expected format.
-# @raise [CannotFormatException] the object cannot be formatted
-def to_format(format = :html)
-  # format the object
-end
-
-Using tags we can add semantic metadata to our code without worrying about
-presentation. YARD will handle presentation for us when we decide to generate
-documentation later.
-EOT
-
 system = <<EOT
 Provide high-quality YARD comments for the given Ruby method, including a brief
 description of its purpose, parameters, raised exceptions (and why), and
@@ -149,7 +99,6 @@ Format requirements:
 
 1. Focus on providing a description of the method's purpose
    without including any code snippets.
-2. You should ommit the @return if it is void.
 2. You should ommit the @raise if you are not sure.
 3. Never use `, `ruby, ```, ```ruby in your response.
 4. Never add any other remarks or explanation to your response.
