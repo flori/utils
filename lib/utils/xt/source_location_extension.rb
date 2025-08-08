@@ -5,10 +5,26 @@ module Utils
     module SourceLocationExtension
       include Tins::DeepConstGet
 
+      # Regular expression to match Ruby class method signatures
+      # Matches patterns like "ClassName#method" or "ClassName.method"
       CLASS_METHOD_REGEXP    = /\A([A-Z][\w:]+)([#.])([\w!?]+)/
 
+      # Regular expression to parse file path and line number information
+      # Matches patterns like "file.rb:123" or "file.rb:123-125"
       FILE_LINENUMBER_REGEXP = /\A\s*([^:]+):(\d+)-?(\d+)?/
 
+      # The source_location method determines the file path and line number
+      # information for an object.
+      #
+      # This method analyzes the object to extract source location details,
+      # handling different cases including string representations that contain
+      # file paths with line numbers, class method references, or simple file
+      # names. It returns an array containing the filename and line number,
+      # along with additional methods attached to the array for convenient
+      # access to location information.
+      #
+      # @return [ Array<String, Integer> ] an array containing the filename and line number,
+      #         with additional methods attached for accessing filename, linenumber, and range properties
       def source_location
         filename   = nil
         linenumber = nil
