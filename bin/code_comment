@@ -3,7 +3,6 @@
 require 'ollama'
 include Ollama
 require 'utils'
-include Utils::XDGConfig
 
 META_METHOD = /(
   (class_)?                   # Optional "class_" prefix
@@ -24,6 +23,18 @@ META_METHOD = /(
   )?                          # Optional variant
 )\s+:/x
 
+# Fetches the method definition from a given filename and line number.
+#
+# This method retrieves the source code of a method by analyzing the file
+# location and line number provided. It attempts to identify the method
+# definition by examining the surrounding context, including handling
+# private and protected method declarations.
+#
+# @param filename_linenumber [ Object ] an object that responds to #source_location
+#                                       and provides filename and line number information
+#
+# @return [ String ] the source code of the method definition, or an empty string
+#                    if the method cannot be determined
 def fetch_method(filename_linenumber)
   result = ''
   source_location = filename_linenumber.source_location
@@ -31,7 +42,7 @@ def fetch_method(filename_linenumber)
   if lf.line =~ META_METHOD
     return lf.line
   end
-  if spaces = lf.match_backward(/^(\s*|.*?(private|protected)\s+)def\s+(?:\S+?)(?:\(|\s*$)/)&.first
+  if spaces = lf.match_backward(/^(\s*?)(\S.*?\s+)?def\s+/)&.first
     line_number_begin = lf.line_number
     lf.match_forward(/^#{spaces}end/)
     line_number_end = lf.line_number
@@ -43,34 +54,29 @@ def fetch_method(filename_linenumber)
   result
 end
 
-def fetch_file(filename_linenumber)
-  source_location = filename_linenumber.source_location
-  File.read(source_location.filename)
-end
-
 filename_linenumber = ARGV.shift or fail "require file_name as second argument"
+config              = Utils::ConfigDir.new('code_comment', env_var: 'XDG_CONFIG_HOME')
 method              = fetch_method(filename_linenumber)
 method_indent       = method[/\A( *)/, 1].size
-#file                = fetch_file(filename_linenumber)
 files               = Dir['{lib,spec,test}/**/*.rb']
 base_url            = ENV['OLLAMA_URL'] || 'http://%s' % ENV.fetch('OLLAMA_HOST')
 model               = ENV.fetch('OLLAMA_MODEL', 'llama3.1')
-#file                = File.read(file_name)
 #call_sites          = %x(cscope -L -3 "#{method_name}" $(find . -name '*.rb') | awk '{ print $1 ":" $3 }').lines.map(&:chomp).uniq
 #methods             = call_sites.map { fetch_method(_1) } * ?\n
 
-system = <<EOT
+default_system = <<EOT
 Provide high-quality YARD comments for the given Ruby method, including a brief
 description of its purpose, parameters, raised exceptions (and why), and
 return values, assuming an expert-level understanding of the programming
 concepts involved.
 EOT
-system = nil
+system = config.read('system.txt', default: default_system)
 
-prompt = <<EOT
+file_contents = files.map { _1 + ":\n" + File.read(_1) } * ?\n
+default_prompt = <<EOT
 Look at this code to document it:
 
-#{files.map { File.read(_1) } * ?\n}
+%{file_contents}
 
 Here's an example for how you should document a method.
 
@@ -91,7 +97,7 @@ Here's an example for how you should document a method.
 
 And this is the method you should document:
 
-#{method}
+%{method}
 
 Output a YARD comment for this method:
 
@@ -104,8 +110,11 @@ Format requirements:
 4. Never add any other remarks or explanation to your response.
 5. Start each line of your comment with a single # character.
 EOT
+prompt = config.read('prompt.txt', default: default_prompt) % {
+  method:, file_contents:,
+}
 
-options = Ollama::Options.new(
+default_options = JSON(
   #repeat_penalty: 1.8,
   num_ctx: 16384,
   num_predict: 512,
@@ -116,6 +125,11 @@ options = Ollama::Options.new(
   min_p: 0.1,
 )
 
+client_config = Client::Config.load_from_json config + 'client.json'
+client_config.base_url = base_url
+ollama  = Client.configure_with(client_config)
+options = JSON.parse(config.read('options.json', default: default_options))
+
 if ENV['DEBUG'].to_i == 1
   File.open('debug.log', ?w) do |log|
     log.puts "system:\n#{system}"
@@ -125,9 +139,5 @@ if ENV['DEBUG'].to_i == 1
   end
 end
 
-config = xdg_config('code_comment')
-client_config = Client::Config.load_from_json "#{config}/client.json"
-client_config.base_url = base_url
-ollama   = Client.configure_with(client_config)
 response = ollama.generate(model:, system:, prompt:, options:, stream: false, think: false).response
 puts response.gsub(/^/) { ' ' * method_indent }

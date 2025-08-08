@@ -4,7 +4,6 @@ require 'ollama'
 include Ollama
 require 'tins/xt'
 require 'utils'
-include Utils::XDGConfig
 
 def x(cmd)
   output = `#{cmd}`
@@ -45,7 +44,7 @@ def compute_change(range_from, range_to)
     EOT
   end
 
-  config = xdg_config('changes')
+  config = Utils::ConfigDir.new('changes', env_var: 'XDG_CONFIG_HOME')
 
   base_url      = ENV['OLLAMA_URL'] || 'http://%s' % ENV.fetch('OLLAMA_HOST')
   model         = ENV.fetch('OLLAMA_MODEL', 'llama3.1')

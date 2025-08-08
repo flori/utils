@@ -1,9 +1,8 @@
 #!/usr/bin/env ruby
 
 require 'utils'
-include Utils::XDGConfig
 
-config = xdg_config('commit_message')
+config = Utils::ConfigDir.new('commit_message', env_var: 'XDG_CONFIG_HOME')
 
 branch = `git rev-parse --abbrev-ref HEAD`.chomp
 exec 'ollama_cli', '-c', "#{config}/client.json",

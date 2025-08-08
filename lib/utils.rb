@@ -9,7 +9,7 @@ module Utils
   require 'utils/probe_server'
   require 'utils/ssh_tunnel_specification'
   require 'utils/line_blamer'
-  require 'utils/xdg_config'
+  require 'utils/config_dir'
 
   require 'utils/xt/source_location_extension'
   class ::Object
