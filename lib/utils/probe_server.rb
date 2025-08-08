@@ -1,12 +1,11 @@
 require 'unix_socks'
 require 'tins/xt'
 require 'term/ansicolor'
-class String
-  include Term::ANSIColor
-end
 
 module Utils
   class ProcessJob
+    include Term::ANSIColor
+
     def initialize(args:, probe_server: nil)
       @id           = probe_server&.next_job_id
       @args         = Array(args)
@@ -32,8 +31,8 @@ module Utils
 
     def ok_colorize(string)
       case @ok
-      when false then string.white.on_red
-      when true  then string.black.on_green
+      when false then white { on_red { string } }
+      when true  then black { on_green { string }}
       else            string
       end
     end
@@ -86,6 +85,8 @@ module Utils
   end
 
   class ProbeServer
+    include Term::ANSIColor
+
     def initialize
       @server         = UnixSocks::Server.new(socket_name: 'probe.sock', runtime_dir: Dir.pwd)
       @history        = [].freeze
@@ -101,7 +102,7 @@ module Utils
 
     def start
       output_message "Starting probe server listening to #{@server.server_socket_path}.", type: :info
-      work_loop = Thread.new do
+      Thread.new do
         loop do
           job = @jobs_queue.pop
           run_job job
@@ -141,7 +142,7 @@ module Utils
       docs_size = docs.map { |a| a.first.size }.max
       format = "%-#{docs_size}s %-3s %s"
       output_message [
-        (format % %w[ command sho description ]).on_color(20).white
+        on_color(20) { white { format % %w[ command sho description ] } }
       ] << docs.map { |cmd, doc|
         shortcut = shortcut_of(cmd) and shortcut = "(#{shortcut})"
         format % [ cmd, shortcut, doc ]
@@ -229,13 +230,13 @@ module Utils
       msg =
         case type
         when :success
-          msg.on_color(22).white
+          on_color(22) { white { msg } }
         when :info
-          msg.on_color(20).white
+          on_color(20) { white { msg } }
         when :warn
-          msg.on_color(94).white
+          on_color(94) { white { msg } }
         when :failure
-          msg.on_color(124).blink.white
+          on_color(124) { blink { white { msg } } }
         else
           msg
         end
