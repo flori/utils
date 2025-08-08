@@ -140,12 +140,14 @@ EOT
   exit 1
 end
 
+argv, rest = ARGV.partition { _1 =~ /\A-\d/ }
 $opts = {
-}.update(go('p:e:f:h')) do |o,default,set|
+}.update(go('p:e:f:h', rest)) do |o,default,set|
   set || default
 end
-usage if $opts[?h] || ARGV.size != 1
-$ranges = ARGV.shift
+ranges = argv + rest
+usage if $opts[?h] || ranges.size != 1
+$ranges = ranges.shift
 $limited = $opts[?p] ? Limited.new($opts[?p]) : nil
 ranges = parse_ranges($ranges)
 generator = Generator.new(ranges)
