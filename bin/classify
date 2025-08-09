@@ -1,5 +1,20 @@
 #!/usr/bin/env ruby
 
+# Ruby module name to file path converter
+#
+# This tool helps map between Ruby module naming conventions and filesystem
+# paths, which is essential for Ruby development, code generation, and
+# refactoring. It converts between Foo::BarBaz (module names) and foo/bar_baz
+# (file paths) while supporting various formatting options and project-specific
+# path shifting.
+#
+# Common use cases:
+# - Converting controller names to file paths in Rails
+# - Refactoring code by mapping between naming conventions
+# - Can be used in editor functions for easy access
+#
+# Run 'classify -h' for detailed help and examples
+
 require 'utils'
 require 'tins/go'
 include Tins::GO
@@ -106,14 +121,14 @@ end
 # @return [ Integer ] the calculated shift value based on prefix matching or
 # default setting
 def compute_shift(config, string)
-  string = underscore(string)
-  result = config.classify.shift_path_by_default
+  string  = underscore(string)
+  default = config.classify.shift_path_by_default
   for prefix in config.classify.shift_path_for_prefix
     if string.start_with? prefix
       return prefix.count(?/) + 1
     end
   end
-  result
+  default
 end
 
 # The usage method displays the command-line interface help text and exits the
@@ -143,6 +158,32 @@ def usage
       -p SEPARATOR used for declassification
       -h           display this help
 
+    Examples:
+
+    classify Foo::BarBaz           ⇢ Foo::BarBaz
+    classify -d Foo::Bar           ⇢ foo/bar
+    classify -d foo/bar_baz        ⇢ foo/bar_baz
+    classify foo/bar               ⇢ Foo::Bar
+    classify -b Foo::BarBaz        ⇢ BarBaz
+    classify -d -s Foo::Bar        ⇢ foo/bar.rb
+    classify -t Foo::Bar           ⇢ foo/bar
+    classify -t foo/bar            ⇢ Foo::Bar
+    classify -p . -d Foo::Bar::Baz ⇢ foo.bar.baz
+    classify -p : -d Foo::Bar::Baz ⇢ foo:bar:baz
+    classify -n 1 lib/foo/bar      ⇢ Foo::Bar
+
+    With this configuration in .utilsrc:
+      classify do
+        shift_path_by_default 1 # if no prefix matched
+        shift_path_for_prefix [ # prefixes checked in order
+          'a/b',
+          'c/d/e',
+        ]
+      end
+
+    classify lib/foo/bar   ⇢ Foo::Bar
+    classify a/b/foo/bar   ⇢ Foo::Bar
+    classify c/d/e/foo/bar ⇢ Foo::Bar
   EOT
   exit 0
 end
