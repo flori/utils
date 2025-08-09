@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+#
+# Launch simple HTTP server for a local directory
 
 require 'tins/go'
 include Tins::GO
@@ -7,9 +9,22 @@ require 'webrick'
 $opts = go 'p:h'
 
 if $opts[?h]
-  puts <<USAGE
-#{File.basename($0)} [OPTIONS] [DIR]
-USAGE
+  puts <<~USAGE
+    #{File.basename($0)} - Launch simple HTTP server for a local directory
+    
+    Usage: #{File.basename($0)} [OPTIONS] [DIR]
+    
+    Options:
+      -p PORT    Specify port number (default: 8888)
+      -h         Show this help message
+    
+    Examples:
+      #{File.basename($0)}                    # Serve current directory on port 8888
+      #{File.basename($0)} -p 3000            # Serve on port 3000
+      #{File.basename($0)} /path/to/dir       # Serve specific directory
+    
+    Note: If no directory is specified, serves the current working directory.
+  USAGE
   exit
 end
 
