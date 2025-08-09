@@ -1,4 +1,21 @@
 #!/usr/bin/env ruby
+#
+# Line blamer - Show Git blame information for lines or files
+#
+# Usage: blameline [OPTIONS] [LINES|FILES]
+#
+# Displays Git blame information for specified lines or files.
+#
+# Options:
+#   -s    Read lines from stdin instead of command-line arguments
+#   -h    Show this help message
+#
+# Examples:
+#   blameline file.rb:23                 # Blame all lines in file
+#   blameline -s < lines.txt             # Blame lines from stdin
+#   echo some/code:23 | blameline -s     # Blame single line from stdin
+#
+# Shows author, commit hash, and date for each line of code.
 
 require 'tins/go'
 include Tins::GO
