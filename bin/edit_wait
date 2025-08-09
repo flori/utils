@@ -1,3 +1,17 @@
 #!/usr/bin/env ruby
+#
+# Wait for editor to close files before returning control
+#
+# Usage:
+#   edit_wait file1 file2    # Wait for editor to close specified files
+#
+# This script is a simple wrapper that calls 'edit -w' with all provided arguments.
+# The '-w' flag makes the editor wait until the file(s) are closed before returning.
+#
+#
+# Examples:
+#   edit_wait README.md            # Edit README.md and wait for closure
+#   edit_wait file1.txt file2.txt  # Edit multiple files and wait for all to close
+
 
 exec 'edit', '-w', *$*
