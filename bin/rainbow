@@ -1,12 +1,50 @@
 #!/usr/bin/env ruby
+#
+# rainbow - Create colorful ASCII art with Figlet fonts
+#
+# This script generates rainbow-colored ASCII text using Figlet fonts. It
+# takes input text and converts it to colorful ASCII art by applying
+# alternating colors (red, yellow, green, cyan, blue, magenta) to each line.
+#
+# Usage:
+#   rainbow "Hello World"           # Basic usage with text argument
+#   echo "Hello" | rainbow          # Read from stdin
+#   rainbow                         # Defaults to "ruby X.X.X"
+#
+# Requirements:
+#   - figlet installed in PATH
+#   - Ruby with figlet and term/ansicolor gems
+#
+# The script automatically discovers Figlet fonts in the system installation
+# directory and provides helpful error messages when fonts are not found.
+#
+# Examples:
+#   rainbow "Welcome" small
+#   rainbow "Ruby" big
+#   echo    "World" | rainbow slant
 
 require 'figlet'
 require 'term/ansicolor'
 include Term::ANSIColor
 
+# The fetch_font method retrieves a Figlet font by name.
+#
+# This method attempts to locate and load a Figlet font file based on the
+# provided font name. It first checks if figlet is available in the system
+# path, and exits if it's not found.
+# The method then constructs the appropriate font file path by checking for the
+# font in the current directory or searching within the figlet installation
+# directory. If the font cannot be found, it lists all available fonts and
+# exits with an error message.
+#
+# @param font_name [ String ] the name of the font to fetch
+#
+# @return [ Figlet::Font ] a new Figlet::Font object initialized with the found
+# font file path
 def fetch_font(font_name)
   if `which figlet`.empty?
-    fail "need figlet in path, please install it."
+    STDERR.puts "Require figlet to be in path, please install it."
+    exit 1
   end
   font_name += ".flf" unless font_name.end_with?(".flf")
 
@@ -27,6 +65,18 @@ def fetch_font(font_name)
   Figlet::Font.new(font_path)
 end
 
+# The create_rainbow_ascii method generates colored ASCII art text using a
+# specified color palette.
+#
+# This method takes an input text string and converts it into rainbow-colored
+# ASCII art by applying different colors to each line of the art. It utilizes a
+# predefined set of colors that cycle through the available color options to
+# create a vibrant visual effect.
+#
+# @param text [ String ] the input text to be converted into ASCII art
+#
+# @return [ String ] the colored ASCII art text with rainbow coloring applied
+# to each line
 def create_rainbow_ascii(text)
   ascii_art = $t[text]
 
