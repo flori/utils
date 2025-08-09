@@ -1,4 +1,10 @@
 #!/usr/bin/env ruby
+#
+# Enhanced vim editor launcher with advanced feature
+# 
+# This script is a sophisticated wrapper around vim that provides enhanced
+# editing capabilities including server management, git integration, and
+# batch file handling.
 
 require 'tins/xt'
 include Tins::GO
