@@ -7,7 +7,6 @@ module Utils
       # buffer_size instance variable.
       #
       # @return [ Integer ] the current buffer size value
-      def buffer_size; end
       attr_accessor :buffer_size
     end
     self.buffer_size = 2 ** 20 - 1

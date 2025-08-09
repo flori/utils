@@ -434,7 +434,8 @@ module Utils
     #
     # @return [ Utils::ProbeServer::LogWrapper ] a wrapped environment object
     # for variable management
-    memoize_method def env
+    memoize method:
+    def env
       LogWrapper.new(self, ENV)
     end
 

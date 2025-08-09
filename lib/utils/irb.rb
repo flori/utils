@@ -294,47 +294,118 @@ module Utils
       end
 
       class MethodWrapper < WrapperBase
+        # The initialize method sets up a new instance with the specified
+        # object, method name, and module flag.
+        #
+        # This method creates and configures a new instance by storing the
+        # method object and its description, handling both instance methods and
+        # regular methods based on the module flag parameter.
+        #
+        # @param obj [ Object ] the object from which to retrieve the method
+        # @param name [ String ] the name of the method to retrieve
+        # @param modul [ TrueClass, FalseClass ] flag indicating whether to retrieve an instance method
         def initialize(obj, name, modul)
           super(name)
           @method = modul ? obj.instance_method(name) : obj.method(name)
           @description = @method.description(style: :namespace)
         end
 
+        # The method reader returns the method object associated with the
+        # instance.
         attr_reader :method
 
+        # The owner method retrieves the owner of the method object.
+        #
+        # This method checks if the wrapped method object responds to the owner
+        # message and returns the owner if available, otherwise it returns nil.
+        #
+        # @return [ Object, nil ] the owner of the method or nil if not applicable
         def owner
           method.respond_to?(:owner) ? method.owner : nil
         end
 
+        # The arity method returns the number of parameters expected by the method.
+        #
+        # @return [ Integer ] the number of required parameters for the method
         def arity
           method.arity
         end
 
+        # The source_location method retrieves the file path and line number
+        # where the method is defined.
+        #
+        # This method accesses the underlying source location information for
+        # the method object, returning an array that contains the filename and
+        # line number of the method's definition.
+        #
+        # @return [ Array<String, Integer> ] an array containing the filename and line number
+        #         where the method is defined, or nil if the location cannot be determined
         def source_location
           method.source_location
         end
 
+        # The <=> method compares the descriptions of two objects for ordering
+        # purposes.
+        #
+        # @param other [ Object ] the other object to compare against
+        #
+        # @return [ Integer ] -1 if this object's description is less than the other's,
+        #         0 if they are equal, or 1 if this object's description is greater than the other's
         def <=>(other)
           @description <=> other.description
         end
       end
 
       class ConstantWrapper < WrapperBase
+        # The initialize method sets up a new instance with the provided object
+        # and name.
+        #
+        # This method configures the instance by storing a reference to the
+        # object's class and creating a description string that combines the
+        # name with the class name.
+        #
+        # @param obj [ Object ] the object whose class will be referenced
+        # @param name [ String ] the name to be used in the description
+        #
+        # @return [ Utils::Patterns::Pattern ] a new pattern instance configured with the provided arguments
         def initialize(obj, name)
           super(name)
           @klass = obj.class
           @description = "#@name:#@klass"
         end
 
+        # The klass reader method provides access to the class value stored in the instance.
+        #
+        # @return [ Object ] the class value
         attr_reader :klass
       end
 
-      # Return all the constants defined in +modul+.
+      # The irb_constants method retrieves and wraps all constants from a given
+      # module.
+      #
+      # This method collects all constants defined in the specified module,
+      # creates ConstantWrapper instances for each constant, and returns them
+      # sorted in ascending order.
+      #
+      # @param modul [ Object ] the module from which to retrieve constants
+      #
+      # @return [ Array<ConstantWrapper> ] an array of ConstantWrapper objects
+      #         representing the constants in the module, sorted alphabetically
       def irb_constants(modul = self)
         modul.constants.map { |c| ConstantWrapper.new(modul.const_get(c), c) }.sort
       end
 
-      # Return all the subclasses of +klass+. TODO implement subclasses w/out rails
+      # The irb_subclasses method retrieves and wraps subclass information for
+      # a given class.
+      #
+      # This method fetches the subclasses of the specified class and creates
+      # ConstantWrapper instances for each subclass, allowing them to be sorted
+      # and displayed in a structured format.
+      #
+      # @param klass [ Object ] the class object to retrieve subclasses from
+      #
+      # @return [ Array<ConstantWrapper> ] an array of ConstantWrapper objects
+      # representing the subclasses
       def irb_subclasses(klass = self)
         klass.subclasses.map { |c| ConstantWrapper.new(eval(c), c) }.sort
       end
