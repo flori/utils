@@ -1,10 +1,29 @@
 #!/usr/bin/env ruby
+#
+# Probe test runner and server management tool
+#
+# This utility provides comprehensive testing capabilities with support for
+# multiple test frameworks (RSpec, Test::Unit, Cucumber) and triggering test
+# runs via probe -c client.
+#
+# Features:
+# - Run specific tests by name or file
+# - Start/connect to probe servers for testing/env setting.
+# - Environment variable management on probe servers
+# - Automatic framework detection and configuration
 
 require 'utils'
 include Utils
 include Tins::GO
 require 'shellwords'
 
+# The usage method displays the command-line interface help text and version
+# information.
+#
+# This method outputs a formatted help message that describes the available
+# options for the command-line tool, including test execution parameters, probe
+# server controls, and environment variable management. It also shows the
+# current version of the tool.
 def usage
   puts <<~EOT
     Usage: #{File.basename($0)} [OPTS] [FILENAME[:LINENO]]
@@ -23,21 +42,52 @@ def usage
   exit 1
 end
 
+# The cmd method executes a system command with bundle exec prefix.
+#
+# This method prepares and runs a system command by prepending 'bundle' and
+# 'exec' to the provided arguments. It prints the joined command to stdout
+# before execution and exits the current process with the command's exit status
+# if it fails.
+#
+# @param args [ Array<String> ] the command arguments to be executed
 def cmd(*args)
   args.unshift 'bundle', 'exec'
   puts Shellwords.join(args)
   system(*args) or exit $?.exitstatus
 end
 
-def find_cmd(*cmds, on_fail: -> *cmds { raise fail "no #{cmds * '|'} command found" })
+# The find_cmd method searches for the first available command in a list of
+# candidates.
+#
+# It attempts to locate executable commands by checking their availability in
+# the system path. The method returns the first successfully found command or
+# executes a fallback block if none are found.
+#
+# @param cmds [ Array<String> ] an array of command names to search for
+# @param on_fail [ Proc ] a block to execute if no commands are found
+#
+# @return [ String, Object ] the first found command string or the result of the fallback block
+def find_cmd(*cmds, on_fail: -> *cmds { fail "no #{cmds * '|'} command found" })
   cmds.map { |c| `which #{c}`.full?(:chomp) }.compact.first or on_fail.(*cmds)
 end
 
+# The start_server method initializes and begins operation of a probe server.
+#
+# This method configures the environment for server operation by setting the
+# thread abort behavior based on the debug flag, then creates and starts a new
+# probe server instance to handle incoming requests and process jobs.
 def start_server
   Thread.abort_on_exception = $DEBUG
   Utils::ProbeServer.new.start
 end
 
+# The connect_server method establishes a connection to a probe server and
+# handles environment variable operations.
+#
+# This method initializes a probe client and processes command-line options for
+# setting or retrieving environment variables.
+# It also enqueues jobs for execution on the probe server when specified.
+#
 def connect_server
   probe_client = ProbeClient.new
   if setting = $opts[?C]
