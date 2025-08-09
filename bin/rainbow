@@ -13,7 +13,6 @@
 #
 # Requirements:
 #   - figlet installed in PATH
-#   - Ruby with figlet and term/ansicolor gems
 #
 # The script automatically discovers Figlet fonts in the system installation
 # directory and provides helpful error messages when fonts are not found.
