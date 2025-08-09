@@ -1,10 +1,6 @@
-require 'tins/deep_const_get'
-
 module Utils
   module Xt
     module SourceLocationExtension
-      include Tins::DeepConstGet
-
       # Regular expression to match Ruby class method signatures
       # Matches patterns like "ClassName#method" or "ClassName.method"
       CLASS_METHOD_REGEXP    = /\A([A-Z][\w:]+)([#.])([\w!?]+)/
@@ -40,8 +36,8 @@ module Utils
             klassname   = $1
             method_kind = $2 == '#' ? :instance_method : :method
             methodname  = $3
-            filename, linenumber =
-              deep_const_get(klassname).__send__(method_kind, methodname).source_location
+            filename, linenumber = ::Object.const_get(klassname).
+              __send__(method_kind, methodname).source_location
           else
             filename = string
           end
