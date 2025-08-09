@@ -6,6 +6,17 @@ include Tins::GO
 require 'tins/xt/string'
 require 'term/ansicolor'
 
+# The path_shifter method processes a string path by splitting it using the
+# specified separator and then either removing the first n elements or taking a
+# slice from the end, depending on whether n is positive or negative.
+#
+# @param string [ String ] the path string to be processed
+# @param separator [ String ] the character used to split the path string,
+# defaults to '/'
+# @param n [ Integer, nil ] the number of elements to remove from the beginning
+# of the path if positive, or take from the end if negative
+#
+# @return [ String ] the resulting path string after processing
 def path_shifter(string, separator: ?/, n: nil)
   n or return string
   n, path = n.to_i, string.split(separator)
@@ -17,6 +28,15 @@ def path_shifter(string, separator: ?/, n: nil)
   path * separator
 end
 
+# The underscore method converts a string to underscored format.
+#
+# This method processes a string by first applying path shifting based on
+# options, then applies the standard underscore transformation.
+# It optionally appends '.rb' to the result if specified in the options.
+#
+# @param string [ String ] the input string to be converted
+#
+# @return [ String ] the underscored version of the input string
 def underscore(string)
   string = path_shifter(string, n: $opts[?n], separator: '::')
   string = Tins::StringUnderscore.instance_method(:underscore).bind(string).()
@@ -24,20 +44,67 @@ def underscore(string)
   string
 end
 
+# The parameterize method converts a string into a URL-friendly format by
+# replacing spaces and special characters with a specified separator.
+#
+# This method takes an input string and transforms it into a lowercase,
+# underscore-separated format suitable for use in URLs or file names. It
+# handles forward slashes by replacing them with the specified separator
+# character.
+#
+# @param string [ String ] the input string to be parameterized
+# @param separator [ String ] the character to replace forward slashes with
+#
+# @return [ String ] the parameterized string with forward slashes replaced by
+# the specified separator
 def parameterize(string, separator)
   underscore(string).gsub(?/, separator) # quick and dirty
 end
 
+# The camelize method converts a string into camelCase format by processing...
+# It removes the file extension first, then applies camelization to the
+# remaining string.
+#
+# @param string [ String ] the input string to be converted
+#
+# @return [ String ] the camelized string result
 def camelize(string)
   string = path_shifter(string, n: $opts[?n])
   string = string.gsub(/#{Regexp.quote(File.extname(string))}\Z/, '')
   string.camelize
 end
 
+# The camelcase? method checks whether a string starts with an uppercase
+# letter.
+#
+# This method determines if the provided string begins with a capital letter,
+# returning true if it does and false otherwise.
+#
+# @param string [ String ] the string to be checked for camelCase format
+#
+# @return [ TrueClass, FalseClass ] true if the string starts with an uppercase
+# letter, false otherwise
 def camelcase?(string)
-  string[0, 1] =~ /[A-Z]/
+  string =~ /\A[A-Z]/
 end
 
+# The compute_shift method determines the shift value for a string based on
+# configuration settings.
+#
+# This method processes a string by converting it to underscore format and then
+# checks against configured shift path prefixes to determine an appropriate
+# shift value.
+# If a matching prefix is found, it returns the count of forward slashes in the
+# prefix plus one. Otherwise, it returns the default shift path value from the
+# configuration.
+#
+# @param config [ Object ] the configuration object containing classify
+# settings
+# @param string [ String ] the input string to process and determine shift
+# value for
+#
+# @return [ Integer ] the calculated shift value based on prefix matching or
+# default setting
 def compute_shift(config, string)
   string = underscore(string)
   result = config.classify.shift_path_by_default
@@ -49,6 +116,17 @@ def compute_shift(config, string)
   result
 end
 
+# The usage method displays the command-line interface help text and exits the
+# program.
+#
+# This method prints a formatted usage message that describes the available
+# options for the command-line tool, including descriptions of each flag and
+# their functionality.
+# It provides information about how to classify and declassify path names into
+# module namespaces, along with various toggle and formatting options.
+#
+# @return [ void ] This method always exits the program with status code 0
+# after displaying help.
 def usage
   puts <<~EOT
     Usage: #{File.basename($0)} [OPTS]
