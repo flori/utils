@@ -1,4 +1,9 @@
 #!/usr/bin/env ruby
+#
+# SSH tunnel manager with session and multiplexer support
+#
+# This script manages SSH connections with tunneling capabilities, session
+# management, and terminal multiplexer integration (screen/tmux).
 
 require 'fileutils'
 include FileUtils::Verbose
@@ -18,6 +23,8 @@ Host *
   ControlPath ~/.ssh/%r@%h:%p.sock
 SSH_CONFIG_END
 
+# The usage method displays the command-line interface help text and version
+# information.
 def usage
   puts <<~EOT
     Usage: #{File.basename($0)} [OPTS] [user@]remote[:port]"
@@ -38,6 +45,12 @@ def usage
   exit 1
 end
 
+# The cmd method executes a shell command string.
+#
+# This method takes a command string and executes it using the system exec
+# function, replacing the current process with the specified command.
+#
+# @param string [ String ] the shell command to be executed
 def cmd(string)
   $DEBUG and warn "Executing: #{string.inspect}"
   exec string
