@@ -7,8 +7,8 @@
 # use with caution on untrusted input.
 #
 # Usage:
-#   ./yaml_check <filename>     # Validate a file
-#   cat file.yaml | ./yaml_check # Validate from stdin
+#   yaml_check <filename>     # Validate a file
+#   cat file.yaml | yaml_check # Validate from stdin
 #
 # Options:
 #   DEBUG=1                     # Enable verbose output with parsed YAML
