@@ -1,4 +1,13 @@
 #!/usr/bin/env ruby
+#
+# Find lines exceeding maximum length threshold with author attribution
+# Usage: #{File.basename($0)} [OPTIONS] [FILES]
+# Options:
+#   -m NUM  Maximum line length (default: 80)
+#   -h      Show this help message
+#
+# Outputs tab-separated data: AUTHOR\tLINE_LENGTH\tFILE:LINE_NUMBER
+# for each line longer than the specified threshold.
 
 require 'tins/go'
 include Tins::GO
@@ -17,9 +26,9 @@ max = ($opts[?m] || 80).to_i
 
 files = ARGV
 
-for file in files
+files.each do |file|
   File.open(file) do |f|
-    for line  in f
+		f.each do |line|
       size = line.size
       if size > max
         lineno = f.lineno
