@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-
+#
 # git-empty - Reset git repository to empty state on specified branch
 #
 # WARNING: This command permanently deletes ALL commit history and untracked
