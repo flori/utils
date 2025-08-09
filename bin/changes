@@ -1,4 +1,29 @@
 #!/usr/bin/env ruby
+#
+# Generate changelogs using Git history and LLM summaries
+#
+# Usage:
+#   changes pending    # Show changes since last version
+#   changes current    # Show changes between two latest versions
+#   changes range v1.0.0..v1.2.0  # Show changes in a specific range
+#   changes full       # Generate full changelog from first tag
+#   changes add CHANGELOG.md    # Append new entries to existing file
+#
+# Requires:
+#   - Git repository with version tags (vX.Y.Z format)
+#   - Ollama server running locally or accessible via OLLAMA_URL / OLLAMA_HOST
+#   - Configuration files in ~/.config/changes/
+#     - system.txt: System prompt for LLM
+#     - prompt.txt: Template for changelog generation
+#     - client.json: Ollama client settings
+#     - options.json: Generation options (temperature, etc.)
+#
+# Environment variables:
+#   OLLAMA_URL:  Base URL of Ollama server OR
+#   OLLAMA_HOST: Host of Ollama server
+#   OLLAMA_MODEL: Model to use (default: llama3.1)
+#   XDG_CONFIG_HOME: Custom config directory location
+#   DEBUG: Set to 1 for verbose output
 
 require 'ollama'
 include Ollama
@@ -187,7 +212,15 @@ when 'full', 'add'
     end
   end
 else
-  puts <<~end
+  puts <<~EOT
     Usage: #{File.basename($0)} help|range|full|add|pending
-  end
+
+    Commands:
+      pending        Show changes since last version tag
+      current        Show changes between two latest version tags
+      range <range>  Show changes for a specific Git range (e.g., v1.0.0..v1.2.0)
+      full           Generate complete changelog from first tag
+      add <file>     Append new entries to existing changelog file
+
+  EOT
 end
