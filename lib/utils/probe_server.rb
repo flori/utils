@@ -351,8 +351,6 @@ module Utils
     #
     # This method outputs all completed jobs that have been processed by the probe server,
     # showing their identifiers and command arguments for review.
-    #
-    # @return [ void ]
     doc 'List the history of run jobs.'
     shortcut :l
     def history_list
@@ -444,8 +442,6 @@ module Utils
     shortcut :c
     # The clear method clears the terminal screen by executing the clear
     # command.
-    #
-    # @return [ void ]
     def clear
       system "clear"
     end
@@ -533,8 +529,6 @@ module Utils
     # incoming job requests. It processes different job types by delegating to
     # appropriate handler methods, including enqueuing process jobs and managing
     # environment variable operations through response handling.
-    #
-    # @return [ void ]
     def receive_loop
       @server.receive_in_background do |job|
         case job.type

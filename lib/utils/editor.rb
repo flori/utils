@@ -255,8 +255,6 @@ module Utils
     #
     # @param source_location [ Array<String, Integer> ] the source location
     # containing filename and line number information
-    #
-    # @return [ void ]
     def edit_source_location(source_location)
       edit_file_linenumber(
         source_location.filename,
