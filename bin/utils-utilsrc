@@ -1,4 +1,9 @@
 #!/usr/bin/env ruby
+#
+# Utils Configuration Manager
+#
+# Manages utility configuration files (~/.utilsrc) with commands to show,
+# diff, edit, and display default configurations.
 
 require 'tempfile'
 require 'utils'
