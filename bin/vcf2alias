@@ -1,4 +1,25 @@
 #!/usr/bin/env ruby
+#
+# VCard to Mutt Aliases Converter
+#
+# This script reads a VCard (.vcf) file containing contact information and
+# generates corresponding mutt alias entries in a specified output file.
+# 
+# Features:
+# - Generates unique shorthand identifiers for contact names
+# - Handles multiple email types (HOME, WORK, general)
+# - Supports Unicode characters including German umlauts
+# - Avoids duplicate aliases through intelligent conflict resolution
+# - Automatically resolves symbolic links in output path
+#
+# Usage: vcf2alias [input.vcf] [output.alias]
+#   input.vcf   - VCard file path (defaults to ~/Desktop/Contacts.vcf)
+#   output.alias - Output file path (defaults to ~/.muttrc-aliases)
+#
+# Example output:
+#   alias jsm h-smith <john.smith@company.com>
+#   alias jsmh john.smith <john.smith.home@company.com>
+#   alias jsmw john.smith <john.smith.work@company.com>
 
 require 'tins/xt'
 require 'set'
