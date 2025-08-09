@@ -1,4 +1,10 @@
 #!/usr/bin/env ruby
+#
+# Strip trailing whitespace from files or stdin
+#
+# This script removes trailing spaces and tabs from files, with optional tab
+# conversion to spaces. It can process directories recursively or read from
+# stdin and write to stdout.
 
 require 'tins/go'
 include Tins::GO
@@ -8,20 +14,22 @@ require 'tins/find'
 include Tins::Find
 require 'utils'
 
+# The usage method displays the help message and version information for the
+# command-line tool.
 def usage
-  puts <<-EOT
-Usage: #{File.basename($0)} [OPTS] [PATHS]
+  puts <<~EOT
+    Usage: #{File.basename($0)} [OPTS] [PATHS]
 
-PATHS are the directory and file paths that are search for files to be
-stripped.
+    PATHS are the directory and file paths that are search for files to be
+    stripped.
 
-Options are
+    Options are
 
-  -t COLUMNS  turn tabs into COLUMNS spaces
-  -I SUFFIXES list of suffixes
-  -h          display this help
+      -t COLUMNS  turn tabs into COLUMNS spaces
+      -I SUFFIX   list of suffixes (can be used multiple times)
+      -h          display this help
 
-Version is #{File.basename($0)} #{Utils::VERSION}.
+    Version is #{File.basename($0)} #{Utils::VERSION}.
   EOT
   exit 1
 end
