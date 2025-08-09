@@ -6,6 +6,13 @@ require 'utils'
 include Utils
 require 'tempfile'
 
+# The usage method displays the command-line interface help text and version
+# information.
+#
+# This method outputs a formatted help message that describes the available
+# options and usage patterns for the command-line tool, including detailed
+# explanations of each flag and their purposes. It also displays the current
+# version of the tool.
 def usage
   puts <<-EOT
 Usage: #{File.basename($0)} [OPTS] [PATHS]
@@ -49,7 +56,7 @@ if $opt[?l]
 elsif $opt[?s]
   begin
     until STDIN.eof?
-      line = STDIN.gets
+      line = STDIN.gets.chomp
       line = line.sub(/.*?([^:\s]+:)/, '\1')
       editor.edit(line)
     end
