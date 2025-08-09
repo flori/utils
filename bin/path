@@ -1,4 +1,25 @@
 #!/usr/bin/env ruby
+#
+# PATH manager - Manipulate environment PATH variable
+#
+# Usage: path COMMAND [OPTIONS] [ARGUMENTS]
+#
+# Commands:
+#   prefix PATH_PART    Add path part to beginning of PATH
+#   postfix PATH_PART   Add path part to end of PATH
+#   list                Display current PATH
+#   edit                Edit PATH in external editor
+#
+# Options:
+#   -e                  Output as 'export PATH=...' for shell integration
+#
+# Examples:
+#   path prefix /usr/local/bin     # Add to beginning
+#   path postfix ~/bin             # Add to end
+#   path list                      # Show current PATH
+#   path edit                      # Edit PATH in editor
+#
+# Note: PATH entries are automatically expanded and deduplicated.
 
 require 'tins/go'
 include Tins::GO
