@@ -1,3 +1,9 @@
 #!/usr/bin/env ruby
+#
+# Super-user editor launcher - executes 'edit' command with sudo privileges
+# Usage: sedit [FILE...]
+# 
+# This script is a simple wrapper that elevates permissions when editing files,
+# useful for modifying system configuration files or protected resources.
 
 exec 'sudo', 'edit', *$*
