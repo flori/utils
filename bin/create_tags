@@ -1,4 +1,14 @@
 #!/usr/bin/env ruby
+# 
+# Creates ctags index for Ruby project including bundled gems
+#
+# This script generates a tags file that enables code navigation in editors
+# like Vim. It automatically includes:
+# - Current directory (.) 
+# - All gem paths from bundle list
+# - Excludes pkg directory to avoid vendor code
+#
+# Usage: Run directly from project root
 
 require 'infobar'
 
