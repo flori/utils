@@ -1,4 +1,24 @@
 #!/usr/bin/env ruby
+#
+# Git versions - Generate changelog from Git tags
+#
+# Usage: git-versions [OPTIONS]
+#
+# Displays git log history between version tags in semantic order.
+# Version tags are matched using regex pattern /^v((?:\d+\.)*\d+)/
+# by default, or custom pattern via GIT_VERSIONS_REGEXP environment variable.
+#
+# Options:
+#   Any git log arguments supported (e.g., --oneline, --stat, --since)
+#
+# Examples:
+#   git versions                    # Show colorized changelog with stats
+#   git versions --oneline          # Show compact format
+#   git versions --since="2023-01-01"  # Filter by date
+#   GIT_VERSIONS_REGEXP='^release-(\d+\.\d+\.\d+)$' git versions
+#
+# Shows version headers in red/bold with git log output between each version
+# pair.
 
 require 'tins'
 require 'term/ansicolor'
