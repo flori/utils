@@ -1,4 +1,33 @@
 #!/usr/bin/env ruby
+#
+# Generate YARD comments for Ruby methods using LLM assistance
+#
+# Usage:
+#   code_comment path/to/file.rb:line_number # Generate comment for method at line
+#
+# This script analyzes Ruby source code and generates high-quality YARD comments
+# for methods using an LLM (via Ollama). It examines the surrounding context to
+# identify method definitions and provides comprehensive documentation including
+# descriptions, parameters, return values, and exceptions.
+#
+# Requires:
+#   - Git repository with Ruby files in lib/, spec/, or test/ directories
+#   - Ollama server running locally or accessible via OLLAMA_URL / OLLAMA_HOST
+#   - Configuration files in ~/.config/code_comment/
+#     - system.txt: System prompt for LLM
+#     - prompt.txt: Template for comment generation
+#     - client.json: Ollama client settings
+#     - options.json: Generation options (temperature, etc.)
+#
+# Environment variables:
+#   OLLAMA_URL: Base URL of Ollama server
+#   OLLAMA_MODEL: Model to use (default: llama3.1)
+#   XDG_CONFIG_HOME: Custom config directory location
+#   DEBUG: Set to 1 for verbose output and debug.log creation
+#
+# Examples:
+#   code_comment app/models/user.rb:42      # Document method at line 42
+#   code_comment lib/api/client.rb:15       # Document method at line 15
 
 require 'ollama'
 include Ollama
