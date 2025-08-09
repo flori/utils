@@ -125,8 +125,8 @@ end
 # It provides information about how to classify and declassify path names into
 # module namespaces, along with various toggle and formatting options.
 #
-# @return [ void ] This method always exits the program with status code 0
-# after displaying help.
+# This method always exits the program with status code 0 after displaying
+# help.
 def usage
   puts <<~EOT
     Usage: #{File.basename($0)} [OPTS]
@@ -181,6 +181,10 @@ print(
       underscore string
     end
   else
-    camelize string
+    if camelcase?(string)
+      path_shifter(string, separator: '::', n: $opts[?n])
+    else
+      camelize string
+    end
   end
 )
