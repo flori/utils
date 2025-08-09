@@ -1,9 +1,59 @@
 #!/usr/bin/env ruby
 
+# git-empty - Reset git repository to empty state on specified branch
+#
+# WARNING: This command permanently deletes ALL commit history and untracked
+# files from the current repository. Use with extreme caution.
+#
+# Usage:
+#   git-empty <branch_name>
+#
+# Examples:
+#   git-empty feature/new # Reset to empty feature branch
+#
+# This command:
+# 1. Sets HEAD to point to a new branch reference
+# 2. Removes the Git index (staging area)
+# 3. Cleans all untracked files and directories
+#
+# The repository will be left in a completely fresh state with no history.
+
 require 'fileutils'
 include FileUtils
 
 name = ARGV.shift or fail 'require a branch name'
+
+puts <<~EOT
+  WARNING: This will reset the current repository to empty state on branch '#{name}'
+  This will DELETE ALL commit history and untracked files!
+  Are you absolutely sure? (y/N): 
+EOT
+
+unless gets =~ /\Ay/i
+  puts "Operation cancelled."
+  exit 0
+end
+
+system "git symbolic-ref HEAD refs/heads/#{name}"
+rm '.git/index'
+system 'git clean -fdx'
+```
+
+require 'fileutils'
+include FileUtils
+
+name = ARGV.shift or fail 'require a branch name'
+
+puts <<~EOT
+  WARNING: This will reset the current repository to empty state on branch '#{name}'
+  This will DELETE ALL commit history and untracked files!
+  Are you absolutely sure? (y/N): 
+EOT
+
+unless gets =~ /\Ay/i
+  puts "Operation cancelled."
+  exit 0
+end
 
 system "git symbolic-ref HEAD refs/heads/#{name}"
 rm '.git/index'
