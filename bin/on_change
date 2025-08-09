@@ -1,5 +1,27 @@
 #!/usr/bin/env ruby
+#
+# Monitor file for changes and execute command when modified
+#
+# Usage:
+#   on_change filename [command...]    # Watch file and run command on changes
+#
+# This script monitors a file for modifications and executes a specified
+# command whenever the file is changed. It can be used for auto-reloading,
+# rebuilding, or triggering actions when source files are updated.
+#
+# If no command is provided, 'true' is executed by default.
+#
+# Special replacement:
+#   %f in command will be replaced with the filename being monitored
+#
+# Examples:
+#   on_change Gemfile bundle install
+#   on_change tests/utils_test.rb ruby -I lib:tests %f
 
+# The execute method runs a command by processing its arguments and displaying
+# the output.
+#
+# @param args [ Array ] the command arguments to be executed
 def execute(*args)
   cmd = args.map(&:inspect) * ' '
   puts "Executing: #{cmd}"
