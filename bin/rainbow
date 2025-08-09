@@ -5,6 +5,9 @@ require 'term/ansicolor'
 include Term::ANSIColor
 
 def fetch_font(font_name)
+  if `which figlet`.empty?
+    fail "need figlet in path, please install it."
+  end
   font_name += ".flf" unless font_name.end_with?(".flf")
 
   font_path =
