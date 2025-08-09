@@ -1,4 +1,9 @@
 #!/usr/bin/env ruby
+#
+# Range enumerator - Generate combinations from multiple ranges and execute
+# commands
+#
+# Generates cartesian product of ranges and processes each combination.
 
 require 'tins'
 include Tins

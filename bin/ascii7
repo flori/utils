@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-
+#
 # This script generates a visual representation of how 7-bit ASCII characters #
 # are interpreted when the upper 2 bits (prefix) are varied while keeping the
 # lower 5 bits constant. It demonstrates the relationship between binary
