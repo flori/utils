@@ -1,4 +1,19 @@
 #!/usr/bin/env ruby
+#
+# RDoc to Markdown Converter
+#
+# This script converts RDoc formatted documentation into Markdown format.
+# It reads from standard input (or files passed via ARGF) and outputs
+# the converted Markdown to stdout.
+#
+# Usage: rd2md [input.rdoc] > output.md
+#   or:  cat input.rdoc | rd2md > output.md
+#
+# Features:
+# - Converts RDoc markup syntax to equivalent Markdown
+# - Preserves code blocks, lists, and formatting
+# - Handles standard RDoc elements like headings, emphasis, and links
+# - Streaming conversion for efficient processing of large files
 
 require 'rdoc'
 
