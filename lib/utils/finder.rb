@@ -1,5 +1,4 @@
 require 'term/ansicolor'
-require 'tins/xt'
 require 'tempfile'
 require 'digest/md5'
 require 'fileutils'

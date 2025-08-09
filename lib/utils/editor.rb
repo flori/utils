@@ -1,4 +1,3 @@
-require 'tins/xt/full'
 require 'fileutils'
 require 'rbconfig'
 require 'pstree'

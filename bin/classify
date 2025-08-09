@@ -16,9 +16,7 @@
 # Run 'classify -h' for detailed help and examples
 
 require 'utils'
-require 'tins/go'
 include Tins::GO
-require 'tins/xt/string'
 require 'term/ansicolor'
 
 # The path_shifter method processes a string path by splitting it using the

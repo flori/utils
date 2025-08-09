@@ -2,7 +2,6 @@
 
 require 'utils'
 include Utils
-require 'tins/xt'
 include Tins::GO
 require 'search_ui'
 include SearchUI

@@ -2,9 +2,8 @@
 
 require 'fileutils'
 include FileUtils::Verbose
-require 'tins/xt'
-include Tins::GO
 require 'utils'
+include Tins::GO
 require 'pstree'
 require 'term/ansicolor'
 include Term::ANSIColor

@@ -1,3 +1,5 @@
+require 'tins/xt'
+
 module Utils
   require 'utils/version'
   require 'utils/md5'

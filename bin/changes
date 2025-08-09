@@ -2,7 +2,6 @@
 
 require 'ollama'
 include Ollama
-require 'tins/xt'
 require 'utils'
 
 # Executes a shell command and returns its output.

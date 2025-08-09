@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'pathname'
-require 'tins/xt'
 require 'fileutils'
 include FileUtils::Verbose
 require 'utils'

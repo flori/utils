@@ -1,4 +1,3 @@
-require 'tins/xt'
 require 'irb/completion'
 require 'enumerator'
 require 'tempfile'

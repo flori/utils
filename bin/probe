@@ -1,10 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'tins/xt'
-require 'tins/lines_file'
-include Tins::GO
 require 'utils'
 include Utils
+include Tins::GO
 require 'shellwords'
 
 def usage

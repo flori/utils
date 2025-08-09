@@ -1,5 +1,4 @@
 require 'tins'
-require 'tins/xt/string'
 
 class Utils::ConfigFile
   class << self

@@ -1,5 +1,4 @@
 require 'term/ansicolor'
-require 'tins/xt'
 
 class Utils::Grepper
   include Tins::Find

@@ -1,5 +1,4 @@
 require 'unix_socks'
-require 'tins/xt'
 require 'term/ansicolor'
 
 module Utils

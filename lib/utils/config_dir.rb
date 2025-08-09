@@ -1,5 +1,4 @@
 require 'pathname'
-require 'tins/xt'
 require 'stringio'
 
 module Utils
