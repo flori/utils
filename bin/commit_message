@@ -1,4 +1,29 @@
 #!/usr/bin/env ruby
+#
+# Git Commit Message Generator
+#
+# Generates AI-powered commit messages based on git changes using Ollama.
+# Reads configuration from $XDG_CONFIG_HOME/commit_message/ directory.
+#
+# Usage:
+#   commit_message
+#
+# The script automatically:
+# - Determines current git branch name
+# - Loads configuration files (client.json, options.json, system.txt, prompt.txt)
+# - Generates commit message using ollama_cli with the current diff as input
+#
+# Requirements:
+# - Git repository in current directory
+# - ollama_cli tool installed
+# - Ollama server running
+# - Configuration files in $XDG_CONFIG_HOME/commit_message/
+#
+# Configuration files:
+# - client.json: Ollama API client configuration
+# - options.json: Generation options  
+# - system.txt: System prompt for AI model
+# - prompt.txt: Commit message template, contains %{branch} and %{stdin}
 
 require 'utils'
 
