@@ -1,8 +1,26 @@
 #!/usr/bin/env ruby
+#
+# Untest - Convert Minitest test blocks to standard Ruby methods
+#
+# This script transforms Minitest test definitions from:
+#   test "method name" do
+#     # test code
+#   end
+# 
+# To standard Ruby method definitions:
+#   def test_method_name
+#     # test code
+#   end
+# 
+# Usage:
+#   untest file1.rb file2.rb
+# 
+# The script preserves whitespace and normalizes test names to snake_case
+# format.
 
 require 'tins/xt/secure_write'
 
-for filename in ARGV
+ARGV.each do |filename|
   File.open(filename) do |input|
     File.secure_write(filename) do |output|
       until input.eof?
