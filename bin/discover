@@ -1,4 +1,25 @@
 #!/usr/bin/env ruby
+#
+# File Discovery and Search Tool
+#
+# Interactive file discovery and search utility with advanced filtering and
+# editing capabilities. Combines file system traversal with intelligent pattern
+# matching and Vim integration.
+#
+# Features:
+# - Interactive pattern input with live search results
+# - File system discovery with directory traversal
+# - Vim integration for editing discovered files
+# - Configurable search filters (regexp, fuzzy, case-insensitive)
+# - Search index management and caching
+# - Directory listing and leaf directory identification
+# - Character set filtering for patterns
+# - Interactive selection when multiple matches exist
+#
+# The tool creates a searchable index of your file system (which is also used
+# by the search tool) and provides interactive discovery of files matching your
+# criteria, with seamless Vim
+# integration.
 
 require 'utils'
 include Utils
@@ -7,6 +28,16 @@ require 'search_ui'
 include SearchUI
 require 'pathname'
 
+# The edit_files method opens editor windows for specified file paths.
+#
+# This method allows users to edit one or more files using the configured
+# editor. It provides options to pick a specific file from multiple paths or
+# edit all files directly. The method supports waiting for the editor process
+# to complete before returning control.
+#
+# @param paths [ Array<String> ] the file paths to be edited
+# @param pick [ TrueClass, FalseClass ] whether to prompt for file selection
+# @param wait [ TrueClass, FalseClass ] whether to wait for the editor to finish
 def edit_files(*paths, pick: false, wait: true)
   editor = Utils::Editor.new
   if pick
@@ -24,6 +55,13 @@ def edit_files(*paths, pick: false, wait: true)
   end
 end
 
+# The usage method displays the help message and version information for the
+# application.
+#
+# This method prints a formatted usage message to standard output, including
+# the application name, available options, and version number. It also shows
+# detailed descriptions of each command-line option and their expected
+# arguments.
 def usage
   puts <<-EOT
 Usage: #{File.basename($0)} [OPTS] [PATTERN] [PATHS]
