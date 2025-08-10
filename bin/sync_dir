@@ -1,4 +1,29 @@
 #!/usr/bin/env ruby
+#
+# Directory Synchronization Tool
+#
+# This script synchronizes directories with interactive conflict resolution. It
+# compares source and destination directories recursively, showing differences
+# and prompting for actions when conflicts arise.
+#
+# Usage:
+#   sync_dir <source_directory> [<destination_directory>]
+#
+# If destination is not specified, current directory is used.
+#
+# Features:
+# - Interactive file comparison with colored diffs
+# - Support for copying, editing, deleting, or skipping files
+# - Configuration-based skipping of files/directories
+# - Vim integration for editing files
+# - Colorized output using ANSI escape codes
+#
+# Actions available when conflicts are detected:
+# - c: Copy file to destination
+# - e: Edit file with vim
+# - d: Delete file from source
+# - s: Skip (continue with next file)
+# - q: Quit (exit script)
 
 require 'pathname'
 require 'fileutils'
@@ -10,16 +35,39 @@ include Term::ANSIColor
 $config = Utils::ConfigFile.new
 $config.configure_from_paths
 
+# The local_path method computes the relative path from the current directory
+# to the specified path.
+#
+# This method takes an absolute or relative path and returns its relative
+# representation with respect to the current working directory.
+#
+# @param path [ String ] the path to be converted to a relative path
+#
+# @return [ String ] the relative path from the current directory to the
+# specified path
 def local_path(path)
   Pathname.new(path).expand_path.relative_path_from(
     Pathname.new(?.).expand_path
   ).to_s
 end
 
+# The diff_dir method compares the contents of two directories recursively.
+#
+# This method executes a shell command to perform a recursive directory
+# comparison between the source and destination paths, reporting differences in
+# files and subdirectories.
+#
+# @return [ String ] the output from the diff command showing directory
+# differences
 def diff_dir
   `diff -rq #{$src.inspect} #{$dst.inspect}`
 end
 
+# The ask? method prompts the user for input and returns the trimmed response.
+#
+# @param prompt [ String ] the message to display to the user
+#
+# @return [ String ] the user's input with leading and trailing whitespace removed
 def ask?(prompt:)
   print prompt
   gets.chomp

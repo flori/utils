@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-
+#
 # Ruby module name to file path converter
 #
 # This tool helps map between Ruby module naming conventions and filesystem
