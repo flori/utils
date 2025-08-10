@@ -1,4 +1,20 @@
 #!/usr/bin/env ruby
+#
+# Code Search and Edit Tool
+# 
+# Interactive code search and editing utility that combines grep-like functionality
+# with Vim integration for efficient code navigation and modification.
+#
+# Features:
+# - Search code patterns across files with extensive filtering options
+# - Edit matching files directly in Vim with automatic positioning
+# - Interactive replacement with confirmation prompts
+# - Support for fuzzy matching, regular expressions, and case-insensitive searches
+# - Git integration to show author information
+# - Configurable context display (lines before/after matches)
+#
+# The tool integrates seamlessly with your terminal workflow, allowing you to
+# search code and edit files without touching the mouse.
 
 require 'utils'
 include Utils
@@ -7,6 +23,17 @@ require 'term/ansicolor'
 include Term::ANSIColor
 require 'tempfile'
 
+# The convert_ruby_to_vim_regexp method converts a Ruby regular expression
+# pattern to a Vim-compatible regular expression string.
+#
+# This method takes a Ruby regular expression object and transforms it into a
+# format suitable for Vim's regular expression engine.
+# It duplicates the source pattern, escapes standalone question marks, and
+# appends a case folding flag when appropriate.
+#
+# @param pattern [ Regexp ] the Ruby regular expression pattern to convert
+#
+# @return [ String ] the converted Vim-compatible regular expression string
 def convert_ruby_to_vim_regexp(pattern)
   regexp = pattern.source.dup
   regexp.gsub!(/([^\\])\?/, '\1\\?')
@@ -14,6 +41,16 @@ def convert_ruby_to_vim_regexp(pattern)
   regexp
 end
 
+# The read_line method retrieves a specific line from a file based on the
+# source location.
+#
+# This method extracts the filename and line number from the provided path
+# object, then opens the file to lazily iterate through its contents until it
+# finds and returns the line at the specified line number.
+#
+# @param path [ Object] the path object containing source location information
+#
+# @return [ String, nil ] the content of the specified line if found, otherwise nil
 def read_line(path)
   filename, lineno = path.source_location
   File.open(filename) do |file|
@@ -21,6 +58,17 @@ def read_line(path)
   end
 end
 
+# The replace_line method replaces a specific line in a file with a new line
+# content.
+#
+# This method takes a path object that contains source location information,
+# extracts the filename and line number, then opens the file to replace the
+# specified line with the provided new line content. It uses a temporary file
+# to perform the replacement safely without corrupting the original file.
+#
+# @param path [ Object] an object that responds to source_location and provides
+#                       filename and line number information
+# @param new_line [ String ] the new line content that will replace the existing line
 def replace_line(path, new_line)
   filename, lineno = path.source_location
   Tempfile.open do |output|
@@ -42,6 +90,23 @@ def replace_line(path, new_line)
   end
 end
 
+# The replace_ask method guides the user through replacing patterns in a file
+# line by line.
+#
+# It reads a line from the specified path, displays it with highlighted
+# matches, and prompts the user for replacement decisions based on the provided
+# pattern and replacement string.
+# The method supports various user responses to control the replacement
+# process, including replacing individual matches, all matches, editing the
+# file, or quitting.
+#
+# @param editor [ Utils::Editor ] the editor instance used for file editing
+# @param path [ String ] the file path from which to read and replace content
+# @param pattern [ Utils::Patterns::Pattern ] the pattern matcher used to identify content for replacement
+# @param replace [ String ] the string to replace matched content with
+# @param all [ TrueClass, FalseClass ] flag indicating whether to replace all matches immediately
+#
+# @return [ TrueClass, FalseClass ] true if all matches were replaced, false otherwise
 def replace_ask(editor, path, pattern, replace, all)
   line = read_line path
   display_new_line = line.gsub(
@@ -76,6 +141,18 @@ def replace_ask(editor, path, pattern, replace, all)
   end
 end
 
+# The edit_files method opens editor sessions for specified files and applies
+# pattern-based editing operations.
+#
+# This method utilizes an editor instance to open files for editing, applying
+# either replacement operations or interactive selection based on provided
+# parameters. It supports processing multiple paths with optional pattern
+# matching and replacement functionality.
+#
+# @param pattern [ String ] the pattern used for filtering or matching files
+# @param paths [ Array<String> ] the list of file paths to be processed
+# @param pick [ TrueClass, FalseClass ] determines whether to interactively select a file from the paths
+# @param replace [ String, nil ] the replacement string to be applied when performing replacements
 def edit_files(pattern, paths, pick: false, replace: nil)
   editor = Utils::Editor.new
   editor.edit_remote_send("<ESC>/#{convert_ruby_to_vim_regexp(pattern)}<CR>")
@@ -106,6 +183,12 @@ def edit_files(pattern, paths, pick: false, replace: nil)
   end
 end
 
+# The usage method displays the command-line interface help text and version
+# information.
+#
+# This method outputs a formatted help message that describes the available
+# options and usage patterns for the command-line tool, including pattern
+# matching, file filtering, context display, and search behavior.
 def usage
   puts <<~EOT
     Usage: #{File.basename($0)} [OPTS] PATTERN [PATHS]
