@@ -1,4 +1,32 @@
 #!/usr/bin/env ruby
+#
+# Method Printer Tool
+#
+# Extracts and prints complete method definitions from Ruby source files based
+# on line number references. Takes filename:line_number input and outputs the
+# full method body including surrounding whitespace and indentation.
+#
+# Usage:
+#   print_method [FILENAME:LINE_NUMBER]...
+#
+# Examples:
+#   print_method file.rb:42
+#   echo "file.rb:42" | print_method
+#
+# Features:
+# - Parses Ruby method definitions by line number
+# - Preserves original indentation and formatting
+# - Handles nested methods and complex indentation
+# - Works with both command-line arguments and stdin input
+# - Uses Tins::LinesFile for efficient line-based file access
+#
+# The tool identifies method boundaries by looking for:
+# - Opening 'def' statement with proper indentation
+# - Closing 'end' statement at the same indentation level
+# - Preserves all original formatting including whitespace
+#
+# This is particularly useful for extracting method definitions from large
+# codebases or when debugging specific method implementations.
 
 require 'utils'
 
@@ -7,7 +35,7 @@ inputs = ARGV.empty? ? STDIN : ARGV
 inputs.each do |filename_linenumber|
   source_location = filename_linenumber.source_location
   lf = Tins::LinesFile.for_filename(source_location.filename, source_location.linenumber)
-  if spaces = lf.match_backward(/^(\s*)def\s+(?:\S+?)(?:\(|\s*$)/)&.first
+  if spaces = lf.match_backward(/^(\s*?)(\S.*?\s+)?def\s+/)&.first
     line_number_begin = lf.line_number
     lf.match_forward(/^#{spaces}end/)
     line_number_end = lf.line_number
