@@ -1,12 +1,41 @@
 #!/usr/bin/env ruby
 # vim: set ft=ruby et sw=2 ts=2:
 # encoding: ascii-8bit
+#
+# MySQL Backup Parser/Processor
+#
+# Parses and processes MySQL dump files with various operations including
+# listing tables, creating table statements, truncating tables, inserting data,
+# replacing records, and searching patterns.
+#
+# Usage:
+#   myex list|create|truncate|insert|replace|search [OPTION] [TABLES]
+#
+# Commands:
+#   list        Display all tables in the backup
+#   create      Display CREATE TABLE statements (use -d to drop tables first)
+#   truncate    Truncate tables (use -t to truncate before insert)
+#   insert      Extract INSERT statements (use -i to add IGNORE, -t to truncate)
+#   replace     Convert INSERT to REPLACE statements
+#   search      Search pattern in INSERT statements with context (-p PATTERN -C NUMBER)
+#
+# Options:
+#   -d          Drop table before creation
+#   -t          Truncate table before insert
+#   -i          Add IGNORE to INSERT statements
+#   -p PATTERN  Pattern for search command
+#   -C NUMBER   Context size for search command
+#
+#
+# The script processes stdin as MySQL dump content and outputs processed statements.
 
 require 'tins/go'
 include Tins::GO
 require 'term/ansicolor'
 include Term::ANSIColor
 
+# The usage method displays the command-line interface help text and exits the
+# program.
 def usage
   puts <<EOT
 Usage: #{File.basename($0)} list|create|truncate|insert|replace|search [OPTION] [TABLES]
@@ -40,6 +69,15 @@ EOT
   exit 1
 end
 
+# The bell method outputs a bell character followed by a backspace character
+# multiple times. It pauses between each output based on the specified sleep
+# duration.
+#
+# @param n [ Integer ] the number of times to output the bell and backspace
+# characters @param s [ Float ] the sleep duration in seconds between each
+# output
+#
+# @return [ Integer ] returns the number of iterations performed
 def bell(n = 1, s = 1)
   n.times do
     STDERR.print "\a\b"
