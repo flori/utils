@@ -32,6 +32,7 @@
 require 'ollama'
 include Ollama
 require 'utils'
+require 'context_spook'
 
 META_METHOD = /(
   (class_)?                   # Optional "class_" prefix
@@ -79,11 +80,11 @@ def fetch_construct(filename_linenumber)
   return result, :method
 end
 
-def build_method_prompt(construct_type, construct, file_contents)
+def build_method_prompt(construct_type, construct, context)
   default_prompt = <<~EOT
     Look at this code to document it:
 
-    %{file_contents}
+    %{context}
 
     Here's an example for how you should document a %{construct_type}.
 
@@ -118,15 +119,15 @@ def build_method_prompt(construct_type, construct, file_contents)
     5. Start each line of your comment with a single # character.
   EOT
   $config.read('method-prompt.txt', default: default_prompt) % {
-    construct_type:, construct:, file_contents:,
+    construct_type:, construct:, context:,
   }
 end
 
-def build_class_module_prompt(construct_type, construct, file_contents)
+def build_class_module_prompt(construct_type, construct, context)
   default_prompt = <<~EOT
     Look at this code to document it:
 
-    %{file_contents}
+    %{context}
 
     Here's an example for how you should document a %{construct_type}.
 
@@ -154,16 +155,16 @@ def build_class_module_prompt(construct_type, construct, file_contents)
     5. Start each line of your comment with a single # character.
   EOT
   $config.read('class-module-prompt.txt', default: default_prompt) % {
-    construct_type:, construct:, file_contents:,
+    construct_type:, construct:, context:,
   }
 end
 
-def build_prompt(construct_type, construct, file_contents)
+def build_prompt(construct_type, construct, context)
   case construct_type
   when :method
-    build_method_prompt(construct_type, construct, file_contents)
+    build_method_prompt(construct_type, construct, context)
   when :class, :module
-    build_class_module_prompt(construct_type, construct, file_contents)
+    build_class_module_prompt(construct_type, construct, context)
   else
     fail "unknown construct_type #{construct_type.inspect}"
   end
@@ -171,12 +172,28 @@ end
 
 filename_linenumber = ARGV.shift or fail "require file_name as second argument"
 $config             = Utils::ConfigDir.new('code_comment', env_var: 'XDG_CONFIG_HOME')
-files               = Dir['{lib,spec,test}/**/*.rb']
 base_url            = ENV['OLLAMA_URL'] || 'http://%s' % ENV.fetch('OLLAMA_HOST')
 model               = ENV.fetch('OLLAMA_MODEL', 'llama3.1')
 construct, construct_type = fetch_construct(filename_linenumber)
 construct_indent          = construct[/\A( *)/, 1].size
-file_contents = files.map { _1 + ":\n" + File.read(_1) } * ?\n
+context = if File.exist?(filename = 'contexts/code_comment.rb')
+            ContextSpook.generate_context(filename)
+          else
+            ContextSpook.generate_context do
+              context do
+                file "README.md", tags: %w[ documentation ]
+
+                # Auto-discover files using globs
+                %w[ lib spec test ].each do |dir|
+                  namespace dir do
+                    Dir["#{dir}/**/*.rb"].each do |filename|
+                      file filename, tags: %w[ ruby ]
+                    end
+                  end
+                end
+              end
+            end
+          end.to_json
 #call_sites          = %x(cscope -L -3 "#{method_name}" $(find . -name '*.rb') | awk '{ print $1 ":" $3 }').lines.map(&:chomp).uniq
 #methods             = call_sites.map { fetch_method(_1) } * ?\n
 
@@ -201,7 +218,7 @@ default_system = <<~EOT
 EOT
 system = $config.read('system.txt', default: default_system)
 
-prompt = build_prompt(construct_type, construct, file_contents)
+prompt = build_prompt(construct_type, construct, context)
 
 default_options = JSON(
   #repeat_penalty: 1.8,

@@ -37,6 +37,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency(%q<ollama-ruby>.freeze, ["~> 1.5.0".freeze])
   s.add_runtime_dependency(%q<kramdown-ansi>.freeze, ["~> 0.0.1".freeze])
   s.add_runtime_dependency(%q<figlet>.freeze, ["~> 1.0".freeze])
+  s.add_runtime_dependency(%q<context_spook>.freeze, ["~> 0.2".freeze])
   s.add_runtime_dependency(%q<simplecov>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<debug>.freeze, [">= 0".freeze])
 end
