@@ -176,7 +176,7 @@ base_url            = ENV['OLLAMA_URL'] || 'http://%s' % ENV.fetch('OLLAMA_HOST'
 model               = ENV.fetch('OLLAMA_MODEL', 'llama3.1')
 construct, construct_type = fetch_construct(filename_linenumber)
 construct_indent          = construct[/\A( *)/, 1].size
-context = if File.exist?(filename = 'contexts/code_comment.rb')
+context = if File.exist?(filename = '.contexts/code_comment.rb')
             ContextSpook.generate_context(filename)
           else
             ContextSpook.generate_context do
