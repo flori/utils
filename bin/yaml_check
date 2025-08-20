@@ -24,6 +24,8 @@
 #   DEBUG=1 ./yaml_check data.yaml
 #
 
+require 'yaml'
+
 format = -> s {
   if /^\((?<f>[^)]+)\):\ (?<m>.*?) at line (?<l>\d+) column (?<c>\d+)/ =~ s
     [ f, l, c, m ] * ?:
