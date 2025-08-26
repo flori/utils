@@ -3,6 +3,19 @@ require 'rbconfig'
 require 'pstree'
 
 module Utils
+  # An editor interface for interacting with Vim server instances.
+  #
+  # This class provides functionality for managing Vim editor sessions through
+  # server connections, enabling features like remote file editing, window
+  # management, and server state monitoring. It handles communication with
+  # running Vim instances and supports various configuration options for
+  # customizing the editing experience.
+  #
+  # @example
+  #   editor = Utils::Editor.new
+  #   editor.edit('file.rb')
+  #   editor.activate
+  #   editor.stop
   class Editor
     # The initialize method sets up a new editor instance with default
     # configuration.
@@ -11,7 +24,8 @@ module Utils
     # flag, pause duration, and server name. It also loads the configuration
     # file and assigns the edit configuration section to the instance.
     #
-    # @param block [ Proc ] optional block to be executed after initialization
+    # @yield |editor| optional block to be executed after initialization with
+    # self as argument.
     #
     # @return [ Utils::Editor ] a new editor instance configured with default settings
     def initialize
@@ -41,10 +55,14 @@ module Utils
       name.upcase
     end
 
-    # The pause_duration method gets or sets the pause duration value.
+    # The pause_duration method provides access to the duration value used for
+    # pausing operations.
     #
-    # @return [ Integer ] the current pause duration value
-    # @param value [ Integer ] the new pause duration value to set
+    # This method returns the current value of the pause duration attribute,
+    # which controls how long certain operations should wait or pause between
+    # actions.
+    #
+    # @return [ Integer, Float ] the current pause duration value in seconds
     attr_accessor :pause_duration
 
     # The wait method gets the wait status.
