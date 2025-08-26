@@ -1,4 +1,12 @@
 module Utils
+  # A class for analyzing and retrieving git blame information for specific
+  # lines of code.
+  #
+  # This class provides functionality to initialize with a file path and line
+  # number, and then perform git blame operations to obtain information about
+  # when and by whom that specific line was last modified. It serves as a
+  # utility for developers to quickly access historical context for individual
+  # lines of code within their projects.
   class LineBlamer
     # Initializes a new LineBlamer instance to analyze source code line
     # information.

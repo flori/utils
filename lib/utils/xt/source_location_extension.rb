@@ -1,5 +1,14 @@
 module Utils
   module Xt
+    # Extension module for adding source location functionality to objects.
+
+    # This module provides enhanced source location capabilities by extending
+    # objects with methods that can determine file paths and line numbers
+    # associated with method definitions, class references, or file-based
+    # locations. It supports parsing of various input formats including
+    # file:line syntax, class.method patterns, and provides convenient
+    # accessors for filename, line number, and range information through the
+    # source_location method.
     module SourceLocationExtension
       # Regular expression to match Ruby class method signatures
       # Matches patterns like "ClassName#method" or "ClassName.method"
