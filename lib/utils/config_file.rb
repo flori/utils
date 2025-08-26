@@ -730,6 +730,17 @@ class Utils::ConfigFile
     @sync_dir ||= SyncDir.new
   end
 
+  class CodeComment < BlockConfig
+    dsl_accessor :code_globs, 'lib/**/*.rb', 'spec/**/*.rb', 'tests/**/*rb'
+  end
+
+  def code_comment(&block)
+    if block
+      @code_comment = CodeComment.new(&block)
+    end
+    @code_comment ||= CodeComment.new
+  end
+
   # The to_ruby method generates a Ruby configuration string by collecting
   # configuration data from various components and combining them into a
   # single formatted output.

@@ -11,7 +11,7 @@
 # descriptions, parameters, return values, and exceptions.
 #
 # Requires:
-#   - Git repository with Ruby files in lib/, spec/, or test/ directories
+#   - Git repository with Ruby files in lib/, spec/, or tests/ directories
 #   - Ollama server running locally or accessible via OLLAMA_URL / OLLAMA_HOST
 #   - Configuration files in ~/.config/code_comment/
 #     - system.txt: System prompt for LLM
@@ -118,7 +118,7 @@ def build_method_prompt(construct_type, construct, context)
     4. Never add any other remarks or explanation to your response.
     5. Start each line of your comment with a single # character.
   EOT
-  $config.read('method-prompt.txt', default: default_prompt) % {
+  $config_dir.read('method-prompt.txt', default: default_prompt) % {
     construct_type:, construct:, context:,
   }
 end
@@ -154,7 +154,7 @@ def build_class_module_prompt(construct_type, construct, context)
     4. Never add any other remarks or explanation to your response.
     5. Start each line of your comment with a single # character.
   EOT
-  $config.read('class-module-prompt.txt', default: default_prompt) % {
+  $config_dir.read('class-module-prompt.txt', default: default_prompt) % {
     construct_type:, construct:, context:,
   }
 end
@@ -171,7 +171,9 @@ def build_prompt(construct_type, construct, context)
 end
 
 filename_linenumber = ARGV.shift or fail "require file_name as second argument"
-$config             = Utils::ConfigDir.new('code_comment', env_var: 'XDG_CONFIG_HOME')
+$config = Utils::ConfigFile.new
+$config.configure_from_paths
+$config_dir             = Utils::ConfigDir.new('code_comment', env_var: 'XDG_CONFIG_HOME')
 base_url            = ENV['OLLAMA_URL'] || 'http://%s' % ENV.fetch('OLLAMA_HOST')
 model               = ENV.fetch('OLLAMA_MODEL', 'llama3.1')
 construct, construct_type = fetch_construct(filename_linenumber)
@@ -185,15 +187,17 @@ default_context = ContextSpook.generate_context do
     file "README.md", tags: %w[ documentation ]
 
     # Auto-discover files using globs
-    %w[ lib spec test ].each do |dir|
+    $config.code_comment.code_globs.each do |dir_glob|
+      dir = dir_glob.sub(%r(/.*), '').full? || 'none'
       namespace dir do
-        Dir["#{dir}/**/*.rb"].each do |filename|
-          file filename, tags: %w[ ruby ]
+        Dir[dir_glob].each do |filename|
+          file filename
         end
       end
     end
   end
 end
+
 context = if File.exist?(context_filename)
             STDERR.puts "Using context from #{context_filename.inspect}."
             ContextSpook.generate_context(context_filename)
@@ -223,7 +227,7 @@ default_system = <<~EOT
     * @example usage patterns when helpful
     * Avoid version information (@since)
 EOT
-system = $config.read('system.txt', default: default_system)
+system = $config_dir.read('system.txt', default: default_system)
 
 prompt = build_prompt(construct_type, construct, context)
 
@@ -238,10 +242,10 @@ default_options = JSON(
   min_p: 0.1,
 )
 
-client_config = Client::Config.load_from_json $config + 'client.json'
+client_config = Client::Config.load_from_json $config_dir + 'client.json'
 client_config.base_url = base_url
 ollama  = Client.configure_with(client_config)
-options = JSON.parse($config.read('options.json', default: default_options))
+options = JSON.parse($config_dir.read('options.json', default: default_options))
 
 if ENV['DEBUG'].to_i == 1
   File.open('debug.log', ?w) do |log|
