@@ -1,6 +1,12 @@
 require 'digest/md5'
 
 module Utils
+  # MD5 module for computing MD5 hash digests of files.
+  #
+  # This module provides functionality for calculating MD5 hash digests of
+  # files using the Digest::MD5 library. It offers a convenient interface for
+  # computing hashes while handling file reading in chunks to optimize memory
+  # usage during the hashing process.
   module MD5
     class << self
       # The buffer_size accessor method provides read and write access to the

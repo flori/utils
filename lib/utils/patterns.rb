@@ -1,5 +1,19 @@
 module Utils
+  # A module that provides pattern matching functionality for file searching
+  # and text processing.
+  #
+  # It includes classes for different types of pattern matching including fuzzy
+  # matching and regular expression matching.
   module Patterns
+
+    # Base class for pattern matching implementations.
+    #
+    # This class serves as the foundation for various pattern matching
+    # strategies, providing common functionality for initializing patterns with
+    # character set filtering and case sensitivity options. It handles the core
+    # configuration and delegates specific matching behavior to subclasses.
+    #
+    # @abstract
     class Pattern
       # Initializes a new Pattern instance with the specified options.
       #
@@ -46,6 +60,19 @@ module Utils
       end
     end
 
+    # A fuzzy pattern matcher that performs partial string matching while
+    # preserving character order.
+    #
+    # This class implements a pattern matching strategy that allows for
+    # flexible matching of strings where the characters of the search pattern
+    # appear in sequence within the target string, but not necessarily
+    # consecutively. It is particularly useful for finding text patterns with
+    # potential typos or
+    # when only partial information about the target is available.
+    #
+    # @example
+    #   fuzzy_pattern = FuzzyPattern.new(pattern: 'abc')
+    #   fuzzy_pattern.match('a1b2c3') # => matches because 'a', 'b', and 'c' appear in order
     class FuzzyPattern < Pattern
       # Initializes a fuzzy pattern matcher by processing the pattern string
       # and compiling it into a regular expression.
@@ -70,6 +97,18 @@ module Utils
       end
     end
 
+    # A regular expression pattern matcher that performs exact string matching
+    # with optional case sensitivity.
+    #
+    # This class extends the base Pattern class to provide functionality for
+    # creating and using regular expression patterns. It compiles the provided
+    # pattern into a Regexp object that can be used for matching operations
+    # throughout the application. The pattern matching behavior is influenced
+    # by the case sensitivity configuration inherited from the parent class.
+    #
+    # @example
+    #   regexp_pattern = RegexpPattern.new(pattern: 'foo', icase: true)
+    #   regexp_pattern.match('FOO') # => matches because case insensitive
     class RegexpPattern < Pattern
       # Initializes a regular expression pattern matcher with the specified
       # options.
