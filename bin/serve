@@ -6,7 +6,7 @@ require 'tins/go'
 include Tins::GO
 require 'webrick'
 
-$opts = go 'p:h'
+$opts = go 'b:p:h', defaults: { ?b => '127.0.0.1', ?p => 8888 }
 
 if $opts[?h]
   puts <<~USAGE
@@ -15,12 +15,14 @@ if $opts[?h]
     Usage: #{File.basename($0)} [OPTIONS] [DIR]
     
     Options:
-      -p PORT    Specify port number (default: 8888)
-      -h         Show this help message
+      -b ADDRESS  Address to bind to  (default: "127.0.0.1")
+      -p PORT     Specify port number (default: 8888)
+      -h          Show this help message
     
     Examples:
-      #{File.basename($0)}                    # Serve current directory on port 8888
-      #{File.basename($0)} -p 3000            # Serve on port 3000
+      #{File.basename($0)}                    # Serve current directory on 127.0.0.1:8888
+      #{File.basename($0)} -b 0.0.0.0         # Serve on 0.0.0.0:3000
+      #{File.basename($0)} -p 3000            # Serve on 127.0.0.1:3000
       #{File.basename($0)} /path/to/dir       # Serve specific directory
     
     Note: If no directory is specified, serves the current working directory.
@@ -28,11 +30,13 @@ if $opts[?h]
   exit
 end
 
-port = ($opts[?p] || 8888).to_i
+address = $opts[?b]
+port    = $opts[?p].to_i
 s = WEBrick::HTTPServer.new(
+  BindAddress:  address,
   Port:         port,
   DocumentRoot: ARGV.shift || Dir.pwd
 )
 trap('INT') { s.shutdown }
-puts "You have been served: http://localhost:#{port}/"
+puts "You have been served: http://#{address}:#{port}/"
 s.start
