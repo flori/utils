@@ -1,5 +1,11 @@
 require 'tins'
 
+# Configuration file manager for Utils library.
+#
+# This class provides functionality for loading, parsing, and managing
+# configuration settings from multiple sources. It supports DSL-style
+# configuration blocks and integrates with various utility components to
+# provide centralized configuration management.
 class Utils::ConfigFile
   class << self
     attr_accessor :config_file_paths
@@ -12,6 +18,12 @@ class Utils::ConfigFile
 
   include DSLKit::Interpreter
 
+  # Error raised when configuration file parsing fails.
+  #
+  # This exception is specifically designed to be thrown when issues occur
+  # during the parsing or processing of configuration files within the Utils
+  # library. It inherits from StandardError, making it a standard Ruby
+  # exception that can be caught and handled appropriately by calling code.
   class ConfigFileError < StandardError; end
 
   # The initialize method sets up a new instance of the class.
@@ -76,6 +88,12 @@ class Utils::ConfigFile
     self
   end
 
+  # Base class for defining configuration blocks with DSL accessors.
+  #
+  # This class provides a foundation for creating configuration classes that
+  # support dynamic attribute definition through DSL-style accessor methods. It
+  # includes functionality for registering configuration settings and
+  # generating Ruby code representations of the configuration state.
   class BlockConfig
     class << self
       # The inherited method extends the module with DSL accessor functionality
@@ -158,11 +176,17 @@ class Utils::ConfigFile
     end
   end
 
+  # A configuration class for test execution settings.
+  #
+  # This class manages the configuration options related to running tests,
+  # specifically supporting different test frameworks and defining which
+  # directories should be included in test discovery and execution.
   class Probe < BlockConfig
     # The config method sets up a configuration option for the test framework.
     #
     # This method defines a configuration parameter that specifies which test
-    # framework should be used, allowing for flexible test execution environments.
+    # framework should be used, allowing for flexible test execution
+    # environments.
     #
     # @param name [ Symbol ] the name of the configuration option
     # @param value [ Object ] the value to set for the configuration option
@@ -221,6 +245,13 @@ class Utils::ConfigFile
     @probe ||= Probe.new
   end
 
+  # A configuration class for file system operations.
+  #
+  # This class manages the configuration settings for searching and discovering
+  # files and directories while filtering out unwanted entries based on
+  # configured patterns. It provides functionality to define which directories
+  # should be pruned and which files should be skipped during file system
+  # operations.
   class FileFinder < BlockConfig
     # The prune? method checks if a basename matches any of the configured
     # prune directories.
@@ -254,6 +285,13 @@ class Utils::ConfigFile
     end
   end
 
+  # A configuration class for search operations.
+  #
+  # This class manages the configuration settings for searching files and
+  # directories while filtering out unwanted entries based on configured
+  # patterns. It inherits from FileFinder and provides functionality to define
+  # which directories should be pruned and which files should be skipped during
+  # search processes.
   class Search < FileFinder
     # The prune_dirs method configures the pattern for identifying directories
     # to be pruned during file system operations.
@@ -299,6 +337,12 @@ class Utils::ConfigFile
     @search ||= Search.new
   end
 
+  # A configuration class for file discovery operations.
+  #
+  # This class manages the configuration settings for discovering files and directories
+  # while filtering out unwanted entries based on configured patterns. It inherits from
+  # FileFinder and provides functionality to define which directories should be pruned
+  # and which files should be skipped during discovery processes.
   class Discover < FileFinder
     # The prune_dirs method configures the pattern for identifying directories
     # to be pruned during file system operations.
@@ -361,6 +405,13 @@ class Utils::ConfigFile
     @discover ||= Discover.new
   end
 
+  # A configuration class for file system scope operations.
+  #
+  # This class manages the configuration settings for defining which files and
+  # directories should be included or excluded during file system traversals
+  # and searches. It inherits from FileFinder and provides pattern matching
+  # capabilities for pruning directories and skipping specific files based on
+  # configured regular expressions.
   class Scope < FileFinder
     # The prune_dirs method configures the pattern for identifying directories
     # to be pruned during file system operations.
@@ -404,6 +455,12 @@ class Utils::ConfigFile
     @scope ||= Scope.new
   end
 
+  # A configuration class for whitespace handling operations.
+  #
+  # This class manages the configuration options related to removing or modifying
+  # trailing whitespace in files. It provides functionality to define patterns for
+  # pruning directories and skipping specific files during whitespace processing,
+  # ensuring that only relevant files are affected by space-stripping operations.
   class StripSpaces < FileFinder
     # The prune_dirs method configures the pattern for directory names that
     # should be pruned.
@@ -448,6 +505,12 @@ class Utils::ConfigFile
     @strip_spaces ||= StripSpaces.new
   end
 
+  # SSH tunnel configuration manager
+  #
+  # Provides functionality for configuring and managing SSH tunnels with support for
+  # different terminal multiplexers like tmux and screen. Allows setting up tunnel
+  # specifications with local and remote address/port combinations, handling
+  # environment variables, and managing copy/paste functionality for tunnel sessions.
   class SshTunnel < BlockConfig
     # The terminal_multiplexer method configures the terminal multiplexer
     # setting.
@@ -472,8 +535,6 @@ class Utils::ConfigFile
 
     # The initialize method sets up the instance by calling the superclass
     # constructor and assigning the terminal multiplexer configuration.
-    #
-    # @param terminal_multiplexer [ Object ] the terminal multiplexer to be assigned
     def initialize
       super
       self.terminal_multiplexer = terminal_multiplexer
@@ -540,6 +601,12 @@ class Utils::ConfigFile
       end
     end
 
+    # Manages the copy/paste functionality configuration for SSH tunnels.
+    #
+    # This class handles the setup and configuration of copy/paste capabilities
+    # within SSH tunnel sessions, allowing users to define network addresses,
+    # ports, and other parameters needed for establishing and managing
+    # copy/paste connections through SSH tunnels.
     class CopyPaste < BlockConfig
       # The bind_address method configures the network address to which the
       # server will bind for incoming connections.
@@ -614,6 +681,17 @@ class Utils::ConfigFile
     self.config_settings << :copy_paste
   end
 
+  # The ssh_tunnel method provides access to an SSH tunnel configuration instance.
+  #
+  # This method returns the existing SSH tunnel configuration object if one has
+  # already been created, or initializes and returns a new SSH tunnel
+  # configuration instance if no instance exists. If a block is provided, it
+  # will be passed to the SSH tunnel configuration constructor when creating a
+  # new instance.
+  #
+  # @param block [ Proc ] optional block to configure the SSH tunnel object
+  #
+  # @return [ Utils::ConfigFile::SshTunnel ] an SSH tunnel configuration instance
   def ssh_tunnel(&block)
     if block
       @ssh_tunnel = SshTunnel.new(&block)
@@ -621,6 +699,12 @@ class Utils::ConfigFile
     @ssh_tunnel ||= SshTunnel.new
   end
 
+  # A configuration class for editor settings.
+  #
+  # This class manages the configuration options related to editing operations,
+  # specifically focusing on Vim editor integration. It provides functionality
+  # to configure the path to the Vim executable and default arguments used when
+  # invoking the editor.
   class Edit < BlockConfig
     # The vim_path method determines the path to the vim executable.
     #
@@ -650,6 +734,12 @@ class Utils::ConfigFile
     @edit ||= Edit.new
   end
 
+  # A configuration class for file classification settings.
+  #
+  # This class manages the configuration options related to classifying files
+  # by type or category. It provides functionality to define path shifting
+  # behavior and prefix handling for determining how file paths should be
+  # categorized during classification operations.
   class Classify < BlockConfig
     # The shift_path_by_default method configuration accessor
     #
@@ -687,6 +777,12 @@ class Utils::ConfigFile
     @classify ||= Classify.new
   end
 
+  # A configuration class for directory synchronization settings.
+  #
+  # This class manages the configuration options related to synchronizing
+  # directories using rsync. It provides functionality to define patterns for
+  # skipping certain paths during synchronization operations, making it easy to
+  # exclude temporary, cache, or version control files from being synced.
   class SyncDir < BlockConfig
     # The skip_path method configures a regular expression pattern for skipping
     # paths.
@@ -730,10 +826,26 @@ class Utils::ConfigFile
     @sync_dir ||= SyncDir.new
   end
 
+  # A configuration class for code comment settings.
+  #
+  # This class manages the configuration options related to generating YARD
+  # documentation for Ruby source code. It provides access to glob patterns
+  # that define which files should be considered when generating code comments.
   class CodeComment < BlockConfig
     dsl_accessor :code_globs, 'lib/**/*.rb', 'spec/**/*.rb', 'tests/**/*rb'
   end
 
+  # The code_comment method provides access to a CodeComment configuration
+  # instance.
+  #
+  # This method returns the existing CodeComment instance if one has already
+  # been created, or initializes and returns a new CodeComment instance if no
+  # instance exists. If a block is provided, it will be passed to the
+  # CodeComment constructor when creating a new instance.
+  #
+  # @param block [ Proc ] optional block to configure the CodeComment object
+  #
+  # @return [ Utils::ConfigFile::CodeComment ] a CodeComment configuration instance
   def code_comment(&block)
     if block
       @code_comment = CodeComment.new(&block)
