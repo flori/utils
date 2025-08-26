@@ -9,7 +9,19 @@ $editor = Utils::Editor.new
 $pager = ENV['PAGER'] || 'less -r'
 
 module Utils
+  # A module that extends Ruby's core classes with additional utility methods
+  # for interactive development.
+  #
+  # Provides enhanced functionality for IRB sessions through method extensions
+  # on Object, String, and Regexp classes. Includes features like improved
+  # pattern matching, shell command integration, file I/O operations,
+  # performance measurement tools, and developer productivity enhancements.
   module IRB
+    # A module that extends Regexp functionality with additional pattern
+    # matching and display capabilities.
+    #
+    # Provides enhanced regexp operations including match highlighting and
+    # shell command integration.
     module Shell
       require 'fileutils'
       include FileUtils
@@ -223,6 +235,12 @@ module Utils
         end.compact.sort!
       end
 
+      # Base class for wrapping objects with descriptive metadata.
+      #
+      # This class provides a foundation for creating wrapper objects that
+      # associate descriptive information with underlying objects. It handles
+      # name conversion and provides common methods for accessing and comparing
+      # wrapped objects.
       class WrapperBase
         include Comparable
 
@@ -293,6 +311,15 @@ module Utils
         end
       end
 
+      # A wrapper class for Ruby method objects that provides enhanced
+      # introspection and display capabilities.
+      #
+      # This class extends WrapperBase to create specialized wrappers for Ruby
+      # method objects, offering detailed information about methods including
+      # their source location, arity, and owner. It facilitates interactive
+      # exploration of Ruby methods in environments like IRB by providing
+      # structured access to method metadata and enabling sorting and
+      # comparison operations based on method descriptions.
       class MethodWrapper < WrapperBase
         # The initialize method sets up a new instance with the specified
         # object, method name, and module flag.
@@ -356,6 +383,15 @@ module Utils
         end
       end
 
+      # A wrapper class for Ruby constant objects that provides enhanced
+      # introspection and display capabilities.
+      #
+      # This class extends WrapperBase to create specialized wrappers for Ruby
+      # constant objects, offering detailed information about constants
+      # including their names and associated classes. It facilitates
+      # interactive exploration of Ruby constants in environments like IRB by
+      # providing structured access to constant metadata and enabling sorting
+      # and comparison operations based on constant descriptions.
       class ConstantWrapper < WrapperBase
         # The initialize method sets up a new instance with the provided object
         # and name.
@@ -667,6 +703,15 @@ module Utils
       end
     end
 
+    # A module that extends Regexp functionality with additional pattern
+    # matching and display capabilities.
+    #
+    # Provides enhanced regexp operations including match highlighting and
+    # shell command integration.
+    #
+    # @example
+    #   /pattern/ # => regular expression object
+    #   /pattern/.show_match("text") # => highlighted text match
     module Regexp
       # The show_match method evaluates a string against the receiver pattern
       # and highlights matching portions.
@@ -691,6 +736,11 @@ module Utils
       end
     end
 
+    # A module that extends String with additional utility methods for shell
+    # command piping and file writing operations.
+    #
+    # Provides convenient methods for executing shell commands on string
+    # content and securely writing strings to files.
     module String
       # The | method executes a shell command and returns its output.
       #

@@ -4,6 +4,18 @@ require 'digest/md5'
 require 'fileutils'
 require 'mize'
 
+# A class for finding and searching files with configurable patterns and
+# filters.
+#
+# This class provides functionality for traversing file systems to locate files
+# based on various criteria including file extensions, directory pruning, and
+# pattern matching. It supports both indexed and direct search approaches to
+# optimize performance when dealing with large codebases or frequently accessed
+# file sets.
+#
+# @example
+#   finder = Utils::Finder.new(args: { l: true }, roots: ['.'])
+#   finder.search
 class Utils::Finder
   include Tins::Find
   include Utils::Patterns

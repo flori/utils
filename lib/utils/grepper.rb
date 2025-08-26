@@ -1,10 +1,27 @@
 require 'term/ansicolor'
 
+# A class for searching and matching text patterns within files.
+#
+# This class provides functionality to search through file systems for content
+# matching specified patterns, with support for various output formats and
+# filtering options. It handles directory pruning, file skipping, and different
+# types of pattern matching including regular expressions and fuzzy matching.
+#
+# @example
+#   grepper = Utils::Grepper.new(args: { l: true }, roots: ['.'])
+#   grepper.search
 class Utils::Grepper
   include Tins::Find
   include Utils::Patterns
   include Term::ANSIColor
 
+  # A queue implementation with size limitation.
+  #
+  # @example queue = Utils::Grepper::Queue.new(5) queue << "item1" queue <<
+  # "item2" # ... queue.data # => [ "item1", "item2", ... ]
+  #
+  # The Queue class provides a fixed-size buffer for storing objects. When the
+  # maximum size is exceeded, the oldest item is automatically removed.
   class Queue
     # The initialize method sets up a new instance with the specified maximum
     # size and empty data array.

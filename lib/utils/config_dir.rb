@@ -2,6 +2,21 @@ require 'pathname'
 require 'stringio'
 
 module Utils
+  # A configuration directory manager that handles path resolution and file
+  # operations within a specified directory structure.
+  #
+  # This class provides functionality for managing configuration directories by
+  # deriving paths based on a root directory and name, and offering methods to
+  # read files with optional default values and block handling. It supports
+  # environment variable-based root path resolution and uses Pathname for
+  # robust path manipulation.
+  #
+  # @example
+  #   config_dir = Utils::ConfigDir.new('myapp')
+  #   config_dir.to_s # => returns the string representation of the configuration directory path
+  #   config_dir.join('config.txt') # => returns a Pathname object for the joined path
+  #   config_dir.read('settings.rb') # => reads and returns the content of 'settings.rb' or nil if not found
+  #   config_dir.read('missing.txt', default: 'default content') # => returns 'default content' if file is missing
   class ConfigDir
     # Initializes a new ConfigDir instance with the specified name and optional
     # root path or environment variable.

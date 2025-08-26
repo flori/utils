@@ -1,4 +1,19 @@
 module Utils
+  # A class that represents an SSH tunnel specification for configuring network
+  # connections.
+  #
+  # This class parses and stores the configuration details for SSH tunnels,
+  # including local and remote address/port combinations. It provides methods
+  # to validate the specification, convert it to string or array
+  # representations, and access individual components of the tunnel
+  # configuration.
+  #
+  # @example
+  #   spec = Utils::SshTunnelSpecification.new('localhost:8080:remote.host:22')
+  #   spec.local_addr  # => 'localhost'
+  #   spec.local_port  # => 8080
+  #   spec.remote_addr # => 'remote.host'
+  #   spec.remote_port # => 22
   class SshTunnelSpecification
     # Initializes a new SshTunnelSpecification instance by parsing the provided
     # specification string.
