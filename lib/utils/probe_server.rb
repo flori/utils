@@ -2,6 +2,12 @@ require 'unix_socks'
 require 'term/ansicolor'
 
 module Utils
+  # A process job representation for execution within the probe server system.
+  #
+  # This class encapsulates the information and behavior associated with a
+  # single executable task that can be enqueued and processed by a ProbeServer.
+  # It holds command arguments, manages execution status, and provides
+  # mechanisms for serialization and display of job information.
   class ProcessJob
     include Term::ANSIColor
 
@@ -125,7 +131,19 @@ module Utils
     end
   end
 
+  # A client for interacting with the probe server through Unix domain sockets.
+  #
+  # This class provides an interface for enqueueing process jobs and managing
+  # environment variables on a remote probe server. It uses Unix domain sockets
+  # to communicate with the server, enabling distributed task execution and
+  # configuration management.
   class ProbeClient
+    # A proxy class for managing environment variables through a probe server communication channel.
+    #
+    # This class provides a wrapper around the ENV object that allows setting and retrieving
+    # environment variables while logging these operations through the probe server.
+    # It intercepts assignments and lookups to provide visibility into environment modifications
+    # during probe server operations.
     class EnvProxy
       # The initialize method sets up a new instance with the provided server
       # object.
@@ -208,6 +226,13 @@ module Utils
     end
   end
 
+  # A probe server for managing and executing process jobs through Unix domain
+  # sockets.
+  #
+  # This class provides a mechanism for enqueueing and running process jobs in
+  # a distributed manner, using Unix domain sockets for communication. It
+  # maintains a queue of jobs, tracks their execution status, and provides an
+  # interactive interface for managing the server.
   class ProbeServer
     include Term::ANSIColor
 
@@ -276,13 +301,13 @@ module Utils
 
     annotate :shortcut
 
+    doc 'Display this help.'
+    shortcut :h
     # The help method displays a formatted list of available commands and their
     # descriptions.
     #
     # This method organizes and presents the documented commands along with their
     # shortcuts and descriptions in a formatted table layout for easy reference.
-    doc 'Display this help.'
-    shortcut :h
     def help
       docs      = doc_annotations.sort_by(&:first)
       docs_size = docs.map { |a| a.first.size }.max
@@ -295,6 +320,8 @@ module Utils
       }
     end
 
+    doc 'Enqueue a new job with the argument array <args>.'
+    shortcut :e
     # The job_enqueue method adds a new process job to the execution queue.
     #
     # This method creates a process job instance with the provided arguments
@@ -302,8 +329,6 @@ module Utils
     # about the enqueued job through output messaging.
     #
     # @param args [ Array ] the command arguments to be executed by the process job
-    doc 'Enqueue a new job with the argument array <args>.'
-    shortcut :e
     def job_enqueue(args)
       job = ProcessJob.new(args:, probe_server: self)
       output_message " → #{job.inspect} enqueued.", type: :info
@@ -311,17 +336,19 @@ module Utils
     end
     alias enqueue job_enqueue
 
+    doc 'Quit the server.'
+    shortcut :q
     # The shutdown method terminates the probe server process immediately.
     #
     # This method outputs a warning message indicating that the server is being
     # shut down forcefully and then exits the program with status code 23.
-    doc 'Quit the server.'
-    shortcut :q
     def shutdown
       output_message "Server was shutdown down manually!", type: :info
       exit 23
     end
 
+    doc 'Repeat the job with <job_id> or the last, it will be assigned a new id, though.'
+    shortcut :r
     # The job_repeat method re-executes a previously run job from the history.
     #
     # This method takes a job identifier and attempts to find the corresponding
@@ -334,8 +361,6 @@ module Utils
     #
     # @return [ TrueClass, FalseClass ] true if the job was found and re-enqueued,
     #         false otherwise
-    doc 'Repeat the job with <job_id> or the last, it will be assigned a new id, though.'
-    shortcut :r
     def job_repeat(job_id = @history.last)
       ProcessJob === job_id and job_id = job_id.id
       if old_job = @history.find { |job| job.id == job_id }
@@ -346,17 +371,18 @@ module Utils
       end
     end
 
+    doc 'List the history of run jobs.'
+    shortcut :l
     # The history_list method displays the list of previously executed jobs
     # from the server's history.
     #
     # This method outputs all completed jobs that have been processed by the probe server,
     # showing their identifiers and command arguments for review.
-    doc 'List the history of run jobs.'
-    shortcut :l
     def history_list
       output_message @history
     end
 
+    doc 'Clear the history of run jobs.'
     # The history_clear method clears all entries from the server's execution
     # history.
     #
@@ -365,12 +391,18 @@ module Utils
     # probe server.
     #
     # @return [ TrueClass ] always returns true after clearing the history
-    doc 'Clear the history of run jobs.'
     def history_clear
       @history = []
       true
     end
 
+    # A wrapper class for environment variable management that logs operations.
+    #
+    # This class provides a transparent interface for accessing and modifying
+    # environment variables while recording these interactions. It delegates all
+    # method calls to an underlying object (typically ENV) but intercepts assignments
+    # to log the changes, enabling tracking of environment modifications during
+    # probe server operations.
     class LogWrapper < BasicObject
       # The initialize method sets up a new instance with the provided server
       # object and object.
