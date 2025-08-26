@@ -111,12 +111,16 @@ def build_method_prompt(construct_type, construct, context)
 
     Format requirements:
 
-    1. Focus on providing a description of the %{construct_type}'s purpose
+    1. focus on providing a description of the %{construct_type}'s purpose
        without including any code snippets.
-    2. You should omit the @raise if you are not sure.
-    3. Never use `, `ruby, ```, ```ruby in your response.
-    4. Never add any other remarks or explanation to your response.
-    5. Start each line of your comment with a single # character.
+    2. **always** output just the line comments starting each with a single #
+       character.
+    3. **never** output any executable ruby code like class or module
+       definitions, or method definitions or other code outside of such
+       comments.
+    4. you should omit the @raise if you are not sure.
+    5. never use `, `ruby, ```, ```ruby in your response.
+    6. never add any other remarks or explanation to your response.
   EOT
   $config_dir.read('method-prompt.txt', default: default_prompt) % {
     construct_type:, construct:, context:,
@@ -146,13 +150,16 @@ def build_class_module_prompt(construct_type, construct, context)
 
     Format requirements:
 
-    1. Focus on providing a description of the %{construct_type}'s purpose
+    1. focus on providing a description of the %{construct_type}'s purpose
        without including any code snippets.
-    2. Include @example tag if there are notable usage patterns for this
-       construct.
-    3. Never use `, `ruby, ```, ```ruby in your response.
-    4. Never add any other remarks or explanation to your response.
-    5. Start each line of your comment with a single # character.
+    2. **always** output just the line comments starting each with a single #
+       character.
+    3. **never** output any executable ruby code like class or module
+       definitions, or method definitions or other code outside of such
+       comments.
+    4. you should omit the @raise if you are not sure.
+    5. never use `, `ruby, ```, ```ruby in your response.
+    6. never add any other remarks or explanation to your response.
   EOT
   $config_dir.read('class-module-prompt.txt', default: default_prompt) % {
     construct_type:, construct:, context:,
