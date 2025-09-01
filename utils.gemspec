@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
 
   s.specification_version = 4
 
-  s.add_development_dependency(%q<gem_hadar>.freeze, ["~> 2.1".freeze])
+  s.add_development_dependency(%q<gem_hadar>.freeze, ["~> 2.2".freeze])
   s.add_development_dependency(%q<test-unit>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<unix_socks>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<webrick>.freeze, [">= 0".freeze])
@@ -37,6 +37,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency(%q<ollama-ruby>.freeze, ["~> 1.6".freeze])
   s.add_runtime_dependency(%q<kramdown-ansi>.freeze, ["~> 0.1".freeze])
   s.add_runtime_dependency(%q<figlet>.freeze, ["~> 1.0".freeze])
+  s.add_runtime_dependency(%q<starscope>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<context_spook>.freeze, ["~> 0.2".freeze])
   s.add_runtime_dependency(%q<simplecov>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<debug>.freeze, [">= 0".freeze])

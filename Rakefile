@@ -31,6 +31,7 @@ GemHadar do
   dependency 'ollama-ruby',    '~> 1.6'
   dependency 'kramdown-ansi',  '~> 0.1'
   dependency 'figlet',         '~> 1.0'
+  dependency 'starscope'
   dependency 'context_spook',  '~> 0.2'
   dependency 'simplecov'
   dependency 'debug'
