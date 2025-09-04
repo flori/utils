@@ -4,8 +4,10 @@
 .bundle
 .byebug_history
 .rvmrc
+.starscope.db
 .yardoc
 Gemfile.lock
+cscope.out
 doc
 pkg
 tags

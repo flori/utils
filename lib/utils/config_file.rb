@@ -405,54 +405,53 @@ class Utils::ConfigFile
     @discover ||= Discover.new
   end
 
-  # A configuration class for file system scope operations.
+  # A configuration class for code indexing operations.
   #
-  # This class manages the configuration settings for defining which files and
-  # directories should be included or excluded during file system traversals
-  # and searches. It inherits from FileFinder and provides pattern matching
-  # capabilities for pruning directories and skipping specific files based on
-  # configured regular expressions.
-  class Scope < FileFinder
-    # The prune_dirs method configures the pattern for identifying directories
-    # to be pruned during file system operations.
-    #
-    # This method sets up a regular expression pattern that matches directory
-    # names which should be excluded from processing. The default pattern
-    # excludes version control directories (.svn, .git, CVS) and temporary
-    # directories (tmp).
-    #
-    # @param first [ Regexp ] the regular expression pattern for matching directories to prune
-    config :prune_dirs, /\A(\.svn|\.git|CVS|tmp)\z/
+  # This class manages the configuration settings for generating code indexes
+  # like ctags and cscope. It provides functionality to define which paths
+  # should be indexed and what file formats should be generated for each
+  # indexing tool.
+  #
+  # @example
+  #   indexer = Utils::ConfigFile.new.code_indexer do |config|
+  #     config.paths = %w[ lib spec ]
+  #     config.formats = { 'ctags' => 'tags', 'cscope' => 'cscope.out' }
+  #   end
+  #
+  # The paths config configures the directories to be included in the index
+  # generation process.
+  #
+  # The formats config configures the output file formats for different indexing
+  # tools and the output filenames.
+  class CodeIndexer < BlockConfig
+    config :verbose, false
 
-    # The skip_files configuration method sets up a regular expression pattern
-    # for filtering out files based on their names.
-    #
-    # This method configures a pattern that matches filenames which should be
-    # skipped during file processing operations.
-    # It uses a regular expression to identify files that start with a dot, end
-    # with common temporary file extensions, or match other patterns typically
-    # associated with backup, swap, log, or temporary files.
-    #
-    # @param pattern [ Regexp ] the regular expression pattern used to identify files to skip
-    config :skip_files, /(\A\.|\.sw[pon]\z|\.log\z|~\z)/
+    config :paths, %w[ bin lib spec tests ]
+
+    config :formats, {
+      'ctags'  => 'tags',
+      'cscope' => 'cscope.out',
+    }
   end
 
-  # The scope method initializes and returns a Scope object.
+  # The code_indexer method manages and returns a CodeIndexer configuration
+  # instance.
   #
-  # This method creates a new Scope instance either from the provided block or
-  # with default initialization if no block is given.
-  # The scope object is stored as an instance variable and reused on subsequent
-  # calls.
+  # This method provides access to a CodeIndexer object that handles configuration
+  # for generating code indexes such as ctags and cscope files. It ensures that only
+  # one CodeIndexer instance is created per object by storing it in an instance variable.
+  # When a block is provided, it initializes the CodeIndexer with custom settings;
+  # otherwise, it returns a default CodeIndexer instance.
   #
-  # @param block [ Proc ] optional block to pass to the Scope constructor
+  # @param block [ Proc ] optional block to configure the CodeIndexer object
   #
-  # @return [ Utils::Scope ] a Scope object configured with the provided block
-  # or default settings
-  def scope(&block)
+  # @return [ Utils::ConfigFile::CodeIndexer ] a CodeIndexer configuration instance
+  #         configured either by the block or with default settings
+  def code_indexer(&block)
     if block
-      @scope = Scope.new(&block)
+      @code_indexer = CodeIndexer.new(&block)
     end
-    @scope ||= Scope.new
+    @code_indexer ||= CodeIndexer.new
   end
 
   # A configuration class for whitespace handling operations.

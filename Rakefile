@@ -14,7 +14,8 @@ GemHadar do
     map(&File.method(:basename))
   test_dir    'tests'
   ignore      '.*.sw[pon]', 'pkg', 'Gemfile.lock', '.rvmrc', '.AppleDouble',
-    'tags', '.bundle', '.DS_Store', '.byebug_history', '.yardoc', 'doc'
+    'tags', '.bundle', '.DS_Store', '.byebug_history', '.yardoc', 'doc', 
+    'cscope.out', '.starscope.db'
   package_ignore '.gitignore', 'VERSION'
   readme      'README.md'
   licenses << 'GPL-2.0'

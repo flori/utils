@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+require 'utils'
+config = Utils::ConfigFile.new
+config.configure_from_paths
+
+config.code_indexer.formats.each do |format, output|
+  paths = config.code_indexer.paths.grep_v(/Resolving dependencies/)
+  puts "Indexing code for #{format}…"
+  cmd = [ 'starscope', '-e', format, '-f', output, '--no-read' ]
+  config.code_indexer.verbose and cmd << '--verbose'
+  cmd.push(*paths)
+  system(*cmd)
+  puts "Done."
+end
