@@ -8,6 +8,11 @@ require 'tins'
 # provide centralized configuration management.
 class Utils::ConfigFile
   class << self
+
+    # The config_file_paths accessor method provides read and write access to
+    # the config_file_paths instance variable.
+    #
+    # @return [ Array<String> ] the array of configuration file paths
     attr_accessor :config_file_paths
   end
   self.config_file_paths = [
@@ -123,6 +128,27 @@ class Utils::ConfigFile
         self.config_settings ||= []
         config_settings << name.to_sym
         dsl_accessor name, *r, &block
+        self
+      end
+
+      # The lazy_config method configures a lazy-loaded configuration option
+      # with a default value.
+      #
+      # This method registers a new configuration setting that will be
+      # initialized lazily, meaning the default value or the set value is only
+      # computed when the configuration is actually accessed. It adds the
+      # setting to the list of configuration settings and creates a lazy
+      # accessor for it.
+      #
+      # @param name [ Object ] the name of the configuration setting to define
+      # @yield [ default ] optional block that provides the default value for
+      # the configuration
+      #
+      # @return [ Object ] returns self to allow for method chaining
+      def lazy_config(name, &default)
+        self.config_settings ||= []
+        config_settings << name.to_sym
+        dsl_lazy_accessor(name, &default)
         self
       end
 
@@ -426,7 +452,9 @@ class Utils::ConfigFile
   class CodeIndexer < BlockConfig
     config :verbose, false
 
-    config :paths, %w[ bin lib spec tests ]
+    lazy_config :paths do
+      %w[ bin lib spec tests ]
+    end
 
     config :formats, {
       'ctags'  => 'tags',
