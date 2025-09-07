@@ -14,16 +14,21 @@ include Tins::GO
 require 'utils'
 require 'term/ansicolor'
 
-$opts = go 'm:h'
+$opts = go 'm:h', defaults: { ?m => default_m = 80 }
 
 if $opts[?h]
   puts <<~USAGE
     #{File.basename($0)} [OPTIONS] [FILES]
+
+    Options:
+      -m NUM  Maximum line length (default: #{default_m})
+      -h      Show this help message
+
   USAGE
   exit
 end
-max = ($opts[?m] || 80).to_i
 
+max = $opts[?m].to_i
 files = ARGV
 
 files.each do |file|
@@ -34,7 +39,7 @@ files.each do |file|
         lineno = f.lineno
         blamer = Utils::LineBlamer.new(file, lineno) or next
         blame = blamer.perform or next
-        author = blame[/\((.*?)\d{4}/, 1]
+        author = (blame[/\((.*?)\d{4}/, 1] || 'unknown').strip
         puts [ author, size, "#{file}:#{lineno}" ] * ?\t
       end
     end
