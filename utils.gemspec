@@ -27,7 +27,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency(%q<test-unit>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<unix_socks>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<webrick>.freeze, [">= 0".freeze])
-  s.add_runtime_dependency(%q<tins>.freeze, ["~> 1.43".freeze])
+  s.add_runtime_dependency(%q<tins>.freeze, ["~> 1.44".freeze])
   s.add_runtime_dependency(%q<term-ansicolor>.freeze, ["~> 1.11".freeze])
   s.add_runtime_dependency(%q<pstree>.freeze, ["~> 0.3".freeze])
   s.add_runtime_dependency(%q<infobar>.freeze, ["~> 0.8".freeze])

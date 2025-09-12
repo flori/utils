@@ -22,7 +22,7 @@ GemHadar do
 
   dependency 'unix_socks'
   dependency 'webrick'
-  dependency 'tins',           '~> 1.43'
+  dependency 'tins',           '~> 1.44'
   dependency 'term-ansicolor', '~> 1.11'
   dependency 'pstree',         '~> 0.3'
   dependency 'infobar',        '~> 0.8'
