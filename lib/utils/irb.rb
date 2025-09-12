@@ -333,13 +333,13 @@ module Utils
         # @param modul [ TrueClass, FalseClass ] flag indicating whether to retrieve an instance method
         def initialize(obj, name, modul)
           super(name)
-          @method = modul ? obj.instance_method(name) : obj.method(name)
-          @description = @method.description(style: :namespace)
+          @wrapped_method = modul ? obj.instance_method(name) : obj.method(name)
+          @description = @wrapped_method.description(style: :namespace)
         end
 
         # The method reader returns the method object associated with the
         # instance.
-        attr_reader :method
+        attr_reader :wrapped_method
 
         # The owner method retrieves the owner of the method object.
         #
@@ -348,14 +348,14 @@ module Utils
         #
         # @return [ Object, nil ] the owner of the method or nil if not applicable
         def owner
-          method.respond_to?(:owner) ? method.owner : nil
+          @wrapped_method.respond_to?(:owner) ? @wrapped_method.owner : nil
         end
 
         # The arity method returns the number of parameters expected by the method.
         #
         # @return [ Integer ] the number of required parameters for the method
         def arity
-          method.arity
+          @wrapped_method.arity
         end
 
         # The source_location method retrieves the file path and line number
@@ -368,7 +368,7 @@ module Utils
         # @return [ Array<String, Integer> ] an array containing the filename and line number
         #         where the method is defined, or nil if the location cannot be determined
         def source_location
-          method.source_location
+          @wrapped_method.source_location
         end
 
         # The <=> method compares the descriptions of two objects for ordering
