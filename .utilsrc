@@ -34,5 +34,39 @@ end
 
 code_indexer do
   verbose true
-  paths { [ 'lib' ] }
+  gems = %w[
+    all_images
+    amatch
+    base64
+    bigdecimal
+    complex_config
+    context_spook
+    date
+    debug
+    excon
+    gem_hader
+    infobar
+    json
+    kramdown-ansi
+    logger
+    mize
+    ollama-ruby
+    ostruct
+    parser
+    pstree
+    rake
+    search_ui
+    simplecov
+    stringio
+    sync
+    term-ansicolor
+    tins
+    unix_socks
+    utils
+    webrick
+    yard
+  ]
+  paths {
+    %w[ lib ] + gems.map { `bundle show #{it}` }.map(&:chomp)
+  }
 end
