@@ -47,7 +47,7 @@ config = Utils::ConfigFile.new
 config.configure_from_paths
 
 if paths
-  find(*(paths + [ { :suffix => suffix} ])) do |filename|
+  find(*paths, suffix:) do |filename|
     bn, s = File.basename(filename), File.stat(filename)
     s.symlink? and next
     if s.directory?
