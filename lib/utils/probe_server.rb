@@ -273,7 +273,7 @@ module Utils
         help
         begin
           old, $VERBOSE = $VERBOSE, nil
-          examine(self)
+          IRB.examine(self)
         ensure
           $VERBOSE = old
         end
