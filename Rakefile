@@ -16,7 +16,7 @@ GemHadar do
   ignore      '.*.sw[pon]', 'pkg', 'Gemfile.lock', '.rvmrc', '.AppleDouble',
     'tags', '.bundle', '.DS_Store', '.byebug_history', '.yardoc', 'doc', 
     'cscope.out', '.starscope.db'
-  package_ignore '.gitignore', 'VERSION'
+  package_ignore '.gitignore', 'VERSION', '.github', '.utilsrc'
   readme      'README.md'
   licenses << 'GPL-2.0'
 
