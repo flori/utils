@@ -17,13 +17,13 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/flori/utils".freeze
   s.licenses = ["GPL-2.0".freeze]
   s.rdoc_options = ["--title".freeze, "Utils - Some useful command line utilities".freeze, "--main".freeze, "README.md".freeze]
-  s.rubygems_version = "3.6.9".freeze
+  s.rubygems_version = "3.7.2".freeze
   s.summary = "Some useful command line utilities".freeze
   s.test_files = ["tests/test_helper.rb".freeze, "tests/utils_test.rb".freeze]
 
   s.specification_version = 4
 
-  s.add_development_dependency(%q<gem_hadar>.freeze, ["~> 2.6".freeze])
+  s.add_development_dependency(%q<gem_hadar>.freeze, ["~> 2.8".freeze])
   s.add_development_dependency(%q<test-unit>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<unix_socks>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<webrick>.freeze, [">= 0".freeze])
