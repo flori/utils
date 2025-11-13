@@ -742,7 +742,7 @@ class Utils::ConfigFile
     # @return [ String ] the full path to the vim executable as determined by the which command
     config :vim_path do `which vim`.chomp end
 
-    config :vim_default_args, nil
+    config :vim_default_args, %w[ --clientserver socket ]
   end
 
   # The edit method initializes and returns an Edit object.

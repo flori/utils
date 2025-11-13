@@ -52,7 +52,7 @@ module Utils
     private def derive_server_name
       name = ENV['VIM_SERVER'] || Dir.pwd
       RbConfig::CONFIG['host_os'] =~ /mswin|mingw/ and name = "G_#{name}"
-      name.upcase
+      name.tr(?/, ?_).upcase
     end
 
     # The pause_duration method provides access to the duration value used for
