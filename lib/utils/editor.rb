@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'rbconfig'
 require 'pstree'
+require 'digest/md5'
 
 module Utils
   # An editor interface for interacting with Vim server instances.
@@ -51,8 +52,11 @@ module Utils
     # system configuration
     private def derive_server_name
       name = ENV['VIM_SERVER'] || Dir.pwd
+      prefix = File.basename(name)
+      suffix = Digest::MD5.hexdigest(name)[0, 8]
+      name = [ prefix, suffix ] * ?-
       RbConfig::CONFIG['host_os'] =~ /mswin|mingw/ and name = "G_#{name}"
-      name.tr(?/, ?_).upcase
+      name.upcase
     end
 
     # The pause_duration method provides access to the duration value used for
