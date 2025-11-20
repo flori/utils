@@ -1,5 +1,4 @@
 require 'fileutils'
-require 'rbconfig'
 require 'pstree'
 require 'digest/md5'
 
@@ -55,7 +54,6 @@ module Utils
       prefix = File.basename(name)
       suffix = Digest::MD5.hexdigest(name)[0, 8]
       name = [ prefix, suffix ] * ?-
-      RbConfig::CONFIG['host_os'] =~ /mswin|mingw/ and name = "G_#{name}"
       name.upcase
     end
 
