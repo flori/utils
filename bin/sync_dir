@@ -126,6 +126,7 @@ diff_dir.each_line do |line|
     case ask?(prompt: 'action? ')
     when /\Av/i
       system "vimdiff #{s.inspect} #{d.inspect}"
+      `diff --color=never -u #{s.inspect} #{d.inspect}`.empty? and next
     when /\Aq/i
       exit
     else
