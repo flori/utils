@@ -72,7 +72,7 @@ directory and file paths that are searched.
 Options are
 
   -pX         interpret PATTERN argument as X=r for regexp or X=f for fuzzy
-  -r          reset the search index
+  -r          reset the search index by force
   -c          disable color output
   -e          open the matching files with edit command
   -E          pick one file to edit
