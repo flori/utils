@@ -32,7 +32,7 @@ GemHadar do
   dependency 'kramdown-ansi',  '~> 0.1'
   dependency 'figlet',         '~> 1.0'
   dependency 'starscope'
-  dependency 'context_spook',  '~> 0.2'
+  dependency 'context_spook',  '~> 1.0'
   dependency 'webrick'
   dependency 'simplecov'
   dependency 'debug'

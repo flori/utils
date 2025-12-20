@@ -37,7 +37,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency(%q<kramdown-ansi>.freeze, ["~> 0.1".freeze])
   s.add_runtime_dependency(%q<figlet>.freeze, ["~> 1.0".freeze])
   s.add_runtime_dependency(%q<starscope>.freeze, [">= 0".freeze])
-  s.add_runtime_dependency(%q<context_spook>.freeze, ["~> 0.2".freeze])
+  s.add_runtime_dependency(%q<context_spook>.freeze, ["~> 1.0".freeze])
   s.add_runtime_dependency(%q<webrick>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<simplecov>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<debug>.freeze, [">= 0".freeze])
