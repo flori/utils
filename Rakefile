@@ -20,7 +20,7 @@ GemHadar do
   readme      'README.md'
   licenses << 'GPL-2.0'
 
-  dependency 'unix_socks'      '~> 0.2'
+  dependency 'unix_socks',     '~> 0.2'
   dependency 'tins',           '~> 1.51'
   dependency 'term-ansicolor', '~> 1.11'
   dependency 'pstree',         '~> 0.3'
