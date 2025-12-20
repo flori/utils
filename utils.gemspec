@@ -17,17 +17,16 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/flori/utils".freeze
   s.licenses = ["GPL-2.0".freeze]
   s.rdoc_options = ["--title".freeze, "Utils - Some useful command line utilities".freeze, "--main".freeze, "README.md".freeze]
-  s.rubygems_version = "3.7.2".freeze
+  s.rubygems_version = "4.0.2".freeze
   s.summary = "Some useful command line utilities".freeze
   s.test_files = ["tests/test_helper.rb".freeze, "tests/utils_test.rb".freeze]
 
   s.specification_version = 4
 
-  s.add_development_dependency(%q<gem_hadar>.freeze, ["~> 2.8".freeze])
+  s.add_development_dependency(%q<gem_hadar>.freeze, ["~> 2.10".freeze])
   s.add_development_dependency(%q<test-unit>.freeze, [">= 0".freeze])
-  s.add_runtime_dependency(%q<unix_socks>.freeze, [">= 0".freeze])
-  s.add_runtime_dependency(%q<webrick>.freeze, [">= 0".freeze])
-  s.add_runtime_dependency(%q<tins>.freeze, ["~> 1.44".freeze])
+  s.add_runtime_dependency(%q<unix_socks~> 0.2>.freeze, [">= 0".freeze])
+  s.add_runtime_dependency(%q<tins>.freeze, ["~> 1.51".freeze])
   s.add_runtime_dependency(%q<term-ansicolor>.freeze, ["~> 1.11".freeze])
   s.add_runtime_dependency(%q<pstree>.freeze, ["~> 0.3".freeze])
   s.add_runtime_dependency(%q<infobar>.freeze, ["~> 0.8".freeze])
@@ -39,6 +38,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency(%q<figlet>.freeze, ["~> 1.0".freeze])
   s.add_runtime_dependency(%q<starscope>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<context_spook>.freeze, ["~> 0.2".freeze])
+  s.add_runtime_dependency(%q<webrick>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<simplecov>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<debug>.freeze, [">= 0".freeze])
 end
