@@ -44,7 +44,7 @@ code_indexer do
     date
     debug
     excon
-    gem_hader
+    gem_hadar
     infobar
     json
     kramdown-ansi
