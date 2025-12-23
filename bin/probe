@@ -78,7 +78,10 @@ end
 # probe server instance to handle incoming requests and process jobs.
 def start_server
   Thread.abort_on_exception = $DEBUG
-  Utils::ProbeServer.new.start
+  Utils::ProbeServer.new(
+    server_type: $config.probe.server_type,
+    port: $config.probe.tcp_server_port
+  ).start
 end
 
 # The connect_server method establishes a connection to a probe server and
@@ -89,7 +92,10 @@ end
 # It also enqueues jobs for execution on the probe server when specified.
 #
 def connect_server
-  probe_client = ProbeClient.new
+  probe_client = Utils::ProbeClient.new(
+    server_type: $config.probe.server_type,
+    port: $config.probe.tcp_server_port
+  )
   if setting = $opts[?C]
     case setting
     when /\A([^=]+)=([^=]+)\z/

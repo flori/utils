@@ -2,6 +2,37 @@ require 'unix_socks'
 require 'term/ansicolor'
 
 module Utils
+  # A module that provides server handling functionality for creating and
+  # managing socket servers.
+  #
+  # This module encapsulates the logic for initializing different types of
+  # socket servers based on the specified server type, supporting both TCP and
+  # domain socket configurations. It provides a centralized approach to server
+  # creation and management within the Utils library.
+  module ServerHandling
+    # The create_server method initializes and returns a socket server instance
+    # based on the specified server type.
+    #
+    # This method creates either a TCP socket server or a domain socket server
+    # depending on the server type parameter. It configures the server with the
+    # appropriate parameters including port number for TCP servers or socket
+    # name and runtime directory for domain sockets.
+    #
+    # @param server_type [ Symbol ] the type of socket server to create, either :tcp or another value for domain socket
+    # @param port [ Integer ] the port number to use for TCP socket server creation
+    #
+    # @return [ UnixSocks::TCPSocketServer, UnixSocks::DomainSocketServer ] a
+    #   new socket server instance of the specified type
+    def create_server(server_type, port)
+      case server_type
+      when :tcp
+        UnixSocks::TCPSocketServer.new(port:)
+      else
+        UnixSocks::DomainSocketServer.new(socket_name: 'probe.sock', runtime_dir: Dir.pwd)
+      end
+    end
+  end
+
   # A process job representation for execution within the probe server system.
   #
   # This class encapsulates the information and behavior associated with a
@@ -138,6 +169,8 @@ module Utils
   # to communicate with the server, enabling distributed task execution and
   # configuration management.
   class ProbeClient
+    include ServerHandling
+
     # A proxy class for managing environment variables through a probe server communication channel.
     #
     # This class provides a wrapper around the ENV object that allows setting and retrieving
@@ -194,8 +227,8 @@ module Utils
     #
     # @return [ Utils::ProbeServer ] a new probe server instance configured with
     #         the specified socket name and runtime directory
-    def initialize
-      @server = UnixSocks::Server.new(socket_name: 'probe.sock', runtime_dir: Dir.pwd)
+    def initialize(server_type: :unix, port: 6666)
+      @server = create_server(server_type, port)
     end
 
     # The env method provides access to environment variable management through
@@ -234,6 +267,7 @@ module Utils
   # maintains a queue of jobs, tracks their execution status, and provides an
   # interactive interface for managing the server.
   class ProbeServer
+    include ServerHandling
     include Term::ANSIColor
 
     # The initialize method sets up a new probe server instance.
@@ -245,8 +279,8 @@ module Utils
     #
     # @return [ Utils::ProbeServer ] a new probe server instance configured
     # with the specified socket name and runtime directory
-    def initialize
-      @server         = UnixSocks::Server.new(socket_name: 'probe.sock', runtime_dir: Dir.pwd)
+    def initialize(server_type: :unix, port: 6666)
+      @server         = create_server(server_type, port)
       @history        = [].freeze
       @jobs_queue     = Queue.new
       @current_job_id = 0
@@ -258,7 +292,7 @@ module Utils
     # from the queue and entering a receive loop to handle incoming requests.
     # It also manages interrupt signals to enter interactive mode when needed.
     def start
-      output_message "Starting probe server listening to #{@server.server_socket_path}.", type: :info
+      output_message "Starting probe server listening to #{@server.to_url}", type: :info
       Thread.new do
         loop do
           job = @jobs_queue.pop
@@ -278,7 +312,7 @@ module Utils
           $VERBOSE = old
         end
         @server.remove_socket_path
-        output_message "Quitting interactive mode, but still listening to #{@server.server_socket_path}.", type: :info
+        output_message "Quitting interactive mode, but still listening to #{@server.to_url}", type: :info
         retry
       end
     end

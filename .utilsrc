@@ -17,7 +17,9 @@ strip_spaces do
 end
 
 probe do
-  test_framework :'test-unit'
+  test_framework  :'test-unit'
+  server_type     :unix
+  tcp_server_port 59999
 end
 
 ssh_tunnel do
