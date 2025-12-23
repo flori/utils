@@ -31,20 +31,6 @@ module Utils
       @directory_path = derive_directory_path(name, root_path)
     end
 
-    # Memoizes the foobar method's return value and returns the result of the computation.
-    # Initializes a new ConfigDir instance with the specified name and optional
-    # root path or environment variable.
-    #
-    # @param name [ String ] the name of the directory to be used
-    # @param root_path [ String, nil ] the root path to use; if nil, the
-    #                                  default root path is used
-    # @param env_var [ String, nil ] the name of the environment variable to
-    #                                check for the root path
-    def initialize(name, root_path: nil, env_var: nil)
-      root_path ||= env_var_path(env_var)
-      @directory_path = derive_directory_path(name, root_path)
-    end
-
     # Returns the string representation of the configuration directory path.
     #
     # @return [ String ] the path of the configuration directory as a string
