@@ -14,7 +14,7 @@ module Utils
   require 'utils/editor'
   require 'utils/finder'
   require 'utils/grepper'
-  require 'utils/probe_server'
+  require 'utils/probe'
   require 'utils/ssh_tunnel_specification'
   require 'utils/line_blamer'
   require 'utils/config_dir'

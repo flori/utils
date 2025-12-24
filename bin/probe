@@ -14,6 +14,7 @@
 
 require 'utils'
 include Utils
+include Utils::Probe
 include Tins::GO
 require 'shellwords'
 
@@ -78,7 +79,7 @@ end
 # probe server instance to handle incoming requests and process jobs.
 def start_server
   Thread.abort_on_exception = $DEBUG
-  Utils::ProbeServer.new(
+  ProbeServer.new(
     server_type: $config.probe.server_type,
     port: $config.probe.tcp_server_port
   ).start
@@ -92,7 +93,7 @@ end
 # It also enqueues jobs for execution on the probe server when specified.
 #
 def connect_server
-  probe_client = Utils::ProbeClient.new(
+  probe_client = ProbeClient.new(
     server_type: $config.probe.server_type,
     port: $config.probe.tcp_server_port
   )
