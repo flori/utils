@@ -2,6 +2,7 @@ require 'irb/completion'
 require 'enumerator'
 require 'tempfile'
 require 'pp'
+require 'shellwords'
 require 'utils'
 require_maybe 'ap'
 
@@ -81,6 +82,48 @@ module Utils
       # @param patterns [ Array<String> ] the patterns to look up documentation for
       def yri(*patterns)
         ri(*patterns, doc: 'yri')
+      end
+
+      # The ai method interacts with an Ollama chat service to process queries
+      # and optionally return responses.
+      #
+      # This method constructs command-line arguments for the ollama_chat_send
+      # utility based on the provided options, executes the command with the
+      # query as input, and returns the response if requested.
+      #
+      # @param query [ String ] the input query to send to the Ollama chat
+      #   service
+      # @param command [ TrueClass, FalseClass ] whether to treat the query as
+      #   a command
+      # @param respond [ TrueClass, FalseClass ] whether to capture and return
+      #   the response from the service
+      # @param parse [ TrueClass, FalseClass ] whether to parse the response
+      # @param dir [ String ] the directory to use for the operation
+      #
+      # @return [ String, nil ] the response from the Ollama chat service if
+      #   respond is true, otherwise nil
+      def ai(query, command: false, respond: false, parse: false, dir: ?.)
+        dir = File.expand_path(dir)
+        args = {
+          ?r => respond,
+          ?t => command,
+          ?p => parse,
+          ?d => dir,
+        }
+        args = args.map { |k, v|
+          v == false and next
+          v == true ? "-#{k}" : [ "-#{k}", v.to_s ]
+        }.flatten.compact
+        args.unshift 'ollama_chat_send'
+        response = nil
+        IO.popen(Shellwords.join(args), 'r+') do |io|
+          io.write query
+          io.close_write
+          if respond
+            response = io.read
+          end
+        end
+        response
       end
 
       # The irb_open method opens a URL or executes a block to capture output
