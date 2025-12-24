@@ -2,12 +2,12 @@
 
 search do
   prune_dirs /\A(\.svn|\.git|\.terraform|CVS|tmp|coverage|corpus|pkg|\.yardoc|doc)\z/
-  skip_files /(\A\.|\.sw[pon]\z|\.(log|fnm|jpg|jpeg|png|pdf|svg)\z|\Atags\z|~\z)/i
+  skip_files /(\A\.|\.sw[pon]\z|\.(log|fnm|jpg|jpeg|png|pdf|svg)\z|\A(cscope\.out|tags)\z|~\z)/i
 end
 
 discover do
   prune_dirs /\A(\.svn|\.git|\.terraform|\.yardoc|CVS|tmp|coverage|corpus|pkg|\.yardoc|doc)\z/
-  skip_files /(\A\.|\.sw[pon]\z|\.log\z|~\z)/
+  skip_files /(\A\.|\.sw[pon]\z|\.log\z|\A(cscope\.out|tags)\z|~\z)/
   index_expire_after 3_600
 end
 
