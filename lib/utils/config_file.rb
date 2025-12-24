@@ -288,6 +288,17 @@ class Utils::ConfigFile
     @probe ||= Probe.new
   end
 
+  # The irb_server_url method configures the URL for the IRB server
+  # communication.
+  #
+  # This method sets up a DSL accessor for the IRB server URL, providing a
+  # default value that uses a Unix domain socket located in the current working
+  # directory.
+  #
+  # @return [ String ] the configured IRB server URL including the default
+  #   socket path
+  dsl_accessor :irb_server_url, "unix://#{Pathname.pwd + 'irb.socket'}"
+
   # A configuration class for file system operations.
   #
   # This class manages the configuration settings for searching and discovering

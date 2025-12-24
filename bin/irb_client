@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+
+require 'utils/irb'
+include Utils::IRB
+
+def usage
+  <<~EOT
+    Usage: #{File.basename($0)} ACTION
+
+    Actions:
+      store_snippet    Store code snippet from STDIN
+      execute_snippet  Execute code snippet from STDIN (no output)
+      eval_snippet     Evaluate code snippet from STDIN and print result
+      stop_server      Stop the IRB server
+
+    Examples:
+      # Evaluate code and get result
+      echo '2 + 2' | #{File.basename($0)} eval_snippet
+      # => 4
+
+      # Execute code (no output)
+      echo 'puts "hello"' | #{File.basename($0)} execute_snippet
+
+      # Store code snippet
+      echo 'def hello; "world"; end' | #{File.basename($0)} store_snippet
+
+      # Stop server
+      #{File.basename($0)} stop_server
+  EOT
+end
+    
+case action = ARGV.shift || 'usage'
+when 'store_snippet'
+  irb_client.send(action, STDIN.read)
+when 'execute_snippet'
+  irb_client.send(action, STDIN.read)
+when 'eval_snippet'
+  puts irb_client.send(action, STDIN.read)
+when 'stop_server'
+  irb_client.send(action)
+else
+  abort usage
+end

@@ -704,6 +704,50 @@ module Utils
         nil
       end
 
+      # The irb_server method provides access to an IRB server instance for
+      # interactive Ruby sessions.
+      #
+      # This method ensures that a single IRB server instance is created and
+      # started for the current process, loading the configuration from
+      # standard paths and using the configured server URL.
+      #
+      # @return [ Utils::IRB::IRBServer ] the IRB server instance, initialized
+      #   and started if not already running
+      def irb_server
+        unless @irb_server
+          config = Utils::ConfigFile.new.tap(&:configure_from_paths)
+          @irb_server = Utils::IRB::IRBServer.new(url: config.irb_server_url).start
+        end
+        @irb_server
+      end
+
+      # The irb_server_stop method sends a stop command to the IRB server
+      # client.
+      #
+      # This method accesses the IRB client instance and invokes the
+      # stop_server method on it, which gracefully shuts down the IRB server
+      # process.
+      #
+      # @return [ nil ] always returns nil after sending the stop command to
+      #   the server
+      def irb_server_stop
+        irb_client.stop_server
+      end
+
+      # The irb_client method provides access to an IRB server client instance.
+      #
+      # This method creates and returns a new IRB server client by first
+      # loading the configuration from standard paths and then using the
+      # configured server URL
+      # to initialize the client.
+      #
+      # @return [ Utils::IRB::IRBServer ] a new IRB server client instance configured
+      #         with the URL from the application's configuration
+      def irb_client
+        config = Utils::ConfigFile.new.tap(&:configure_from_paths)
+        Utils::IRB::IRBServer.new(url: config.irb_server_url)
+      end
+
       # The ed method opens files for editing using the system editor.
       #
       # This method provides a convenient way to edit files by invoking the
@@ -836,6 +880,8 @@ module Utils
     end
   end
 end
+
+require 'utils/irb/irb_server'
 
 Utils::IRB.configure
 
