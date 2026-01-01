@@ -63,6 +63,14 @@ class Utils::IRB::IRBServer
         result = time_eval { eval(message.snippet) }
         @logger.info "Evaluation of #{message.to_json} took %.2fs" % @eval_duration
         message.respond(result: result.to_s, type: message.action)
+      when 'eval_lines'
+        b = binding
+        result = message.lines.map do |line|
+          l = line.chomp
+          r = b.eval(l)
+          [ l, message.prefix, r ].join
+        end.join(?\n)
+        message.respond(result: result, type: message.action)
       when 'stop'
         @logger.info "Stopping #{self.class.name} server on #{@url}."
         Thread.current.exit
@@ -116,7 +124,27 @@ class Utils::IRB::IRBServer
   #
   # @return [ String ] the result of the code snippet evaluation as a string
   def eval_snippet(code)
-    message = build_client.transmit_with_response({ action: 'eval', snippet: code })
+    message = build_client.transmit_with_response(
+      { action: 'eval', snippet: code }
+    )
+    message.result
+  end
+
+  # The eval_lines method sends a series of code lines to the IRB server for
+  # evaluation and returns the formatted results.
+  #
+  # This method transmits multiple lines of code to the IRB server for
+  # execution, with each line being evaluated in sequence. It includes a prefix
+  # for each result line and returns the combined output from the evaluation.
+  #
+  # @param lines [ Array<String> ] the array of code lines to be evaluated
+  # @param prefix [ String ] the prefix to be added to each result line, defaults to ' # => '
+  #
+  # @return [ String ] the formatted results from evaluating the code lines
+  def eval_lines(lines, prefix = ' # => ')
+    message = build_client.transmit_with_response(
+      { action: 'eval_lines', prefix:, lines: }
+    )
     message.result
   end
 
