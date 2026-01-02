@@ -35,7 +35,7 @@ module Utils::Probe
       #
       # @return [ String ] the updated environment variable value returned by the server
       def []=(key, value)
-        response = @server.transmit_with_response(type: 'set_env', key:, value:)
+        response = @server.transmit_with_response({ type: 'set_env', key:, value: })
         response.env
       end
 
@@ -48,7 +48,7 @@ module Utils::Probe
       #
       # @return [ String ] the value of the specified environment variable
       def [](key)
-        response = @server.transmit_with_response(type: 'get_env', key:)
+        response = @server.transmit_with_response({ type: 'get_env', key: })
         response.env
       end
 
