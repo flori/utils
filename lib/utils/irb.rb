@@ -4,6 +4,9 @@ require 'tempfile'
 require 'pp'
 require 'shellwords'
 require 'utils'
+require 'fileutils'
+require 'amatch'
+require 'search_ui'
 require_maybe 'ap'
 
 $editor = Utils::Editor.new
@@ -24,7 +27,7 @@ module Utils
     # Provides enhanced regexp operations including match highlighting and
     # shell command integration.
     module Shell
-      require 'fileutils'
+      include SearchUI
       include FileUtils
       include Tins::Find
 
@@ -672,36 +675,59 @@ module Utils
         end
       end
 
-      # The irb_load! method loads Ruby files by their names into the current
-      # environment.
-      #
-      # This method takes one or more file names and attempts to locate and
-      # load the corresponding Ruby files from the current directory and its
-      # subdirectories. It ensures that each file is loaded only once by
-      # tracking loaded files using their MD5 checksums. The method outputs
-      # messages to standard error indicating which files have been
-      # successfully loaded.
-      #
-      # @param files [ Array<String> ] the names of the Ruby files to be loaded
-      #
-      # @return [ nil ] always returns nil after processing all specified files
-      def irb_load!(*files)
-        files = files.map { |f| f.gsub(/(\.rb)?\Z/, '.rb') }
-        loaded = {}
-        for file in files
-          catch :found do
-            Find.find('.') do |f|
-              File.directory?(f) and next
-              md5_f = Utils::MD5.md5(f)
-              if f.end_with?(file) and !loaded[md5_f]
-                Kernel.load f
-                loaded[md5_f] = true
-                STDERR.puts "Loaded '#{f}'."
-              end
-            end
-          end
-        end
-        nil
+    # The irb_load! method loads Ruby files by their names into the current
+    # environment through an interactive selection interface.
+    #
+    # This method takes a glob pattern and finds matching Ruby files, then
+    # presents an interactive search interface for selecting which file to load.
+    # It ensures that each file is loaded only once by tracking loaded files
+    # using their paths. The method outputs messages to standard error
+    # indicating which file has been successfully loaded.
+    #
+    # @param glob [String] the glob pattern to search for Ruby files (defaults to
+    #   ENV['UTILS_IRB_LOAD_GLOB'] or 'lib/**/*.rb')
+    #
+    # @return [Boolean] true if a file was successfully loaded, false if no file
+    #   was selected or loaded
+    #
+    # @example
+    #   # Load a file interactively with default glob pattern
+    #   irb_load!
+    #
+    #   # Load files matching a custom pattern
+    #   irb_load!('app/models/**/*.rb')
+    #
+    #   # Set environment variable for default pattern
+    #   ENV['UTILS_IRB_LOAD_GLOB'] = 'lib/**/*.rb'
+    #   irb_load!
+    #
+    # @note This method uses fuzzy matching to help find files when typing
+    #   partial names. It respects the terminal height to limit the number of
+    #   displayed results.
+    #
+    # @see SearchUI for the interactive search interface implementation
+    # @see Amatch::PairDistance for the fuzzy matching algorithm
+      def irb_load!(glob = ENV.fetch('UTILS_IRB_LOAD_GLOB', 'lib/**/*.rb'))
+        files = Dir.glob(glob)
+        found = Search.new(
+          match: -> answer {
+            matcher = Amatch::PairDistance.new(answer.downcase)
+            matches = files.map { |n| [ n, -matcher.similar(n.downcase) ] }.
+              sort.select { _2 < 0 }.sort_by(&:last).map(&:first)
+            matches.empty? and matches = files
+            matches.first(Tins::Terminal.lines - 1)
+          },
+          query: -> _answer, matches, selector {
+            matches.each_with_index.
+            map { |m, i| i == selector ? "→ " + Search.on_blue(m) : "  " + m } * ?\n
+          },
+          found: -> _answer, matches, selector {
+            matches[selector]
+          },
+          output: STDOUT
+        ).start
+        found or return false
+        load found
       end
 
       # The irb_server method provides access to an IRB server instance for
