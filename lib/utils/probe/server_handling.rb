@@ -8,25 +8,20 @@ module Utils::Probe
   # creation and management within the Utils library.
   module ServerHandling
     # The create_server method initializes and returns a socket server instance
-    # based on the specified server type.
+    # based on the specified server URL configuration
     #
-    # This method creates either a TCP socket server or a domain socket server
-    # depending on the server type parameter. It configures the server with the
-    # appropriate parameters including port number for TCP servers or socket
-    # name and runtime directory for domain sockets.
+    # This method acts as a factory for creating socket server objects,
+    # delegating to the UnixSocks.from_url method to construct either a TCP
+    # socket server or a domain socket server depending on the URL scheme
+    # provided
     #
-    # @param server_type [ Symbol ] the type of socket server to create, either :tcp or another value for domain socket
-    # @param port [ Integer ] the port number to use for TCP socket server creation
+    # @param server_url [ String ] the URL specifying the socket server
+    #   configuration
     #
     # @return [ UnixSocks::TCPSocketServer, UnixSocks::DomainSocketServer ] a
-    #   new socket server instance of the specified type
-    def create_server(server_type, port)
-      case server_type
-      when :tcp
-        UnixSocks::TCPSocketServer.new(port:)
-      else
-        UnixSocks::DomainSocketServer.new(socket_name: 'probe.sock', runtime_dir: Dir.pwd)
-      end
+    #   new socket server instance configured according to the URL specification
+    def create_server(server_url)
+      UnixSocks.from_url(server_url)
     end
   end
 end

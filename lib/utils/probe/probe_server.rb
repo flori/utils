@@ -19,8 +19,8 @@ module Utils::Probe
     #
     # @return [ Utils::ProbeServer ] a new probe server instance configured
     # with the specified socket name and runtime directory
-    def initialize(server_type: :unix, port: 6666)
-      @server         = create_server(server_type, port)
+    def initialize(server_url:)
+      @server         = create_server(server_url)
       @history        = [].freeze
       @jobs_queue     = Queue.new
       @current_job_id = 0

@@ -57,15 +57,18 @@ module Utils::Probe
 
     # The initialize method sets up a new probe server instance.
     #
-    # This method creates and configures a Unix domain socket server for
-    # handling probe jobs and communication. It initializes the server with a
-    # specific socket name and runtime directory, preparing it to listen for
-    # incoming connections and process jobs.
+    # This method creates and configures the core components of the probe
+    # server, including initializing the Unix domain socket server for
+    # communication, setting up the job queue for processing tasks, and
+    # preparing the history tracking for completed jobs.
     #
-    # @return [ Utils::ProbeServer ] a new probe server instance configured with
-    #         the specified socket name and runtime directory
-    def initialize(server_type: :unix, port: 6666)
-      @server = create_server(server_type, port)
+    # @param server_url [ String ] the URL to be used for the probe server
+    #   communication
+    #
+    # @return [ Utils::ProbeServer ] a new probe server instance configured
+    #   with the specified socket name and runtime directory
+    def initialize(server_url:)
+      @server = create_server(server_url)
     end
 
     # The env method provides access to environment variable management through

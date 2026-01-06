@@ -33,6 +33,7 @@ def usage
 
       -n TESTNAME   run the test TESTNAME in file FILENAME
       -t FRAMEWORK  use test framework FRAMEWORK (rspec, test-unit or cucumber)
+      -s SERVER_URL tcp/unix URL to connect to
       -c            start probe as a client
       -C FOO[=BAR]  set/get env variable on probe server
       -l            start probe as a server
@@ -72,6 +73,17 @@ def find_cmd(*cmds, on_fail: -> *cmds { fail "no #{cmds * '|'} command found" })
   cmds.map { |c| `which #{c}`.full?(:chomp) }.compact.first or on_fail.(*cmds)
 end
 
+# The server_url method retrieves the configured server URL for probe operations.
+#
+# This method checks if a server URL has been specified via command-line
+# options and returns it if available. Otherwise, it falls back to the server
+# URL configured in the probe settings.
+#
+# @return [ String ] the server URL for probe operations
+def server_url
+  $opts[?s] || $config.probe.server_url
+end
+
 # The start_server method initializes and begins operation of a probe server.
 #
 # This method configures the environment for server operation by setting the
@@ -79,10 +91,7 @@ end
 # probe server instance to handle incoming requests and process jobs.
 def start_server
   Thread.abort_on_exception = $DEBUG
-  ProbeServer.new(
-    server_type: $config.probe.server_type,
-    port: $config.probe.tcp_server_port
-  ).start
+  ProbeServer.new(server_url:).start
 end
 
 # The connect_server method establishes a connection to a probe server and
@@ -93,10 +102,7 @@ end
 # It also enqueues jobs for execution on the probe server when specified.
 #
 def connect_server
-  probe_client = ProbeClient.new(
-    server_type: $config.probe.server_type,
-    port: $config.probe.tcp_server_port
-  )
+  probe_client = ProbeClient.new(server_url:)
   if setting = $opts[?C]
     case setting
     when /\A([^=]+)=([^=]+)\z/
@@ -125,7 +131,7 @@ if i = ARGV.index('--')
 else
   $args = ARGV.dup
 end
-$opts = go 'lct:n:C:h', $args
+$opts = go 'lct:n:C:s:h', $args
 $opts[?h] and usage
 
 case

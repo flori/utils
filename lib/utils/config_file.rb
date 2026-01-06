@@ -224,22 +224,16 @@ class Utils::ConfigFile
     # @param dirs [ Array<String> ] the array of directory names to include
     config :include_dirs, %w[lib test tests ext spec]
 
-    # The server_type method configures the type of server to be used.
+    # The server_url method configures the URL for the probe server
+    # communication.
     #
-    # This method sets up the server type configuration option, which
-    # determines the underlying server implementation to be utilized, this is
-    # either :unix for UNIX domain sockets or :tcp for TCP Sockets.
+    # This method sets up a DSL accessor for the probe server URL, providing a
+    # default value that uses a Unix domain socket located in the current
+    # working directory.
     #
-    # @return [ Symbol ] returns the server type configured
-    config :server_type, :unix
-
-    # The tcp_server_port method configures the TCP server port setting.
-    #
-    # This method sets up a configuration option that specifies the port number
-    # to be used for TCP server operations.
-    #
-    # @param value [ Integer ] the TCP server port number to use
-    config :tcp_server_port, 59999
+    # @return [ String ] the configured probe server URL including the default
+    #   socket path
+    dsl_accessor :server_url, "unix://#{Pathname.pwd + 'probe.socket'}"
 
     # The include_dirs_argument method constructs a colon-separated string from
     # include directories.
