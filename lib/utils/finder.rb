@@ -92,7 +92,7 @@ class Utils::Finder
       end
       true
     }
-    find(*@roots, visit: visit) do |filename|
+    find(*@roots, visit:) do |filename|
       filename.stat.directory? and filename << ?/
       paths << filename
     end
