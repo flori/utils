@@ -10,6 +10,7 @@ module Utils
   require 'utils/version'
   require 'utils/md5'
   require 'utils/patterns'
+  require 'utils/xdg'
   require 'utils/config_file'
   require 'utils/editor'
   require 'utils/finder'

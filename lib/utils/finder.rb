@@ -19,6 +19,7 @@ require 'mize'
 class Utils::Finder
   include Tins::Find
   include Utils::Patterns
+  include Utils::XDG
   include Term::ANSIColor
 
   # The initialize method sets up the finder instance with the provided options.
@@ -110,11 +111,8 @@ class Utils::Finder
   # @return [ String ] the full file path where finder results should be stored
   def index_path
     roots = @roots.map { |r| File.expand_path(r) }.uniq.sort
-    filename = "finder-paths-" +
-      Digest::MD5.new.update(roots.inspect).hexdigest
-    dirname = File.join(Dir.tmpdir, File.basename($0))
-    FileUtils.mkdir_p dirname
-    File.join(dirname, filename)
+    filename = "finder-paths-" + Digest::MD5.new.update(roots.inspect).hexdigest
+    XDG_CACHE_HOME.app_dir('utils') + filename
   end
 
   # The create_paths method generates and stores path information by building a

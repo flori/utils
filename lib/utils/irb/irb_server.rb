@@ -17,6 +17,8 @@ require 'fileutils'
 #   client.store_snippet('puts "Hello World"')
 #   result = server.eval_snippet('2 + 2')
 class Utils::IRB::IRBServer
+  include Utils::XDG
+
   # The initialize method sets up a new IRBServer instance with the specified
   # URL.
   #
@@ -172,10 +174,7 @@ class Utils::IRB::IRBServer
   # @return [ String ] the path to the log file that will be used for logging
   def setup_logger
     unless @log_out
-      xdg_dir  = File.expand_path(ENV.fetch('XDG_STATE_HOME', '~/.local/state'))
-      log_path = Pathname.new(xdg_dir) + 'utils'
-      FileUtils.mkdir_p log_path
-      log_path += 'irb-server.log'
+      log_path = XDG_STATE_HOME.app_dir('utils') + 'irb-server.log'
       @log_out = File.new(log_path, ?a)
     end
     @log_out.sync = true
