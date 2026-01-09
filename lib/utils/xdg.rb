@@ -1,5 +1,6 @@
 require 'pathname'
 require 'fileutils'
+require 'stringio'
 
 # Module for handling XDG base directory specifications and application
 # directory management.
