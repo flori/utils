@@ -112,7 +112,7 @@ class Utils::Finder
   def index_path
     roots = @roots.map { |r| File.expand_path(r) }.uniq.sort
     filename = "finder-paths-" + Digest::MD5.new.update(roots.inspect).hexdigest
-    XDG_CACHE_HOME.app_dir('utils') + filename
+    XDG_CACHE_HOME.sub_dir_path('utils') + filename
   end
 
   # The create_paths method generates and stores path information by building a

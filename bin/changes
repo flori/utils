@@ -28,6 +28,7 @@
 require 'ollama'
 include Ollama
 require 'utils'
+include Utils::XDG
 
 # Executes a shell command and returns its output.
 #
@@ -101,13 +102,12 @@ def compute_change(range_from, range_to)
     EOT
   end
 
-  config = Utils::ConfigDir.new('changes', env_var: 'XDG_CONFIG_HOME')
-
+  config        = XDG_CONFIG_HOME + 'changes'
   base_url      = ENV['OLLAMA_URL'] || 'http://%s' % ENV.fetch('OLLAMA_HOST')
   model         = ENV.fetch('OLLAMA_MODEL', 'llama3.1')
-  system        = File.read("#{config}/system.txt")
-  prompt        = File.read("#{config}/prompt.txt") + "\n\n#{log}\n"
-  client_config = Client::Config.load_from_json("#{config}/client.json")
+  system        = config.read('system.txt')
+  prompt        = config.read('prompt.txt') + "\n\n#{log}\n"
+  client_config = Client::Config.load_from_json(config + 'client.json')
   client_config.base_url = base_url
 
   if ENV['DEBUG'].to_i == 1

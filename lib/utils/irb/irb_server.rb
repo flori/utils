@@ -174,7 +174,7 @@ class Utils::IRB::IRBServer
   # @return [ String ] the path to the log file that will be used for logging
   def setup_logger
     unless @log_out
-      log_path = XDG_STATE_HOME.app_dir('utils') + 'irb-server.log'
+      log_path = XDG_STATE_HOME.sub_dir_path('utils') + 'irb-server.log'
       @log_out = File.new(log_path, ?a)
     end
     @log_out.sync = true

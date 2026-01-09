@@ -26,10 +26,11 @@
 # - prompt.txt: Commit message template, contains %{branch} and %{stdin}
 
 require 'utils'
+include Utils::XDG
 
-config = Utils::ConfigDir.new('commit_message', env_var: 'XDG_CONFIG_HOME')
+config = XDG_CONFIG_HOME + 'commit_message'
 
 branch = `git rev-parse --abbrev-ref HEAD`.chomp
-exec 'ollama_cli', '-c', "#{config}/client.json",
-  '-M', "#{config}/options.json", '-P', "branch=#{branch}",
-  '-s', "#{config}/system.txt", '-p', "#{config}/prompt.txt"
+exec 'ollama_cli', '-c', config + 'client.json',
+  '-M', config + 'options.json', '-P', "branch=#{branch}",
+  '-s', config + 'system.txt', '-p', config + 'prompt.txt'

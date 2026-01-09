@@ -18,7 +18,6 @@ module Utils
   require 'utils/probe'
   require 'utils/ssh_tunnel_specification'
   require 'utils/line_blamer'
-  require 'utils/config_dir'
 
   require 'utils/xt/source_location_extension'
   class ::Object
