@@ -206,7 +206,7 @@ def usage
       -B NUMBER   displays NUMBER lines of context before the match
       -C NUMBER   displays NUMBER lines of context around the match
       -f          just list the paths of the files that would be searched
-      -F          just consider real files when searching
+      -F          follow symlinks when searching
       -l          just list the paths of the files with matches
       -L          list only the path:linenumber of the files with matches
       -pX         interpret PATTERN argument as X=f fuzzy or X=r for regexp

@@ -249,7 +249,7 @@ class Utils::Grepper
       if !s ||
           s.directory? && @config.search.prune?(bn) ||
           (s.file? || s.symlink?) && @config.search.skip?(bn) ||
-          @args[?F] && s.symlink?
+          !@args[?F] && s.symlink?
       then
         @args[?v] and warn "Pruning #{filename.inspect}."
         prune
