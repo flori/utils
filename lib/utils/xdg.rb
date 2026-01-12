@@ -92,31 +92,13 @@ module Utils::XDG
       end
     end
 
-    # The join method creates a new path by combining the current path with a
-    # given path component.
-    #
-    # This method takes a path string and appends it to the current path,
-    # returning a new Pathname object that represents the combined path.
-    #
-    # @param path [ String ] the path component to append to the current path
-    #
-    # @return [ Pathname ] a new Pathname object representing the joined path
-    def join(path)
-      self.class.new(super)
-    end
-
-    # The + method creates a new instance by combining the current path with
-    # the provided path component.
-    #
-    # This method takes a path component and uses the superclass's + method to
-    # combine it with the current path, then wraps the result in a new instance
-    # of the same class as the current object.
-    #
-    # @param path [ String, Pathname ] the path component to be added to the current path
-    #
-    # @return [ self.class ] a new instance of the same class with the combined path
-    def +(path)
-      self.class.new(super)
+    %i[
+      join + dirname basename realpath expand_path cleanpath
+      relative_path_from
+    ].each do |id|
+      define_method(id) do |*args, **kw, &block|
+        self.class.new(super(*args, **kw, &block))
+      end
     end
 
     alias to_str to_s
