@@ -85,7 +85,7 @@ Options are
   -n NUMBER   the first NUMBER of matches is returned
   -s          search by interactively inputting PATTERN
   -l          list all paths in cache relative to current directory
-  -L          list all paths in cahce as absolute pathes from root
+  -L          list all paths in cache as absolute pathes from root
   -h          display this help
 
 Version is #{File.basename($0)} #{Utils::VERSION}.
