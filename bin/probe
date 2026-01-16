@@ -117,22 +117,28 @@ def connect_server
     opts = $opts.subhash(*%w[n t]).each_with_object([]) { |(k, v), a|
       v.full? and a.concat [ "-#{k}", v ]
     }
-    probe_client.enqueue opts + $args
+    args = opts + $args
+    args += %w[ -- ] + $testrunner_args unless $testrunner_args.empty?
+    probe_client.enqueue(args)
     exit
   end
 end
 
 $config = Utils::ConfigFile.new
 $config.configure_from_paths
-testrunner_args = []
+$testrunner_args = []
 if i = ARGV.index('--')
-  testrunner_args.concat ARGV[(i + 1)..-1]
+  $testrunner_args.concat ARGV[(i + 1)..-1]
   $args = ARGV[0...i]
 else
   $args = ARGV.dup
 end
 $opts = go 'lct:n:C:s:h', $args
 $opts[?h] and usage
+
+$args.freeze
+$testrunner_args.freeze
+$opts.freeze
 
 case
 when $opts[?l]
@@ -156,11 +162,11 @@ when :rspec
     end
   end
   cmd 'ruby', '-I', $config.probe.include_dirs_argument, *rspec,
-    *($args + testrunner_args)
+    *($args + $testrunner_args)
 when :'test-unit'
   if testname = $opts[?n]
     cmd 'ruby', '-I', $config.probe.include_dirs_argument,
-      *($args + testrunner_args), '-n', testname
+      *($args + $testrunner_args), '-n', testname
   else
     $args = $args.inject([]) { |args, a|
       args.push(*File.directory?(a) ? Dir[File.join(a, ?*)] : a)
@@ -171,13 +177,13 @@ when :'test-unit'
         lf = Tins::LinesFile.for_filename(*sl)
         if testname = lf.match_backward(/def\s+(\S+?)(?:\(|\s*$)/).full?(:first)
           cmd 'ruby', '-I', $config.probe.include_dirs_argument,
-            sl.filename, *testrunner_args, '-n', testname
+            sl.filename, *$testrunner_args, '-n', testname
         else
           warn "no test found before line #{sl.linenumber}"
         end
       else
         cmd 'ruby', '-I', $config.probe.include_dirs_argument,
-          sl.filename, *testrunner_args
+          sl.filename, *$testrunner_args
       end
     end
   end
@@ -185,7 +191,7 @@ when :cucumber
   cucumber = find_cmd('cucumber')
   if linenumber = $opts[?n]
     cmd 'ruby', cucumber, '-r', $config.probe.include_dirs_argument, '-l',
-      linenumber, *($args + testrunner_args)
+      linenumber, *($args + $testrunner_args)
   else
     $args = $args.map do |a|
       if Utils::Editor::FILE_LINENUMBER_REGEXP =~ a
@@ -195,6 +201,6 @@ when :cucumber
       end
     end
     cmd 'ruby', cucumber, '-r', $config.probe.include_dirs_argument,
-      *($args + testrunner_args)
+      *($args + $testrunner_args)
   end
 end
