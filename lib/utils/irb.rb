@@ -747,6 +747,19 @@ module Utils
         @irb_server
       end
 
+      # The irb_current_snippet method retrieves the current code snippet
+      # stored in the IRB server.
+      #
+      # This method accesses the IRB server instance and returns the snippet
+      # that has been stored for execution, or nil if no snippet is currently
+      # stored or if the server is not available.
+      #
+      # @return [ String, nil ] the current code snippet stored in the IRB
+      #   server, or nil if not available
+      def irb_current_snippet
+        irb_server&.snippet
+      end
+
       # The irb_server_stop method sends a stop command to the IRB server
       # client.
       #
