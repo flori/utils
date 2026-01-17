@@ -7,6 +7,7 @@ require 'utils'
 require 'fileutils'
 require 'amatch'
 require 'search_ui'
+require 'logger'
 require_maybe 'ap'
 
 $editor = Utils::Editor.new
@@ -509,7 +510,6 @@ module Utils
       #
       # @return [ String ] the captured output as a string
       def capture_output(with_stderr = false)
-        require 'tempfile'
         begin
           old_stdout, $stdout = $stdout, Tempfile.new('irb')
           if with_stderr
@@ -816,7 +816,6 @@ module Utils
         # @return [ TrueClass, FalseClass ] true if the logger was switched to
         # the custom logger, false if it was reverted to the original logger
         def irb_toggle_logging
-          require 'logger'
           if ActiveRecord::Base.logger != $logger
             $old_logger = ActiveRecord::Base.logger
             ActiveRecord::Base.logger = $logger
