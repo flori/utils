@@ -20,7 +20,25 @@ module Utils
   require 'utils/line_blamer'
 
   require 'utils/xt/source_location_extension'
+  # Extend all existing modules that define source_location with our
+  # enhancements.
+  # This ensures compatibility with existing code that may have overridden
+  # source_location while avoiding conflicts with Ruby's core classes. The
+  # ObjectSpace iteration discovers all modules that already have
+  # source_location methods, and we prepend our extension to them. We rescue
+  # TypeError to handle cases where prepending isn't possible (e.g., certain
+  # core classes or frozen modules). Finally, we also prepend to ::Object
+  # itself to ensure the extension is applied to the root class.
+  # This approach maintains backward compatibility while ensuring comprehensive
+  # coverage of all classes that might need source location enhancement.
+  ObjectSpace.each_object(Module).
+    select { it.method_defined?(:source_location) }.
+    reject { it <= Utils::Xt::SourceLocationExtension }.
+    each do
+      it.prepend(Utils::Xt::SourceLocationExtension)
+    rescue TypeError
+    end
   class ::Object
-    include Utils::Xt::SourceLocationExtension
+    prepend Utils::Xt::SourceLocationExtension
   end
 end

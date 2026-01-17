@@ -43,6 +43,9 @@ module Utils
         filename   = nil
         linenumber = nil
         rangeend   = nil
+        if defined? super
+          filename, linenumber = super
+        end
         if respond_to?(:to_str)
           string = to_str
           case
@@ -59,19 +62,25 @@ module Utils
           else
             filename = string
           end
-        else
+        elsif !linenumber
           filename = to_s
         end
         array = linenumber ? [ filename, linenumber ] : [ filename, 1 ]
-        array_singleton_class = class << array; self; end
-        array_singleton_class.instance_eval do
+        decorate_object(array, filename:, linenumber:, rangeend:)
+      end
+
+      private
+
+      def decorate_object(object, filename: nil, linenumber: nil, rangeend: nil)
+        sc = object.singleton_class
+        sc.instance_eval do
           define_method(:filename) { filename }
           define_method(:linenumber) { linenumber }
           define_method(:rangeend) { rangeend }
           define_method(:to_s) { [ filename, linenumber ].compact * ':' }
           define_method(:range) { rangeend ? "#{to_s}-#{rangeend}" : "#{to_s}" }
         end
-        array
+        object
       end
     end
   end
