@@ -79,7 +79,7 @@ class Utils::IRB::IRBServer
       else
         @logger.warn("Message for action #{message.action.inspect} not supported.")
       end
-    rescue => e
+    rescue StandardError, SyntaxError => e
       @logger.error("#{self.class.name} caught #{e.class}: #{e} for #{message.to_json}.")
     end
     self
