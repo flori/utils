@@ -40,7 +40,7 @@ else
       # interface compatibility
       def start(_ignore)
         output.puts "Storing error list in #{@errors_lst.path.inspect}: "
-        output.puts ?- * Tins::Terminal.columns
+        output.puts ?━ * Tins::Terminal.columns
       end
 
       # The close method closes the error log file handle.
@@ -66,8 +66,8 @@ else
       # @param summary [ Object ] the summary object to be processed and displayed
       def dump_summary(summary)
         line = summary_line(summary)
-        @errors_lst.puts ?= * 80, line
-        output.puts ?= * Tins::Terminal.columns, line
+        @errors_lst.puts ?═ * 80, line
+        output.puts ?═ * Tins::Terminal.columns, line
       end
 
       # The example_passed method outputs a formatted line for a passed test
@@ -290,10 +290,16 @@ else
       #
       # @return [ String ] the formatted and colorized test result string
       def format_line(example)
-        args = [ location(example), run_time(example), description(example) ]
-        uncolored = "%s # S %3.3fs %s" % args
+        status = execution_result(example).status
+        status_emoji = Hash.new { ?❔ }.merge(
+          passed: ?✅,
+          failed: ?❌,
+          pending: ?⏩
+        )
+        args = [ location(example), status_emoji[status], run_time(example), description(example) ]
+        uncolored = "%s # %s %3.3fs %s" % args
         uncolored = uncolored[0, Tins::Terminal.columns]
-        case execution_result(example).status
+        case status
         when :passed
           success_color(uncolored)
         when :failed
