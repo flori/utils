@@ -86,6 +86,7 @@ Options are
   -s          search by interactively inputting PATTERN
   -l          list all paths in cache relative to current directory
   -L          list all paths in cache as absolute pathes from root
+  -g          use git ls-files for finding files instead of cache
   -h          display this help
 
 Version is #{File.basename($0)} #{Utils::VERSION}.
