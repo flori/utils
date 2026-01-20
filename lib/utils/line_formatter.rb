@@ -296,8 +296,8 @@ else
           failed: ?❌,
           pending: ?⏩
         )
-        args = [ location(example), status_emoji[status], run_time(example), description(example) ]
-        uncolored = "%s # %s %3.3fs %s" % args
+        args = [ status_emoji[status], location(example), run_time(example), description(example) ]
+        uncolored = "%s %s # %3.3fs %s" % args
         uncolored = uncolored[0, Tins::Terminal.columns]
         case status
         when :passed
