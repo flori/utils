@@ -391,17 +391,18 @@ module Utils::IRB::Shell
   #
   # @yield [ i ] the block to be measured, receiving the iteration count as an argument
   def irb_time_watch(duration = 1)
+    normalize = -> value { value.ask_and_send(:to_f) || 0.0 }
     start = Time.now
     pre = nil
     avg = Hash.new
     i = 0
     fetch_next = -> cur do
-      pre = cur.map(&:to_f)
+      pre = cur.map(&normalize)
       i += 1
       sleep duration
     end
     loop do
-      cur = [ yield(i) ].flatten
+      cur = [ yield(i) ].flatten.map(&normalize)
       unless pre
         fetch_next.(cur)
         redo
