@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
-# stub: utils 0.91.0 ruby lib
+# stub: utils 0.91.1 ruby lib
 
 Gem::Specification.new do |s|
   s.name = "utils".freeze
-  s.version = "0.91.0".freeze
+  s.version = "0.91.1".freeze
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
@@ -25,20 +25,20 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency(%q<gem_hadar>.freeze, [">= 2.17.0".freeze])
   s.add_development_dependency(%q<test-unit>.freeze, [">= 0".freeze])
-  s.add_runtime_dependency(%q<unix_socks>.freeze, ["~> 0.3".freeze])
   s.add_runtime_dependency(%q<tins>.freeze, ["~> 1.51".freeze])
   s.add_runtime_dependency(%q<term-ansicolor>.freeze, ["~> 1.11".freeze])
+  s.add_runtime_dependency(%q<ollama-ruby>.freeze, ["~> 1.6".freeze])
+  s.add_runtime_dependency(%q<context_spook>.freeze, ["~> 1.0".freeze])
+  s.add_runtime_dependency(%q<figlet>.freeze, ["~> 1.0".freeze])
+  s.add_runtime_dependency(%q<unix_socks>.freeze, ["~> 0.3".freeze])
   s.add_runtime_dependency(%q<pstree>.freeze, ["~> 0.3".freeze])
   s.add_runtime_dependency(%q<infobar>.freeze, ["~> 0.8".freeze])
   s.add_runtime_dependency(%q<mize>.freeze, ["~> 0.6".freeze])
   s.add_runtime_dependency(%q<amatch>.freeze, ["~> 0.6".freeze])
+  s.add_runtime_dependency(%q<kramdown-ansi>.freeze, [">= 0.4".freeze])
   s.add_runtime_dependency(%q<search_ui>.freeze, [">= 0.0.9".freeze])
-  s.add_runtime_dependency(%q<all_images>.freeze, ["~> 0.5.0".freeze])
-  s.add_runtime_dependency(%q<ollama-ruby>.freeze, ["~> 1.6".freeze])
-  s.add_runtime_dependency(%q<kramdown-ansi>.freeze, ["~> 0.1".freeze])
-  s.add_runtime_dependency(%q<figlet>.freeze, ["~> 1.0".freeze])
+  s.add_runtime_dependency(%q<all_images>.freeze, [">= 0.12".freeze])
   s.add_runtime_dependency(%q<starscope>.freeze, [">= 0".freeze])
-  s.add_runtime_dependency(%q<context_spook>.freeze, ["~> 1.0".freeze])
   s.add_runtime_dependency(%q<webrick>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<simplecov>.freeze, [">= 0".freeze])
   s.add_runtime_dependency(%q<debug>.freeze, [">= 0".freeze])
