@@ -67,8 +67,8 @@ module Utils::IRB::Shell
     ri(*patterns, doc: 'yri')
   end
 
-  # The ai method interacts with an Ollama chat service to process queries
-  # and optionally return responses.
+  # The ocs method interacts with an Ollama chat service to process queries and
+  # optionally return responses.
   #
   # This method constructs command-line arguments for the ollama_chat_send
   # utility based on the provided options, executes the command with the
@@ -85,7 +85,7 @@ module Utils::IRB::Shell
   #
   # @return [ String, nil ] the response from the Ollama chat service if
   #   respond is true, otherwise nil
-  def ai(query, command: false, respond: false, parse: false, dir: ?.)
+  def ocs(query, command: false, respond: false, parse: false, dir: ?.)
     dir = File.expand_path(dir)
     args = {
       ?r => respond,
