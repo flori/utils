@@ -258,7 +258,7 @@ else
       # full description or abbreviated version
       #
       # @return [ String ] the appropriate description based on the full parameter value
-      def description(example, full: ENV['VERBOSE'].to_i == 1)
+      def description(example, full: true)
         if full
           example.example.full_description
         else
@@ -296,9 +296,22 @@ else
           failed: ?❌,
           pending: ?⏩
         )
-        args = [ status_emoji[status], location(example), run_time(example), description(example) ]
-        uncolored = "%s %s # %3.3fs %s" % args
-        uncolored = uncolored[0, Tins::Terminal.columns]
+        description = self.description(example)
+        uncolored   = nil
+        cols        = Tins::Terminal.columns - 1
+        redone      = false
+        1.times do
+          args      = [ status_emoji[status], location(example), run_time(example), description ]
+          uncolored = "%s %s # %3.3fs %s" % args
+          if !redone && uncolored.size > cols
+            description = self.description(example, full: false)
+            redone = true
+            redo
+          else
+            break
+          end
+        end
+        uncolored = uncolored[0, cols]
         case status
         when :passed
           success_color(uncolored)
