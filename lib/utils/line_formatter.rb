@@ -335,7 +335,7 @@ else
       #
       # @return [ String ] the input text wrapped with green color ANSI escape codes
       def success_color(text)
-        Term::ANSIColor.green(text)
+        Term::ANSIColor.bright_green(text)
       end
 
       # The failure_color method applies red color formatting to the provided
@@ -349,7 +349,7 @@ else
       #
       # @return [ String ] the colorized text wrapped with red formatting codes
       def failure_color(text)
-        Term::ANSIColor.red(text)
+        Term::ANSIColor.bright_red(text)
       end
 
       # The pending_color method applies yellow color formatting to the
@@ -363,7 +363,7 @@ else
       #
       # @return [ String ] the colorized text with yellow formatting applied
       def pending_color(text)
-        Term::ANSIColor.yellow(text)
+        Term::ANSIColor.bright_yellow(text)
       end
 
       # The location method extracts and formats the file path and line number
