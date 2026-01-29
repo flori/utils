@@ -33,13 +33,13 @@ else
       # The start method initializes the error logging output.
       #
       # This method writes a header message to the output indicating where the
-      # error list will be stored, followed by a separator line made of dashes
+      # errors list will be stored, followed by a separator line made of dashes
       # that spans the width of the terminal.
       #
       # @param _ignore [ Object ] this parameter is ignored and exists for
       # interface compatibility
       def start(_ignore)
-        output.puts "Storing error list in #{@errors_lst.path.inspect}: "
+        output.puts "Storing errors list in #{@errors_lst.path.inspect}: "
         output.puts ?━ * Tins::Terminal.columns
       end
 
