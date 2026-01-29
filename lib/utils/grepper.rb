@@ -138,7 +138,7 @@ class Utils::Grepper
     @filename = filename
     @output = []
     bn, s = File.basename(filename), File.stat(filename)
-    if !s || s.directory? && @config.search.prune?(bn)
+    if !s || s.directory? && @config.search.prune?(bn, additional_dirs: @args[?P])
       @args[?v] and warn "Pruning #{filename.inspect}."
       prune
     end

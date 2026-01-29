@@ -205,8 +205,9 @@ class Utils::ConfigFile
     #
     # @return [ TrueClass, FalseClass ] true if the basename matches any prune pattern,
     #         false otherwise
-    def prune?(basename)
-      Array(prune_dirs).any? { |pd| pd.match(basename.to_s) }
+    def prune?(basename, additional_dirs: nil)
+      ([ Array(prune_dirs), Array(additional_dirs) ].compact.flatten).
+        any? { |pd| pd.match(basename.to_s) }
     end
 
     # The skip? method determines whether a file should be skipped based on

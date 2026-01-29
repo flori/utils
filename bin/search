@@ -227,7 +227,7 @@ def usage
   exit 1
 end
 
-args = go 'r:p:I:A:B:C:s:S:n:N:a:i:G:cfFlLeEvgh'
+args = go 'r:p:I:A:B:C:s:S:n:N:a:i:G:P:cfFlLeEvgh'
 args[?h] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }

@@ -155,7 +155,7 @@ module Utils::Finder::Files
       s  = filename.stat
       bn = filename.pathname.basename
       if !s ||
-          s.directory? && @config.discover.prune?(bn) ||
+          s.directory? && @config.discover.prune?(bn, additional_dirs: @args[?P]) ||
           s.file? && @config.discover.skip?(bn)
       then
         @args[?v] and warn "Pruning #{filename.inspect}."
