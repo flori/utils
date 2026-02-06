@@ -82,7 +82,7 @@ Options are
   -d          match also directories
   -D          list all search leaf directories
   -v          be verbose
-  -n NUMBER   the first NUMBER of matches is returned
+  -m NUMBER   the maximum NUMBER of matches that is returned
   -s          search by interactively inputting PATTERN
   -l          list all paths in cache relative to current directory
   -L          list all paths in cache as absolute pathes from root
@@ -94,14 +94,14 @@ Version is #{File.basename($0)} #{Utils::VERSION}.
   exit 1
 end
 
-args = go 'n:I:i:a:p:P:lLcreEvdsDgh', defaults: { ?a => '\\w' }
+args = go 'm:I:i:a:p:P:lLcreEvdsDgh', defaults: { ?a => '\\w' }
 args[?h] and usage
 
 Term::ANSIColor.coloring = (STDIN.tty? && ENV['TERM'] !~ /dumb/) && !args[?c]
 STDOUT.sync = true
 config = Utils::ConfigFile.new
 config.configure_from_paths
-args[?n] ||= (args[?l] || args[?L]) ? 1 << 60 : config.discover.max_matches
+args[?m] ||= (args[?l] || args[?L]) ? 1 << 60 : config.discover.max_matches
 
 if args[?s]
   pattern = ''
@@ -125,7 +125,7 @@ finder = -> * {
 search = -> * {
   f        = nil
   pattern  = pattern.dup
-  args[?n] = Term::ANSIColor.terminal_lines - 1
+  args[?m] = Term::ANSIColor.terminal_lines - 1
   found = Search.new(
     match: -> answer {
       pattern.replace answer
