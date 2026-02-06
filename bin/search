@@ -200,6 +200,7 @@ def usage
 
       -n PATTERN  only search files whose names match fuzzy PATTERN
       -N PATTERN  only search files whose names match regexp PATTERN
+      -m NUMBER   maximum number of files to return
       -s PATTERN  skip lines that match fuzzy PATTERN
       -S PATTERN  skip lines that match regexp PATTERN
       -A NUMBER   displays NUMBER lines of context after the match
@@ -227,7 +228,7 @@ def usage
   exit 1
 end
 
-args = go 'r:p:I:A:B:C:s:S:n:N:a:i:G:P:cfFlLeEvgh'
+args = go 'r:p:I:A:B:C:s:S:n:N:m:a:i:G:P:cfFlLeEvgh'
 args[?h] and usage
 pattern = ARGV.shift or usage
 roots = (ARGV.empty? ? [ Dir.pwd ] : ARGV).map { |f| File.expand_path(f) }

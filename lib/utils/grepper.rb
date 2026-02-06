@@ -88,6 +88,11 @@ class Utils::Grepper
         raise ArgumentError, "needs to be an integer number >= 1"
       end
     end
+
+    if max_files = @args[?m].to_i and max_files > 0
+      @max_files = max_files
+    end
+
     @paths  = []
     pattern_opts = opts.subhash(:pattern) | {
       :cset  => @args[?a],
@@ -260,8 +265,17 @@ class Utils::Grepper
       end
     }
     find(*@roots, visit: visit) do |filename|
-      match(filename)
+      if @max_files && @paths.length >= @max_files
+        break
+      else
+        match(filename)
+      end
     end
+
+    if @max_files
+      @paths = @paths.first(@max_files)
+    end
+
     @paths = @paths.sort_by(&:source_location)
     self
   end
