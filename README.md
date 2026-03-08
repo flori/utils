@@ -52,8 +52,7 @@ gem install utils
 ### 🔍 Searching
 
 - **`blameline`** - Show git blame line for a file and line number
-- **`create_cstags`** - Create cscope tags file for current directory
-- **`create_tags`** - Create ctags tags file for current directory  
+- **`code_indexer`** - Create ctags/cscope tags file for current directory  
 - **`discover`** - Find files with specific content patterns
 - **`git-versions`** - Show git versions of files and directories
 - **`long_lines`** - Finds long lines with author attribution
