@@ -4,11 +4,22 @@ require 'utils'
 config = Utils::ConfigFile.new
 config.configure_from_paths
 
+only_format = ARGV.shift
+
 config.code_indexer.formats.each do |format, output|
+  if only_format
+    format == only_format or next
+  end
   paths = config.code_indexer.paths.grep_v(/Resolving dependencies/)
   puts "Indexing code for #{format}…"
-  cmd = [ 'starscope', '-e', format, '-f', output, '--no-read' ]
-  config.code_indexer.verbose and cmd << '--verbose'
+  case format
+  when 'ctags'
+    cmd = [ 'ctags', '-f', output, '--exclude=pkg', '-R' ]
+    config.code_indexer.verbose and cmd << '--verbose'
+  when 'cscope'
+    cmd = [ 'starscope', '-e', format, '-f', output, '--no-read' ]
+    config.code_indexer.verbose and cmd << '--verbose'
+  end
   cmd.push(*paths)
   system(*cmd)
   puts "Done."
