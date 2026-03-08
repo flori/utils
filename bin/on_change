@@ -1,53 +1,118 @@
 #!/usr/bin/env ruby
 #
-# Monitor file for changes and execute command when modified
+# Monitor a set of files (specified by glob patterns) for modifications.
+# When any watched file changes, run an arbitrary shell command,
+# optionally inserting the full path of that file via the placeholder %f.
 #
 # Usage:
-#   on_change filename [command...]    # Watch file and run command on changes
+#   ./on_change [OPTS] [COMMAND]
 #
-# This script monitors a file for modifications and executes a specified
-# command whenever the file is changed. It can be used for auto-reloading,
-# rebuilding, or triggering actions when source files are updated.
+# Options:
+#   -i <glob>   Glob pattern(s) of files to watch.  Can be repeated
+#               – e.g., `-i 'lib/**/*.rb' -i bin/*`.
+#   -d <sec>    Sleep interval (seconds) when no changes are detected.
+#               Must be a positive integer; defaults to 1 if omitted or <=0.
+#   -h          Show this help message and exit.
 #
-# If no command is provided, 'true' is executed by default.
+# If [COMMAND] is not supplied the script defaults to running `true`.
 #
-# Special replacement:
-#   %f in command will be replaced with the filename being monitored
+# Command placeholder:
+#   The string `%f` inside COMMAND will be replaced by the full path of
+#   each file that changed.  Example:
+#       ./on_change -i 'lib/**/*.rb' echo '%f has been modified'
 #
-# Examples:
-#   on_change Gemfile bundle install
-#   on_change tests/utils_test.rb ruby -I lib:tests %f
+#   • It prints each executed command (for debugging) before streaming its
+#     output to STDOUT.
+
+require 'set'
+require 'tins/go'
+include Tins::GO
+require 'shellwords'
 
 # The execute method runs a command by processing its arguments and displaying
 # the output.
 #
 # @param args [ Array ] the command arguments to be executed
 def execute(*args)
-  cmd = args.map(&:inspect) * ' '
-  puts "Executing: #{cmd}"
+  cmd = Shellwords.join(args)
+  puts "Executing: #{cmd.inspect}"
   IO.popen(cmd, 'r') do |io|
     io.each { |l| puts l }
   end
 end
 
-argv = ARGV.dup
-filename = argv.shift or fail "require a filename as first argument"
-argv.empty? and argv << 'true'
-argv.map! { |a| a == '%f' ? filename : a }
-warn "Observing #{filename.inspect} for changes now and execute #{argv.inspect}."
-old_mtime = nil
-loop do
-  begin
-    mtime = File.mtime(filename)
-    if old_mtime.nil? || mtime > old_mtime
-      execute(*argv)
-    else
-      sleep 0.1
-    end
-  rescue Interrupt
-    exit 1
-  rescue Errno::ENOENT
-  ensure
-    old_mtime = mtime
+# Computes a set of file paths based on glob patterns specified in the global
+# $opts[?i] option. It iterates over each pattern, expands it with Dir.glob,
+# and merges the results into a Set to eliminate duplicates.
+#
+# @return [Set<String>] a set containing the unique file paths matched by the
+#   provided glob patterns
+def compute_files
+  files = Set[]
+  $opts[?i].to_a.each do |glob|
+    files.merge Dir.glob(glob)
   end
+  files
+end
+
+# The usage method displays a help message explaining command‑line options and
+# exits the program with the supplied return code.
+#
+# @param rc [ Integer ] the exit status to use when terminating the process
+def usage(rc)
+  puts <<~EOT
+    Usage: #{File.basename($0)} [OPTS] [COMMAND]
+
+    Options are
+
+      -i <glob>   Glob pattern(s) of files to watch.
+                  The option may be repeated; all matching paths will be monitored.
+      -d <sec>    Sleep interval (in seconds) when no file changes are detected.  
+                  Defaults to 1 second if omitted or set to a non‑positive value.
+      -h          Show this help message and exit.
+
+    If [COMMAND] is not supplied the script defaults to running `true`.
+
+    The command may contain the placeholder `%f`, which will be replaced by
+    the full path of each file that changed. For example:
+
+        #{File.basename($0)} -i 'lib/**/*.rb' -i 'bin/*' echo %f has been modified
+
+    EOT
+  exit rc
+end
+
+$opts = go 'i:d:h'
+
+$opts[?h] and usage(0)
+
+argv = ARGV.dup
+argv.empty? and argv << 'true'
+
+files = compute_files
+files.empty? and fail 'Require files to watch'
+
+old_mtimes = {}
+files.each do |filename|
+  mtime = File.mtime(filename)
+  old_mtimes[filename] = mtime
+end
+
+loop do
+  files = compute_files
+
+  files.each do |filename|
+    begin
+      mtime = File.mtime(filename)
+      if !old_mtimes.key?(filename) || mtime > old_mtimes[filename]
+        execute(*argv.map { _1 == '%f' ? filename : _1 })
+      end
+      old_mtimes[filename] = mtime
+    rescue Interrupt
+      exit 0
+    rescue Errno::ENOENT
+      old_mtimes.delete(filename)
+    end
+  end
+  sleep $opts[?d].to_i.clamp(1..)
 end
