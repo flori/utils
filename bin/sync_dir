@@ -25,7 +25,6 @@
 # - s: Skip (continue with next file)
 # - q: Quit (exit script)
 
-require 'pathname'
 require 'fileutils'
 include FileUtils::Verbose
 require 'utils'

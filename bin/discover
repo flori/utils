@@ -26,7 +26,6 @@ include Utils
 include Tins::GO
 require 'search_ui'
 include SearchUI
-require 'pathname'
 
 # The edit_files method opens editor windows for specified file paths.
 #
