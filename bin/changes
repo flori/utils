@@ -3,11 +3,11 @@
 # Generate changelogs using Git history and LLM summaries
 #
 # Usage:
-#   changes pending    # Show changes since last version
-#   changes current    # Show changes between two latest versions
-#   changes range v1.0.0..v1.2.0  # Show changes in a specific range
-#   changes full       # Generate full changelog from first tag
-#   changes add CHANGELOG.md    # Append new entries to existing file
+#   changes pending [-r vX.Y.Z]  # Show changes since last version (optional future tag)
+#   changes current              # Show changes between two latest versions
+#   changes range v1.0.0..v1.2.0 # Show changes in a specific range
+#   changes full                 # Generate full changelog from first tag
+#   changes add CHANGELOG.md     # Append new entries to existing file
 #
 # Requires:
 #   - Git repository with version tags (vX.Y.Z format)
@@ -29,6 +29,8 @@ require 'ollama'
 include Ollama
 require 'utils'
 include Utils::XDG
+require 'tins/go'
+include Tins::GO
 
 # Executes a shell command and returns its output.
 #
@@ -70,18 +72,20 @@ def find_highest_version_tag(filename)
   end
 end
 
-# The compute_change method generates a changelog entry by processing Git log
-# information and using an LLM to create a formatted summary.
+# Generates a formatted changelog entry by processing Git logs and utilizing an
+# LLM.
 #
-# This method takes two range parameters, computes the Git log between them,
-# retrieves the commit date, and then uses an LLM to generate a human-readable
-# changelog entry based on configuration files and prompt templates.
+# This method calculates the commit range between two points, retrieves the
+# date of the latest commit, and sends the log data to an Ollama-powered LLM to 
+# generate a human-readable summary based on local configuration templates.
 #
-# @param range_from [ Object ] the starting point of the Git log range
-# @param range_to [ Object ] the ending point of the Git log range
+# @param range_from [Object] the starting point of the Git log (e.g., 'v1.0.0')
+# @param range_to [Object] the ending point of the Git log (e.g., 'v1.1.0' or :HEAD)
+# @param future_tag [String] optional override for the version label displayed 
+#   in the resulting header; defaults to `range_to`
 #
-# @return [ String ] a formatted changelog entry including the date and LLM-generated content
-def compute_change(range_from, range_to)
+# @return [String] a formatted Markdown changelog entry including date and summary
+def compute_change(range_from, range_to, future_tag: range_to)
   range_from = range_from.to_s.sub(/\Av?/, ?v)
   if range_to.to_s == 'HEAD'
     range = "#{range_from}..HEAD"
@@ -98,7 +102,7 @@ def compute_change(range_from, range_to)
   if log.strip.empty?
     return <<~EOT
 
-    ## #{date} #{range_to}
+    ## #{date} #{future_tag}
     EOT
   end
 
@@ -122,7 +126,7 @@ def compute_change(range_from, range_to)
 
   return <<~EOT
 
-    ## #{date} #{range_to}
+    ## #{date} #{future_tag}
 
     #{changes}
   EOT
@@ -136,7 +140,8 @@ when 'pending'
     _1.sub(/\Av/, '').version
   }.max
   if last_version
-    puts compute_change(last_version, :HEAD)
+    opts = go('r:')
+    puts compute_change(last_version, :HEAD, future_tag: opts[?r])
   else
     fail 'need at least one version tag to work'
   end
