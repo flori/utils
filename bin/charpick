@@ -1,0 +1,123 @@
+#!/usr/bin/env ruby
+#
+# charpick — search Unicode characters by name and copy the glyph to the
+# system clipboard.
+#
+# The data source is UnicodeData.txt (UCD), cached under
+# $XDG_CACHE_HOME/charpick/UnicodeData.txt and downloaded on first use.
+#
+# Usage:
+#   charpick               # interactive search
+#   charpick rightarrow    # pre-fill the search field
+#
+# Requires the search_ui (>= 0.2), amatch, and tins gems.
+
+require 'utils'
+require 'net/http'
+require 'uri'
+require 'search_ui'
+require 'tins/xt'
+require 'amatch'
+
+module Charpick
+  # A single Unicode character with its codepoint and lowercased name.
+  Entry = Data.define(:codepoint, :char, :name)
+
+  DATA_URL  = 'https://www.unicode.org/Public/UCD/latest/ucd/UnicodeData.txt'
+  CACHE_DIR = Utils::XDG::XDG_CACHE_HOME.sub_dir_path('charpick')
+  DATA_FILE = CACHE_DIR + 'UnicodeData.txt'
+
+  # Loads the character database, downloading it on first run.
+  #
+  # @return [ Array<Charpick::Entry> ] all named Unicode characters
+  def self.data
+    download unless File.exist?(DATA_FILE)
+    File.readlines(DATA_FILE, chomp: true).filter_map do |line|
+      codepoint, name, = line.split(';')
+      next unless name
+      code = Integer(codepoint, 16)
+      Entry.new(code, [code].pack(?U), name.downcase.tr(' ', '-'))
+    rescue
+    end
+  end
+
+  # Downloads the UCD character database into the cache directory.
+  #
+  # @return [ void ]
+  def self.download
+    uri = URI(DATA_URL)
+    Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
+      File.write(DATA_FILE, http.get(uri.request_uri).body)
+    end
+  end
+
+  # Max number of result rows to render (fits the terminal height).
+  #
+  # @return [ Integer ]
+  def self.limit
+    Tins::Terminal.lines - 1
+  end
+
+  # Finds the first available clipboard command.
+  #
+  # @return [ [ String, Array<String> ], nil ] the command path with its
+  #   arguments, or nil if no clipboard tool is installed
+  def self.clipboard
+    commands = {
+      'pbcopy'  => [],
+      'wl-copy' => [],
+      'xclip'   => %w[ -selection clipboard ],
+      'xsel'    => %w[ --clipboard --input ],
+    }
+    commands.each do |name, args|
+      path = `which #{name}`.full?(:chomp) or next
+      return [ path, args ]
+    end
+    nil
+  end
+
+  # Copies a string to the system clipboard.
+  #
+  # @param char [ String ] the string to copy
+  # @return [ Boolean ] true on success, false if no clipboard tool ran
+  def self.copy(char)
+    cmd = clipboard
+    return false unless cmd
+    IO.popen([ cmd[0], *cmd[1] ], 'w') { |io| io.write(char) }
+    true
+  rescue StandardError
+    false
+  end
+end
+
+entries = Charpick.data
+limit   = Charpick.limit
+
+state   = SearchUI::Search::State.new(ARGV.join(' '), 0)
+selected = SearchUI::Search.new(
+  match: -> answer {
+    return [] if answer.empty?
+    matcher = Amatch::PairDistance.new(answer.downcase)
+    entries.map { |entry| [ entry, matcher.similar(entry.name) ] }
+      .select { |_, score| score > 0 }
+      .sort_by { |_, score| -score }
+      .first(limit)
+      .map(&:first)
+  },
+  query: -> _answer, matches, selector {
+    return 'Type to search names (e.g. "rightarrow").' if matches.empty?
+    matches.each_with_index.map do |entry, i|
+      line = "%s  U+%04X  %s" % [ entry.char, entry.codepoint, entry.name ]
+      i == selector ? "→ " + SearchUI::Search.on_blue(line) : "  " + line
+    end * ?\n
+  },
+  found: -> _answer, matches, selector { matches[selector] },
+  state:
+).start
+
+exit 1 if selected.nil?
+
+copied = Charpick.copy(selected.char)
+puts format('U+%04X  %s  %s — %s', selected.codepoint, selected.char,
+  selected.name, copied ? 'copied to clipboard ✓' : 'printed (no clipboard)')
+puts format('ruby escape: "\\u%04x"', selected.codepoint)

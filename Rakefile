@@ -31,7 +31,7 @@ GemHadar do
   dependency 'mize',           '~> 0.6'
   dependency 'amatch',         '~> 0.6'
   dependency 'kramdown-ansi',  '>= 0.4'
-  dependency 'search_ui',      '>= 0.0.9'
+  dependency 'search_ui',      '>= 0.2.0'
   dependency 'all_images',     '>= 0.12'
   dependency 'starscope'
   dependency 'webrick'
