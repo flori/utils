@@ -100,9 +100,16 @@ gem install utils
 - **`serve`** - Simple HTTP server launcher
 - **`ssh-tunnel`** - Create SSH tunnel to remote host
 
+### ⌨️ Interactive
+
+- **`irb_client`** - Send code to a running IRB server for evaluation and
+  execution (start the server with `irb_server` in the session)
+
 ### 🎨 Slacking
 
 - **`ascii7`** - Generate ASCII art from text
+- **`charpick`** - Fuzzy-search Unicode characters by name and copy the
+  glyph to the clipboard
 - **`enum`** - Enumerate files and directories with line counts
 - **`rainbow`** - Display rainbow-colored banner text
 

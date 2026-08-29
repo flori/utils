@@ -1,4 +1,13 @@
 #!/usr/bin/env ruby
+#
+# irb_client — interact with a running IRB session remotely.
+#
+# Start the server by typing `irb_server` in your IRB session (provided by
+# require 'utils/irb'). Then send code snippets from the command line:
+#
+#   echo '2 + 2' | irb_client eval_snippet    # => 4
+#   echo 'puts "hi"' | irb_client execute_snippet
+#   irb_client stop_server
 
 require 'utils/irb'
 include Utils::IRB
