@@ -15,13 +15,13 @@
 #   - Configuration files in ~/.config/changes/
 #     - system.txt: System prompt for LLM
 #     - prompt.txt: Template for changelog generation
-#     - client.json: Ollama client settings
-#     - options.json: Generation options (temperature, etc.)
 #
 # Environment variables:
 #   OLLAMA_URL:  Base URL of Ollama server OR
 #   OLLAMA_HOST: Host of Ollama server
 #   OLLAMA_MODEL: Model to use (default: llama3.1)
+#   OLLAMA_CLIENT: JSON client configuration
+#   OLLAMA_MODEL_OPTIONS: JSON model options
 #   XDG_CONFIG_HOME: Custom config directory location
 #   DEBUG: Set to 1 for verbose output
 
@@ -111,7 +111,7 @@ def compute_change(range_from, range_to, future_tag: range_to)
   model         = ENV.fetch('OLLAMA_MODEL', 'llama3.1')
   system        = config.read('system.txt')
   prompt        = config.read('prompt.txt') + "\n\n#{log}\n"
-  client_config = Client::Config.load_from_json(config + 'client.json')
+  client_config = Client::Config[**JSON.parse(ENV.fetch('OLLAMA_CLIENT', '{}'))]
   client_config.base_url = base_url
 
   if ENV['DEBUG'].to_i == 1
@@ -120,7 +120,7 @@ def compute_change(range_from, range_to, future_tag: range_to)
   end
 
   ollama  = Client.configure_with(client_config)
-  options = Options.load_from_json "#{config}/options.json"
+  options = Options.from_hash(JSON.parse(ENV.fetch('OLLAMA_MODEL_OPTIONS', '{}')))
   changes = ollama.generate(model:, system:, prompt:, options:, stream: false, think: false)
   changes = changes.response.gsub(/\t/, '  ')
 

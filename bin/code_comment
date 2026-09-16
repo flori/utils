@@ -16,12 +16,13 @@
 #   - Configuration files in ~/.config/code_comment/
 #     - system.txt: System prompt for LLM
 #     - prompt.txt: Template for comment generation
-#     - client.json: Ollama client settings
-#     - options.json: Generation options (temperature, etc.)
+#
 #
 # Environment variables:
 #   OLLAMA_URL: Base URL of Ollama server
 #   OLLAMA_MODEL: Model to use (default: llama3.1)
+#   OLLAMA_CLIENT: JSON client configuration
+#   OLLAMA_MODEL_OPTIONS: JSON model options
 #   XDG_CONFIG_HOME: Custom config directory location
 #   DEBUG: Set to 1 for verbose output and debug.log creation
 #
@@ -254,10 +255,10 @@ default_options = JSON(
   min_p: 0.1,
 )
 
-client_config = Client::Config.load_from_json $config_dir + 'client.json'
+client_config = Client::Config[**JSON.parse(ENV.fetch('OLLAMA_CLIENT', '{}'))]
 client_config.base_url = base_url
 ollama  = Client.configure_with(client_config)
-options = JSON.parse($config_dir.read('options.json', default: default_options))
+options = Options.from_hash(JSON.parse(ENV.fetch('OLLAMA_MODEL_OPTIONS', default_options)))
 
 if ENV['DEBUG'].to_i == 1
   File.open('debug.log', ?w) do |log|

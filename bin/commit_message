@@ -10,7 +10,7 @@
 #
 # The script automatically:
 # - Determines current git branch name
-# - Loads configuration files (client.json, options.json, system.txt, prompt.txt)
+# - Loads configuration files (system.txt, prompt.txt)
 # - Generates commit message using ollama_cli with the current diff as input
 #
 # Requirements:
@@ -20,10 +20,12 @@
 # - Configuration files in $XDG_CONFIG_HOME/commit_message/
 #
 # Configuration files:
-# - client.json: Ollama API client configuration
-# - options.json: Generation options  
 # - system.txt: System prompt for AI model
 # - prompt.txt: Commit message template, contains %{branch} and %{stdin}
+#
+# Environment variables (used by ollama_cli):
+# - OLLAMA_CLIENT: JSON client configuration
+# - OLLAMA_MODEL_OPTIONS: JSON model options
 
 require 'utils'
 include Utils::XDG
@@ -31,6 +33,6 @@ include Utils::XDG
 config = XDG_CONFIG_HOME + 'commit_message'
 
 branch = `git rev-parse --abbrev-ref HEAD`.chomp
-exec 'ollama_cli', '-c', config + 'client.json',
-  '-M', config + 'options.json', '-P', "branch=#{branch}",
+exec 'ollama_cli',
+  '-P', "branch=#{branch}",
   '-s', config + 'system.txt', '-p', config + 'prompt.txt'
