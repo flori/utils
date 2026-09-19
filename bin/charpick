@@ -8,7 +8,7 @@
 #
 # Usage:
 #   charpick               # interactive search
-#   charpick rightarrow    # pre-fill the search field
+#   charpick rightwarrow   # pre-fill the search field
 #
 # Requires the search_ui (>= 0.2), amatch, and tins gems.
 
@@ -103,7 +103,7 @@ selected = SearchUI::Search.new(
       .map(&:first)
   },
   query: -> _answer, matches, selector {
-    return 'Type to search names (e.g. "rightarrow").' if matches.empty?
+    return 'Type to search names (e.g. "rightwarrow").' if matches.empty?
     matches.each_with_index.map do |entry, i|
       line = "%s  U+%04X  %s" % [ entry.char, entry.codepoint, entry.name ]
       i == selector ? "→ " + SearchUI::Search.on_blue(line) : "  " + line
