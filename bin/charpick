@@ -42,8 +42,6 @@ module Charpick
   end
 
   # Downloads the UCD character database into the cache directory.
-  #
-  # @return [ void ]
   def self.download
     uri = URI(DATA_URL)
     Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
