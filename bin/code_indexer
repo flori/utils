@@ -14,7 +14,7 @@ config.code_indexer.formats.each do |format, output|
   puts "Indexing code for #{format}…"
   case format
   when 'ctags'
-    cmd = [ 'ctags', '-f', output, '--exclude=pkg', '-R' ]
+    cmd = [ 'ctags', '-f', output, '--sort=no', '--exclude=pkg', '-R' ]
     config.code_indexer.verbose and cmd << '--verbose'
   when 'cscope'
     cmd = [ 'starscope', '-e', format, '-f', output, '--no-read' ]
