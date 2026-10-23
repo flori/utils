@@ -22,7 +22,7 @@ GemHadar do
 
   dependency 'tins',           '~> 1.51'
   dependency 'term-ansicolor', '~> 1.11'
-  dependency 'ollama-ruby',    '~> 1.6'
+  dependency 'ollama-ruby',    '~> 1.26'
   dependency 'context_spook',  '~> 1.0'
   dependency 'figlet',         '~> 1.0'
   dependency 'unix_socks',     '~> 0.3'

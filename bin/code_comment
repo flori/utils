@@ -187,7 +187,7 @@ filename_linenumber = ARGV.shift or fail "require file_name as second argument"
 $config = Utils::ConfigFile.new
 $config.configure_from_paths
 $config_dir         = XDG_CONFIG_HOME + 'code_comment'
-base_url            = ENV['OLLAMA_URL'] || 'http://%s' % ENV.fetch('OLLAMA_HOST')
+base_url            = Ollama.base_url(ENV['OLLAMA_URL'] || ENV.fetch('OLLAMA_HOST'))
 model               = ENV.fetch('OLLAMA_MODEL', 'llama3.1')
 construct, construct_type = fetch_construct(filename_linenumber)
 construct_indent          = construct[/\A( *)/, 1].size
