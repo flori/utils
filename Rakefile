@@ -1,5 +1,3 @@
-# vim: set filetype=ruby et sw=2 ts=2:
-
 require 'gem_hadar'
 
 GemHadar do
@@ -23,14 +21,14 @@ GemHadar do
   dependency 'tins',           '~> 1.51'
   dependency 'term-ansicolor', '~> 1.11'
   dependency 'ollama-ruby',    '~> 1.26'
-  dependency 'context_spook',  '~> 1.0'
+  dependency 'context_spook',  '~> 1.8'
   dependency 'figlet',         '~> 1.0'
-  dependency 'unix_socks',     '~> 0.3'
+  dependency 'unix_socks',     '~> 0.5'
   dependency 'pstree',         '~> 0.3'
   dependency 'infobar',        '~> 0.8'
   dependency 'mize',           '~> 0.6'
   dependency 'amatch',         '~> 0.6'
-  dependency 'kramdown-ansi',  '>= 0.4'
+  dependency 'kramdown-ansi',  '>= 0.10'
   dependency 'search_ui',      '>= 0.2.0'
   dependency 'all_images',     '>= 0.12'
   dependency 'starscope'
