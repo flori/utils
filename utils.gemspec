@@ -17,29 +17,29 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/flori/utils".freeze
   s.licenses = ["GPL-2.0".freeze]
   s.rdoc_options = ["--title".freeze, "Utils - Some useful command line utilities".freeze, "--main".freeze, "README.md".freeze]
-  s.rubygems_version = "4.0.24".freeze
+  s.rubygems_version = "4.1.0".freeze
   s.summary = "Some useful command line utilities".freeze
   s.test_files = ["tests/test_helper.rb".freeze, "tests/utils_test.rb".freeze]
 
   s.specification_version = 4
 
-  s.add_development_dependency(%q<gem_hadar>.freeze, [">= 2.24.1".freeze])
-  s.add_development_dependency(%q<test-unit>.freeze, [">= 0".freeze])
-  s.add_runtime_dependency(%q<tins>.freeze, ["~> 1.51".freeze])
-  s.add_runtime_dependency(%q<term-ansicolor>.freeze, ["~> 1.11".freeze])
-  s.add_runtime_dependency(%q<ollama-ruby>.freeze, ["~> 1.26".freeze])
-  s.add_runtime_dependency(%q<context_spook>.freeze, ["~> 1.8".freeze])
-  s.add_runtime_dependency(%q<figlet>.freeze, ["~> 1.0".freeze])
-  s.add_runtime_dependency(%q<unix_socks>.freeze, ["~> 0.5".freeze])
-  s.add_runtime_dependency(%q<pstree>.freeze, ["~> 0.3".freeze])
-  s.add_runtime_dependency(%q<infobar>.freeze, ["~> 0.8".freeze])
-  s.add_runtime_dependency(%q<mize>.freeze, ["~> 0.6".freeze])
-  s.add_runtime_dependency(%q<amatch>.freeze, ["~> 0.6".freeze])
-  s.add_runtime_dependency(%q<kramdown-ansi>.freeze, [">= 0.10".freeze])
-  s.add_runtime_dependency(%q<search_ui>.freeze, [">= 0.2.0".freeze])
-  s.add_runtime_dependency(%q<all_images>.freeze, [">= 0.12".freeze])
-  s.add_runtime_dependency(%q<starscope>.freeze, [">= 0".freeze])
-  s.add_runtime_dependency(%q<webrick>.freeze, [">= 0".freeze])
-  s.add_runtime_dependency(%q<simplecov>.freeze, [">= 0".freeze])
-  s.add_runtime_dependency(%q<debug>.freeze, [">= 0".freeze])
+  s.add_development_dependency("gem_hadar".freeze, [">= 2.26.1".freeze])
+  s.add_development_dependency("test-unit".freeze, [">= 0".freeze])
+  s.add_runtime_dependency("tins".freeze, ["~> 1.51".freeze])
+  s.add_runtime_dependency("term-ansicolor".freeze, ["~> 1.11".freeze])
+  s.add_runtime_dependency("ollama-ruby".freeze, ["~> 1.26".freeze])
+  s.add_runtime_dependency("context_spook".freeze, ["~> 1.8".freeze])
+  s.add_runtime_dependency("figlet".freeze, ["~> 1.0".freeze])
+  s.add_runtime_dependency("unix_socks".freeze, ["~> 0.5".freeze])
+  s.add_runtime_dependency("pstree".freeze, ["~> 0.3".freeze])
+  s.add_runtime_dependency("infobar".freeze, ["~> 0.8".freeze])
+  s.add_runtime_dependency("mize".freeze, ["~> 0.6".freeze])
+  s.add_runtime_dependency("amatch".freeze, ["~> 0.6".freeze])
+  s.add_runtime_dependency("kramdown-ansi".freeze, [">= 0.10".freeze])
+  s.add_runtime_dependency("search_ui".freeze, [">= 0.2.0".freeze])
+  s.add_runtime_dependency("all_images".freeze, [">= 0.12".freeze])
+  s.add_runtime_dependency("starscope".freeze, [">= 0".freeze])
+  s.add_runtime_dependency("webrick".freeze, [">= 0".freeze])
+  s.add_runtime_dependency("simplecov".freeze, [">= 0".freeze])
+  s.add_runtime_dependency("debug".freeze, [">= 0".freeze])
 end
