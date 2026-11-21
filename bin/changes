@@ -1,13 +1,17 @@
 #!/usr/bin/env ruby
 #
-# Generate changelogs using Git history and LLM summaries
+# Generate changelogs using Git history and LLM summaries.
+# With -p, includes full diff hunks in the prompt for richer summaries.
 #
 # Usage:
-#   changes pending [-r vX.Y.Z]  # Show changes since last version (optional future tag)
-#   changes current              # Show changes between two latest versions
-#   changes range v1.0.0..v1.2.0 # Show changes in a specific range
-#   changes full                 # Generate full changelog from first tag
-#   changes add CHANGELOG.md     # Append new entries to existing file
+#   changes pending [-r vX.Y.Z] [-p]  # Show changes since last version
+#   changes current [-p]              # Show changes between two latest versions
+#   changes range v1.0.0..v1.2.0 [-p] # Show changes in a specific range
+#   changes full [-p]                 # Generate full changelog from first tag
+#   changes add CHANGELOG.md [-p]     # Append new entries to existing file
+#
+#   -r <tag>  Override the version label in the header (pending only)
+#   -p        Include git diff hunks in the LLM prompt
 #
 # Requires:
 #   - Git repository with version tags (vX.Y.Z format)
@@ -85,7 +89,7 @@ end
 #   in the resulting header; defaults to `range_to`
 #
 # @return [String] a formatted Markdown changelog entry including date and summary
-def compute_change(range_from, range_to, future_tag: range_to)
+def compute_change(range_from, range_to, future_tag: range_to, patch: false)
   range_from = range_from.to_s.sub(/\Av?/, ?v)
   if range_to.to_s == 'HEAD'
     range = "#{range_from}..HEAD"
@@ -94,7 +98,7 @@ def compute_change(range_from, range_to, future_tag: range_to)
     range = "#{range_from}..#{range_to}"
   end
 
-  log = x("git log #{range}")
+  log = x("git log #{'-p ' if patch}#{range}")
 
   date = x("git log -n1 --pretty='format:%cd' --date=short #{range_to}")
 
@@ -133,14 +137,15 @@ end
 
 x("git fetch --tags")
 
+opts = go('pr:')
+
 case command = ARGV.shift
 when 'pending'
   last_version = x("git tag").lines.grep(/^v?\d+\.\d+\.\d+$/).map(&:chomp).map {
     _1.sub(/\Av/, '').version
   }.max
   if last_version
-    opts = go('r:')
-    puts compute_change(last_version, :HEAD, future_tag: opts[?r])
+    puts compute_change(last_version, :HEAD, future_tag: opts[?r], patch: opts[?p])
   else
     fail 'need at least one version tag to work'
   end
@@ -149,7 +154,7 @@ when 'current'
     _1.sub(/\Av/, '').version
   }.sort.last(2)
   if version1 and version2
-    puts compute_change(version1, version2)
+    puts compute_change(version1, version2, patch: opts[?p])
   else
     fail 'need at least two version tags to work'
   end
@@ -157,7 +162,7 @@ when 'range'
   range = ARGV.shift
   if range =~ /\A(.+)\.\.(.+)\z/
     range_from, range_to = $1, $2
-    puts compute_change(range_from, range_to)
+    puts compute_change(range_from, range_to, patch: opts[?p])
   else
     fail "need range of the form v1.2.3..v1.2.4"
   end
@@ -175,7 +180,7 @@ when 'full', 'add'
         * Start
     EOT
     tags.each_cons(2) do |range_from, range_to|
-      ary << compute_change(range_from, range_to)
+      ary << compute_change(range_from, range_to, patch: opts[?p])
     end
     ary.reverse!
     ary.unshift <<~EOT
@@ -188,7 +193,7 @@ when 'full', 'add'
     tags = tags.drop_while { |t| t < start_tag }
     ary = []
     tags.each_cons(2) do |range_from, range_to|
-      ary << compute_change(range_from, range_to)
+      ary << compute_change(range_from, range_to, patch: opts[?p])
     end
     ary.empty? and exit
     ary.reverse!
