@@ -112,6 +112,7 @@ def compute_change(range_from, range_to, future_tag: range_to, patch: false)
   end
 
   log = x("git log #{'-p ' if patch}#{range}")
+  log = log.encode(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: '')
 
   date = x("git log -n1 --pretty='format:%cd' --date=short #{range_to}")
 
