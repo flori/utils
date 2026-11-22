@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
 
   s.specification_version = 4
 
-  s.add_development_dependency("gem_hadar".freeze, [">= 2.26.1".freeze])
+  s.add_development_dependency("gem_hadar".freeze, [">= 2.27.1".freeze])
   s.add_development_dependency("test-unit".freeze, [">= 0".freeze])
   s.add_runtime_dependency("tins".freeze, ["~> 1.51".freeze])
   s.add_runtime_dependency("term-ansicolor".freeze, ["~> 1.11".freeze])
