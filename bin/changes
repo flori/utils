@@ -76,6 +76,19 @@ def find_highest_version_tag(filename)
   end
 end
 
+# Normalizes a version tag to ensure it carries a `v` prefix.
+#
+# If the tag matches a bare semver pattern (e.g. `1.2.3`), a `v` is
+# prepended. Tags that already carry the prefix (e.g. `v1.2.3`) or
+# that don't look like a version (e.g. `HEAD`) are returned as-is.
+#
+# @param tag [Object] the version tag to normalize
+#
+# @return [String] the tag with a guaranteed `v` prefix for bare versions
+def version_tag(tag)
+  tag.to_s.sub(/\Av?(\d+\.\d+\.\d+)\z/, 'v\1')
+end
+
 # Generates a formatted changelog entry by processing Git logs and utilizing an
 # LLM.
 #
@@ -90,11 +103,11 @@ end
 #
 # @return [String] a formatted Markdown changelog entry including date and summary
 def compute_change(range_from, range_to, future_tag: range_to, patch: false)
-  range_from = range_from.to_s.sub(/\Av?/, ?v)
+  range_from = version_tag(range_from)
   if range_to.to_s == 'HEAD'
     range = "#{range_from}..HEAD"
   else
-    range_to = range_to.to_s.sub(/\Av?/, ?v)
+    range_to = version_tag(range_to)
     range = "#{range_from}..#{range_to}"
   end
 
@@ -105,7 +118,7 @@ def compute_change(range_from, range_to, future_tag: range_to, patch: false)
   if log.strip.empty?
     return <<~EOT
 
-    ## #{date} #{future_tag}
+    ## #{date} #{version_tag(future_tag)}
     EOT
   end
 
@@ -129,7 +142,7 @@ def compute_change(range_from, range_to, future_tag: range_to, patch: false)
 
   return <<~EOT
 
-    ## #{date} #{future_tag}
+    ## #{date} #{version_tag(future_tag)}
 
     #{changes}
   EOT
