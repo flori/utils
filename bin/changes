@@ -89,6 +89,20 @@ def version_tag(tag)
   tag.to_s.sub(/\Av?(\d+\.\d+\.\d+)\z/, 'v\1')
 end
 
+# The options method retrieves and parses model configuration options from the
+# OLLAMA_MODEL_OPTIONS environment variable.
+#
+# This method fetches the OLLAMA_MODEL_OPTIONS environment variable, which is
+# expected to contain a JSON-encoded hash of configuration parameters. If the
+# variable is not set, it defaults to an empty hash. The JSON string is then
+# parsed into a Ruby hash and converted into an Options object using the
+# Options.from_hash class method.
+#
+# @return [ Options ] an Options object representing the parsed configuration parameters
+def options
+  Options.from_hash(JSON.parse(ENV.fetch('OLLAMA_MODEL_OPTIONS', '{}')))
+end
+
 # Generates a formatted changelog entry by processing Git logs and utilizing an
 # LLM.
 #
@@ -102,7 +116,7 @@ end
 #   in the resulting header; defaults to `range_to`
 #
 # @return [String] a formatted Markdown changelog entry including date and summary
-def compute_change(range_from, range_to, future_tag: range_to, patch: false)
+def compute_change(range_from, range_to, future_tag: range_to, patch: false, context_length: 4096)
   range_from = version_tag(range_from)
   if range_to.to_s == 'HEAD'
     range = "#{range_from}..HEAD"
@@ -111,8 +125,21 @@ def compute_change(range_from, range_to, future_tag: range_to, patch: false)
     range = "#{range_from}..#{range_to}"
   end
 
+  max_log = (context_length * 0.8 * 4).to_i
+
   log = x("git log #{'-p ' if patch}#{range}")
   log = log.encode(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: '')
+
+  if log.size > max_log
+    if patch
+      warn "Diff too large for #{range} (#{log.size} > #{max_log}), retrying without -p."
+      log = x("git log #{range}")
+      log = log.encode(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: '')
+    end
+    if log.size > max_log
+      log = log[0, max_log] + "\n\n[log truncated]"
+    end
+  end
 
   date = x("git log -n1 --pretty='format:%cd' --date=short #{range_to}")
 
@@ -137,7 +164,6 @@ def compute_change(range_from, range_to, future_tag: range_to, patch: false)
   end
 
   ollama  = Client.configure_with(client_config)
-  options = Options.from_hash(JSON.parse(ENV.fetch('OLLAMA_MODEL_OPTIONS', '{}')))
   changes = ollama.generate(model:, system:, prompt:, options:, stream: false, think: false)
   changes = changes.response.gsub(/\t/, '  ')
 
@@ -151,7 +177,8 @@ end
 
 x("git fetch --tags")
 
-opts = go('pr:')
+opts           = go('pr:m:', defaults: { ?m => options.num_ctx })
+context_length = opts[?m].to_i.nonzero? || 4_096
 
 case command = ARGV.shift
 when 'pending'
@@ -159,7 +186,7 @@ when 'pending'
     _1.sub(/\Av/, '').version
   }.max
   if last_version
-    puts compute_change(last_version, :HEAD, future_tag: opts[?r], patch: opts[?p])
+    puts compute_change(last_version, :HEAD, future_tag: opts[?r], patch: opts[?p], context_length:)
   else
     fail 'need at least one version tag to work'
   end
@@ -168,7 +195,7 @@ when 'current'
     _1.sub(/\Av/, '').version
   }.sort.last(2)
   if version1 and version2
-    puts compute_change(version1, version2, patch: opts[?p])
+    puts compute_change(version1, version2, patch: opts[?p], context_length:)
   else
     fail 'need at least two version tags to work'
   end
@@ -176,7 +203,7 @@ when 'range'
   range = ARGV.shift
   if range =~ /\A(.+)\.\.(.+)\z/
     range_from, range_to = $1, $2
-    puts compute_change(range_from, range_to, patch: opts[?p])
+    puts compute_change(range_from, range_to, patch: opts[?p], context_length:)
   else
     fail "need range of the form v1.2.3..v1.2.4"
   end
@@ -194,7 +221,7 @@ when 'full', 'add'
         * Start
     EOT
     tags.each_cons(2) do |range_from, range_to|
-      ary << compute_change(range_from, range_to, patch: opts[?p])
+      ary << compute_change(range_from, range_to, patch: opts[?p], context_length:)
     end
     ary.reverse!
     ary.unshift <<~EOT
@@ -207,7 +234,7 @@ when 'full', 'add'
     tags = tags.drop_while { |t| t < start_tag }
     ary = []
     tags.each_cons(2) do |range_from, range_to|
-      ary << compute_change(range_from, range_to, patch: opts[?p])
+      ary << compute_change(range_from, range_to, patch: opts[?p], context_length:)
     end
     ary.empty? and exit
     ary.reverse!
