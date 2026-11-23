@@ -220,7 +220,7 @@ when 'full', 'add'
 
         * Start
     EOT
-    tags.each_cons(2).with_infobar(label: 'Change', show: STDOUT.tty?) do |range_from, range_to|
+    tags.each_cons(2).with_infobar(label: 'Change', output: STDERR, show: STDERR.tty?) do |range_from, range_to|
       ary << compute_change(range_from, range_to, patch: opts[?p], context_length:)
       +infobar
     end
@@ -234,7 +234,7 @@ when 'full', 'add'
     start_tag = find_highest_version_tag(filename)
     tags = tags.drop_while { |t| t < start_tag }
     ary = []
-    tags.each_cons(2).with_infobar(label: 'Change', show: STDOUT.tty?) do |range_from, range_to|
+    tags.each_cons(2).with_infobar(label: 'Change', output: STDERR, show: STDERR.tty?) do |range_from, range_to|
       ary << compute_change(range_from, range_to, patch: opts[?p], context_length:)
       +infobar
     end
