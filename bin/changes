@@ -224,6 +224,7 @@ when 'full', 'add'
       ary << compute_change(range_from, range_to, patch: opts[?p], context_length:)
       +infobar
     end
+    infobar.finish
     ary.reverse!
     ary.unshift <<~EOT
       # Changes
@@ -238,6 +239,7 @@ when 'full', 'add'
       ary << compute_change(range_from, range_to, patch: opts[?p], context_length:)
       +infobar
     end
+    infobar.finish
     ary.empty? and exit
     ary.reverse!
     File.open(filename) do |input|
