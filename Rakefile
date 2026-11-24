@@ -18,6 +18,10 @@ GemHadar do
   readme      'README.md'
   licenses << 'GPL-2.0'
 
+  changelog do
+    filename 'CHANGES.md'
+  end
+
   dependency 'tins',           '~> 1.51'
   dependency 'term-ansicolor', '~> 1.11'
   dependency 'ollama-ruby',    '~> 1.26'
