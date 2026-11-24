@@ -1,5 +1,19 @@
 # Changes
 
+## 2026-11-24 v0.104.0
+
+### Features
+- Add `CHANGES.md` documenting the complete project history from **v0.0.0** to
+  **v0.103.1**.
+
+### Improvements
+- Clear the infobar progress display after `full` and `add` loops in
+  `bin/changes` to prevent the progress bar from lingering on the terminal.
+
+### Build & CI
+- Add `CHANGES.md` to the gem's file list in `utils.gemspec`.
+- Add `changelog` configuration to `Rakefile` to recognize `CHANGES.md`.
+
 ## 2026-11-23 v0.103.1
 
 ### Improvements
